@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: pubg-insight-backend
+  profiles:
+    active: local
 
 logging:
   level:
