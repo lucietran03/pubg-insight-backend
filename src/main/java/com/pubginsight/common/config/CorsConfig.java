@@ -1,4 +1,4 @@
-package com.pubginsight.config;
+package com.pubginsight.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

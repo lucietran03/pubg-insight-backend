@@ -10,3 +10,9 @@ spring:
 logging:
   level:
     root: INFO
+
+pubg:
+  api:
+    base-url: https://api.pubg.com
+    key: ${PUBG_API_KEY:placeholder-api-key}
+    default-shard: ${PUBG_DEFAULT_SHARD:steam}
