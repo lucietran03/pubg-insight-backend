@@ -1,6 +1,7 @@
 package com.pubginsight.common.exception;
 
 import com.pubginsight.client.pubg.PubgApiException;
+import com.pubginsight.match.MatchNotFoundException;
 import com.pubginsight.player.PlayerNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(PlayerNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handlePlayerNotFound(PlayerNotFoundException e) {
+    @ExceptionHandler({PlayerNotFoundException.class, MatchNotFoundException.class})
+    public ResponseEntity<Map<String, String>> handleNotFound(RuntimeException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of("error", e.getMessage()));
     }

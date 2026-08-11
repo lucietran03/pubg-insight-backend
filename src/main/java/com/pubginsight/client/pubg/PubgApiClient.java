@@ -1,5 +1,6 @@
 package com.pubginsight.client.pubg;
 
+import com.pubginsight.client.pubg.dto.PubgMatchResponse;
 import com.pubginsight.client.pubg.dto.PubgPlayerListResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -35,6 +36,19 @@ public class PubgApiClient {
             return new PubgPlayerListResponse(List.of());
         } catch (HttpStatusCodeException e) {
             throw new PubgApiException("PUBG API request failed for player '" + playerName + "'", e);
+        }
+    }
+
+    public PubgMatchResponse findMatchById(String matchId) {
+        try {
+            return restClient.get()
+                    .uri("/shards/{shard}/matches/{matchId}", defaultShard, matchId)
+                    .retrieve()
+                    .body(PubgMatchResponse.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            return null;
+        } catch (HttpStatusCodeException e) {
+            throw new PubgApiException("PUBG API request failed for match '" + matchId + "'", e);
         }
     }
 }

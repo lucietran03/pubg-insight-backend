@@ -89,6 +89,10 @@ This is the exact, approved service set. It already maxes rubric criterion 3 (25
 
 If a task seems to need a new AWS service, stop and ask the user first — don't add it unilaterally.
 
+## AWS environment: Learner Lab, not a personal account
+
+Deployment target is an RMIT-provided AWS Academy Learner Lab (see `PROJECT_CONTEXT.md` → AWS Environment). This means: use the Lab's pre-provisioned role (`LabRole`/`LabInstanceProfile`) for service execution roles — never design around creating custom IAM roles/policies, Learner Lab doesn't allow it. Also expect compute to stop between sessions and need restarting; Elastic Beanstalk's stable URL means this doesn't require reconfiguration, just a restart.
+
 ## Automation is graded, manual setup is not
 
 The rubric only awards points for a service if it is "fully implemented and automated" and "automatically invoked by your client interface operations/code/other services **other than CLI/AWS Console**." A service that only works because someone clicked through the AWS Console once scores **zero** for that line, no matter how well it works in the demo.

@@ -166,6 +166,33 @@ PubgPlayerListResponse
                     └─ data: List<PubgResourceIdentifier>   (used by PlayerMapper to build recentMatchIds)
 ```
 
+## Match Analytics (`match/`)
+
+Uses a `recentMatchIds` entry already returned by Player Search — the frontend passes both the player's PUBG account id and a chosen match id.
+
+```
+MatchController.getMatchStats(playerId, matchId)   [GET /api/players/{playerId}/matches/{matchId}]
+  └─ calls MatchService.getMatchStatsForPlayer(matchId, playerId)
+        ├─ calls client.pubg.PubgApiClient.findMatchById(matchId)
+        │     ├─ calls PUBG Developer API  [GET /shards/{shard}/matches/{matchId}]
+        │     ├─ on success → returns client.pubg.dto.PubgMatchResponse (data + included[])
+        │     ├─ on 404 → returns null
+        │     └─ on other HTTP errors → throws client.pubg.PubgApiException
+        │
+        ├─ if the response is null → throws match.MatchNotFoundException
+        │
+        ├─ filters response.included() for type == "participant", finds the one whose
+        │     stats.playerId matches the requested playerId
+        │     └─ if none found → throws match.MatchNotFoundException
+        │           (both cases caught by common.exception.GlobalExceptionHandler → 404 JSON)
+        │
+        └─ calls MatchMapper.toMatchDto(matchId, PubgMatchAttributes, PubgParticipantStats)
+              └─ returns match.MatchDto (kills, headshotRate, damageDealt, timeSurvivedSeconds, winPlace)
+                    → MatchController → JSON response to frontend
+```
+
+PUBG's match response mixes several resource types in one flat `included` array (`roster`, `participant`, `asset`) — `PubgIncludedItem` models only the fields the `participant` type needs; other types' extra fields are ignored via `@JsonIgnoreProperties(ignoreUnknown = true)`.
+
 ## Cross-cutting (not part of the request chain above, applied globally)
 
 ```
@@ -239,6 +266,17 @@ Visualize
 - Headshot Trend
 
 using historical data.
+
+---
+
+# AWS Environment
+
+Deployment target is the **RMIT-provided AWS Academy Learner Lab**, not a personal AWS account — chosen deliberately to avoid real billing risk while cost per-service isn't yet known. This has practical implications for how the AWS integrations below must be built:
+
+- **IAM**: Learner Lab does not allow creating custom IAM roles/policies — use the pre-provisioned Lab role (commonly named `LabRole` / `LabInstanceProfile`) as the execution role for Lambda, Elastic Beanstalk, etc. Don't design anything that assumes we can create our own IAM roles.
+- **Region**: Learner Lab typically locks you to a single region (often `us-east-1`). Confirm the actual region once logged in and use it consistently for every service — TODO: fill in once confirmed.
+- **Sessions time out**: compute resources can stop when a Lab session ends and need restarting before use (e.g. before a demo). Elastic Beanstalk mitigates the worst of this — its environment gets a stable URL (`*.elasticbeanstalk.com`) that survives the underlying EC2 instance restarting or getting a new IP between sessions, so we don't need to reconfigure anything, just restart the environment if it was stopped.
+- Budget is capped by the Lab itself, so cost overruns aren't a real risk here — but avoid leaving expensive resources (e.g. Athena queries over large scans) running unnecessarily anyway, as good practice.
 
 ---
 
