@@ -416,8 +416,9 @@ Actually done
 - **Feature 1 (Player Search)** — verified working end-to-end with real PUBG data.
 - **Feature 2 (Match Analytics)**, including **Win Rate (Season Stats)** — built, unit + integration tested, verified live via a real screenshot (player "TGLTN", 65 matches, real stats displayed). A real production bug (React duplicate-key warning) and a real backend bug (PUBG 429 mismapped to 502) were both found via live testing and fixed.
 - **Feature 3 (AI Insights / Gemini)** — code complete (client, DTOs, `insight/` feature composing Player+Match, prompt built from aggregated metrics only, tolerant response parsing), unit + integration tested. Not yet run against a real Gemini key.
-- **Feature 4 (Analysis History)** — DynamoDB integration code complete (`client/dynamodb`, `history/` feature), unit + integration tested. **Not deployed or run against real AWS** — no table exists yet, and the code couldn't even be compiled in the environment it was written in (no network access). Treat as "ready to test," not "verified."
-- S3 match-data caching (supports Feature 2 and reduces PUBG API load) — code complete (`client/s3`, wired into `MatchService` as a cache-aside layer with soft-fail on any cache error). Same caveat: not deployed, not compiled yet.
+- **Feature 4 (Analysis History)** — DynamoDB integration code complete (`client/dynamodb`, `history/` feature), unit + integration tested, **compile confirmed** by a real `mvn test` run. **Not deployed or run against real AWS** — no table exists yet. Treat as "compiles, ready to test," not "verified against AWS."
+- S3 match-data caching (supports Feature 2 and reduces PUBG API load) — code complete (`client/s3`, wired into `MatchService` as a cache-aside layer with soft-fail on any cache error), **compile confirmed**. Same caveat: not deployed against real AWS yet.
+- **First real `mvn compile`/`mvn test` run completed** — compile succeeded across the entire codebase (including all AWS code written without any prior ability to compile it). One real bug found and fixed: `MatchService` assumed Spring would auto-configure a classic Jackson `ObjectMapper` bean, but this Spring Boot version configures a different (Jackson 3) mapper type instead, so no such bean existed — this broke 8 tests (every test building a real `MatchService`). Fixed by having `MatchService` construct its own `ObjectMapper` directly. See `docs/ARCHITECTURE.md` §8 for detail — this is a real environment fact future Jackson-using code needs to know about.
 - Frontend: full UI for Features 1-3, PUBG-branded MUI theme, redesigned per an explicit design brief (wider layout, sectioned cards, rich match previews, reduced border radius) — see `docs/ARCHITECTURE.md` design decisions.
 - Local baseline QA: error handling for PUBG/Gemini outages, timeouts, and rate limits (429 preserved distinctly from 502/500), server-side failure logging, frontend error-message differentiation by failure type, `check.sh` (compile+test) and `api-test.sh` (live HTTP smoke test, now prints real status/body per call after a real bug in its own id-extraction regex was found and fixed).
 - Real PUBG API call volume per search reduced from 8 to ~5 (cached season id, fewer auto-loaded match previews) after live testing hit the 10 req/min free-tier limit after 1-2 searches.
@@ -429,11 +430,11 @@ Not yet done
 - **Feature 5 (Analytics Dashboard)** — no code yet; needs Athena set up and historical data to actually exist first.
 - Elastic Beanstalk, API Gateway, Lambda, Athena — no code at all; DynamoDB/S3 have code (see above) but none of the six approved AWS services have been deployed or tested against a real AWS account yet. All of this needs the user's own Learner Lab login (region confirmation, table/bucket creation, deployment).
 - Frontend routing — still a single page; will matter once History/Dashboard need separate views.
-- Running `mvn compile`/`mvn test` for the first time with real network access — this project's development environment never had network access to Maven Central, so no backend code (not just the new AWS code) has been compiler-verified yet, only reviewed by inspection.
+- Re-running `mvn test` to confirm the ObjectMapper fix actually resolves all 8 previously-failing tests (fixed by inspection, not yet re-verified by another real run).
 
 Next milestone
 
-- User: confirm Learner Lab region, create the DynamoDB table and S3 bucket, run `mvn compile`/`mvn test` for the first real compilation check, then deploy to Elastic Beanstalk.
+- User: re-run `mvn test` to confirm the ObjectMapper fix, then confirm Learner Lab region, create the DynamoDB table and S3 bucket, then deploy to Elastic Beanstalk.
 
 ---
 

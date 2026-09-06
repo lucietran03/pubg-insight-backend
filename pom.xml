@@ -44,6 +44,11 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+        <!-- Explicit classic Jackson 2 (com.fasterxml.jackson.*) dependencies: this Spring
+             Boot version auto-configures a Jackson 3 (tools.jackson.*) mapper bean by
+             default instead, so com.fasterxml.jackson.databind.ObjectMapper isn't on the
+             classpath otherwise. MatchService builds its own ObjectMapper instance
+             directly (not Spring-injected) because of this - see the comment there. -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

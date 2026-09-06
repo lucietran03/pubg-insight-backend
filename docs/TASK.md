@@ -32,28 +32,30 @@ Everything that doesn't need live AWS access is now done. The remaining work is 
 - **Feature 1 (Player Search)** — verified working end-to-end with real PUBG data.
 - **Feature 2 (Match Analytics)** + **Win Rate (Season Stats)** — verified live via screenshot (player "TGLTN", 65 matches). Two real bugs found via live use and fixed: a React duplicate-key warning (two sibling components keyed with the same value), and PUBG's 429 rate-limit response being mismapped to a generic 502.
 - **Feature 3 (AI Insights / Gemini)** — code complete, unit + integration tested. Not yet run against a real Gemini key.
-- **Feature 4 (Analysis History)** — DynamoDB code complete (`client/dynamodb`, `history/`), unit + integration tested. Not compiled (no network in the dev environment) or deployed.
-- **S3 match-data cache** — code complete (`client/s3`, cache-aside in `MatchService`, soft-fails on any cache error so a broken cache never breaks Match Analytics). Not compiled or deployed.
+- **Feature 4 (Analysis History)** — DynamoDB code complete (`client/dynamodb`, `history/`), unit + integration tested, **compile confirmed by a real `mvn test` run**. Not deployed against real AWS.
+- **S3 match-data cache** — code complete (`client/s3`, cache-aside in `MatchService`, soft-fails on any cache error so a broken cache never breaks Match Analytics), **compile confirmed**. Not deployed against real AWS.
+- **First real `mvn test` run** — compile succeeded across the whole codebase (including all AWS code, written blind with no prior ability to compile). One real bug found: `MatchService` expected Spring to auto-configure a classic Jackson `ObjectMapper` bean; this Spring Boot version configures a different (Jackson 3) mapper type instead, so context startup failed, breaking 8 tests. Fixed by having `MatchService` build its own `ObjectMapper` directly instead of relying on Spring DI for it.
+- 10 candidate demo players identified, updated to ones confirmed to have match data within the last 2 weeks (`src/main/resources/playername.txt`): TGLTN, hwinn, Seoul_, Leab1anc_-, DouYin-_-01, pushiket, Superdduo, Bay-j, 2cut, ixxxsH.
 - PUBG API call volume reduced from 8 to ~5 calls per player search (cached `findCurrentSeasonId()`, reduced match-preview prefetch count) after live testing hit the 10 req/min rate limit after 1-2 searches.
 - Frontend UI redesigned per an explicit design brief: wider layout, sectioned cards (Player Overview / Season Performance / Recent Matches), rich match previews for the most recent few matches, reduced border radius, API-status indicator.
 - `api-test.sh` had its own real bug fixed (JSON id-extraction regex silently failed on spaced JSON, causing checks to be skipped while still reporting "0 failed") — now prints real status/body per call and surfaces skips as warnings.
-- `docs/ARCHITECTURE.md`: system context, component view, 6 sequence diagrams (Player Search, Match Analytics, Season Stats, AI Insights, S3 caching, DynamoDB history), data mapping, error flow, 13 design decisions, planned AWS architecture with a concrete "what's needed to turn it on" checklist.
+- `docs/ARCHITECTURE.md`: system context, component view, 6 sequence diagrams (Player Search, Match Analytics, Season Stats, AI Insights, S3 caching, DynamoDB history), data mapping, error flow, 13 design decisions, planned AWS architecture with a concrete "what's needed to turn it on" checklist, plus the Jackson/ObjectMapper environment gotcha for future code.
 - `docs/SOLUTION_ARCHITECTURE_DOCUMENT.md` and `docs/PROJECT_REPORT.md` drafted.
-- Demo dataset: user has identified ~10 candidate active players (starting from "TGLTN").
+- Repo cleanup: removed dead scaffolding (empty index files, unused assets), synced stale frontend docs with backend's maintained copies, restored `CLAUDE.md` in both repos to real ongoing instructions (had drifted into completed one-off task tickets).
 - Decided to deploy via the RMIT-provided AWS Academy Learner Lab, not a personal AWS account.
 
 ---
 
 ## In Progress
 
-Nothing on the non-AWS track — see Next.
+Re-verifying the ObjectMapper fix with another `mvn test` run — fixed by inspection, not yet re-confirmed by a second real run.
 
 ---
 
 ## Next (all user-owned — needs Learner Lab access)
 
-1. Confirm the Learner Lab's actual region (fill in the TODO in `PROJECT_CONTEXT.md`).
-2. Run `mvn compile` / `mvn test` for the first time with real network access — this is the first real compilation check for the DynamoDB/S3 code (and honestly for a lot of the rest of the backend, given this project's dev environment never had network access).
+1. Re-run `mvn test` to confirm the ObjectMapper fix resolves all 8 previously-failing tests.
+2. Confirm the Learner Lab's actual region (fill in the TODO in `PROJECT_CONTEXT.md`).
 3. Create the DynamoDB table (`pubg-insight-analysis-history` by default, partition key `playerId`, sort key `matchId`) and S3 bucket (`pubg-insight-match-cache` by default) — one-time Console setup, allowed under the rubric.
 4. Verify DynamoDB/S3 actually work against real AWS (search a player, view a match, save analysis history, confirm a second lookup of the same match is a cache hit).
 5. Deploy to Elastic Beanstalk, wire up API Gateway + Lambda, set up Athena — all still fully unbuilt.

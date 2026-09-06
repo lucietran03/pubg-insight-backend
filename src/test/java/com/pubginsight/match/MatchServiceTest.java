@@ -42,11 +42,13 @@ class MatchServiceTest {
     @Mock
     private S3MatchCacheClient s3MatchCacheClient;
 
-    @Mock
-    private ObjectMapper objectMapper;
-
     @InjectMocks
     private MatchService matchService;
+
+    // MatchService builds its own ObjectMapper internally (not Spring-injected - see the
+    // comment on that field for why), so this instance exists only to produce realistic
+    // cached JSON strings for the cache-hit test below, not to be wired into the service.
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void throwsMatchNotFoundWhenMatchDoesNotExist() {
@@ -59,12 +61,7 @@ class MatchServiceTest {
 
     @Test
     void throwsMatchNotFoundWhenPlayerDidNotParticipate() {
-        PubgMatchData matchData = new PubgMatchData("match", "match-1",
-                new PubgMatchAttributes(null, 1800, "squad", "Erangel", "official"));
-        PubgIncludedItem otherPlayerParticipant = new PubgIncludedItem("participant", "p-2",
-                new PubgParticipantAttributes(new PubgParticipantStats(
-                        "account.other", "someoneElse", 1, 0, 100.0, 500.0, 10, 10, 0)));
-        PubgMatchResponse response = new PubgMatchResponse(matchData, List.of(otherPlayerParticipant));
+        PubgMatchResponse response = matchResponseFor("account.other");
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1")).thenReturn(Optional.empty());
         when(pubgApiClient.findMatchById("match-1")).thenReturn(response);
@@ -77,10 +74,9 @@ class MatchServiceTest {
     void cacheHitSkipsPubgCallAndReturnsMappedDto() throws Exception {
         PubgMatchResponse response = matchResponseFor("account.1");
         MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1);
-        String cachedJson = "{\"cached\":true}";
+        String cachedJson = objectMapper.writeValueAsString(response);
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1")).thenReturn(Optional.of(cachedJson));
-        when(objectMapper.readValue(cachedJson, PubgMatchResponse.class)).thenReturn(response);
         when(matchMapper.toMatchDto(eq("match-1"), any(), any())).thenReturn(expectedDto);
 
         MatchDto actual = matchService.getMatchStatsForPlayer("match-1", "account.1");
@@ -92,21 +88,21 @@ class MatchServiceTest {
     }
 
     @Test
-    void cacheMissCallsPubgAndCachesTheResult() throws Exception {
+    void cacheMissCallsPubgAndCachesTheResult() {
         PubgMatchResponse response = matchResponseFor("account.1");
         MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1);
-        String serializedJson = "{\"serialized\":true}";
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1")).thenReturn(Optional.empty());
         when(pubgApiClient.findMatchById("match-1")).thenReturn(response);
-        when(objectMapper.writeValueAsString(response)).thenReturn(serializedJson);
         when(matchMapper.toMatchDto(eq("match-1"), any(), any())).thenReturn(expectedDto);
 
         MatchDto actual = matchService.getMatchStatsForPlayer("match-1", "account.1");
 
         assertThat(actual).isEqualTo(expectedDto);
         verify(pubgApiClient, times(1)).findMatchById("match-1");
-        verify(s3MatchCacheClient, times(1)).cacheMatchJson("match-1", serializedJson);
+        // Don't assert the exact JSON string - that's MatchService's own ObjectMapper's
+        // business, not this test's - just confirm the cache-miss path writes something back.
+        verify(s3MatchCacheClient, times(1)).cacheMatchJson(eq("match-1"), anyString());
     }
 
     @Test
@@ -126,13 +122,12 @@ class MatchServiceTest {
     }
 
     @Test
-    void fallsThroughSilentlyWhenCacheWriteFails() throws Exception {
+    void fallsThroughSilentlyWhenCacheWriteFails() {
         PubgMatchResponse response = matchResponseFor("account.1");
         MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1);
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1")).thenReturn(Optional.empty());
         when(pubgApiClient.findMatchById("match-1")).thenReturn(response);
-        when(objectMapper.writeValueAsString(response)).thenReturn("{}");
         doThrow(new S3CacheException("bucket not reachable", new RuntimeException("boom")))
                 .when(s3MatchCacheClient).cacheMatchJson(anyString(), anyString());
         when(matchMapper.toMatchDto(eq("match-1"), any(), any())).thenReturn(expectedDto);

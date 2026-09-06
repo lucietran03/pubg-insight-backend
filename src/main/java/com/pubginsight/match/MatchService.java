@@ -24,14 +24,18 @@ public class MatchService {
     private final PubgApiClient pubgApiClient;
     private final MatchMapper matchMapper;
     private final S3MatchCacheClient s3MatchCacheClient;
-    private final ObjectMapper objectMapper;
+    // Built directly rather than injected: this Spring Boot version auto-configures a
+    // Jackson 3 (tools.jackson.databind.json.JsonMapper) bean by default, not a
+    // com.fasterxml.jackson.databind.ObjectMapper one, so there is no Spring-managed bean
+    // of this exact type to inject. A private, unmanaged instance is enough - none of our
+    // DTOs need any custom module (dates, etc.), so the default configuration is fine.
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public MatchService(PubgApiClient pubgApiClient, MatchMapper matchMapper,
-                         S3MatchCacheClient s3MatchCacheClient, ObjectMapper objectMapper) {
+                         S3MatchCacheClient s3MatchCacheClient) {
         this.pubgApiClient = pubgApiClient;
         this.matchMapper = matchMapper;
         this.s3MatchCacheClient = s3MatchCacheClient;
-        this.objectMapper = objectMapper;
     }
 
     public MatchDto getMatchStatsForPlayer(String matchId, String playerId) {
