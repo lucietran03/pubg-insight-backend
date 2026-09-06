@@ -2,9 +2,14 @@ package com.pubginsight.client.pubg;
 
 import com.pubginsight.client.pubg.dto.PubgMatchResponse;
 import com.pubginsight.client.pubg.dto.PubgPlayerListResponse;
+import com.pubginsight.client.pubg.dto.PubgSeasonData;
+import com.pubginsight.client.pubg.dto.PubgSeasonListResponse;
+import com.pubginsight.client.pubg.dto.PubgSeasonStatsResponse;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -13,13 +18,20 @@ import java.util.List;
 public class PubgApiClient {
 
     private static final String PUBG_JSON_API_MEDIA_TYPE = "application/vnd.api+json";
+    private static final int CONNECT_TIMEOUT_MILLIS = 3000;
+    private static final int READ_TIMEOUT_MILLIS = 5000;
 
     private final RestClient restClient;
     private final String defaultShard;
 
     public PubgApiClient(PubgApiProperties properties) {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
+        requestFactory.setReadTimeout(READ_TIMEOUT_MILLIS);
+
         this.restClient = RestClient.builder()
                 .baseUrl(properties.baseUrl())
+                .requestFactory(requestFactory)
                 .defaultHeader("Authorization", "Bearer " + properties.key())
                 .defaultHeader("Accept", PUBG_JSON_API_MEDIA_TYPE)
                 .build();
@@ -34,7 +46,7 @@ public class PubgApiClient {
                     .body(PubgPlayerListResponse.class);
         } catch (HttpClientErrorException.NotFound e) {
             return new PubgPlayerListResponse(List.of());
-        } catch (HttpStatusCodeException e) {
+        } catch (HttpStatusCodeException | ResourceAccessException e) {
             throw new PubgApiException("PUBG API request failed for player '" + playerName + "'", e);
         }
     }
@@ -47,8 +59,38 @@ public class PubgApiClient {
                     .body(PubgMatchResponse.class);
         } catch (HttpClientErrorException.NotFound e) {
             return null;
-        } catch (HttpStatusCodeException e) {
+        } catch (HttpStatusCodeException | ResourceAccessException e) {
             throw new PubgApiException("PUBG API request failed for match '" + matchId + "'", e);
+        }
+    }
+
+    public String findCurrentSeasonId() {
+        try {
+            PubgSeasonListResponse response = restClient.get()
+                    .uri("/shards/{shard}/seasons", defaultShard)
+                    .retrieve()
+                    .body(PubgSeasonListResponse.class);
+
+            return response.data().stream()
+                    .filter(season -> Boolean.TRUE.equals(season.attributes().isCurrentSeason()))
+                    .map(PubgSeasonData::id)
+                    .findFirst()
+                    .orElseThrow(() -> new PubgApiException("No current PUBG season found", null));
+        } catch (HttpStatusCodeException | ResourceAccessException e) {
+            throw new PubgApiException("PUBG API request failed for seasons list", e);
+        }
+    }
+
+    public PubgSeasonStatsResponse findSeasonStats(String accountId, String seasonId) {
+        try {
+            return restClient.get()
+                    .uri("/shards/{shard}/players/{accountId}/seasons/{seasonId}", defaultShard, accountId, seasonId)
+                    .retrieve()
+                    .body(PubgSeasonStatsResponse.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            return null;
+        } catch (HttpStatusCodeException | ResourceAccessException e) {
+            throw new PubgApiException("PUBG API request failed for season stats of '" + accountId + "'", e);
         }
     }
 }

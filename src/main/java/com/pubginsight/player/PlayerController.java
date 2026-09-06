@@ -19,4 +19,9 @@ public class PlayerController {
     public PlayerDto getPlayerByName(@PathVariable String name) {
         return playerService.searchPlayerByName(name);
     }
+
+    @GetMapping("/{playerId}/season-stats")
+    public SeasonStatsDto getSeasonStats(@PathVariable String playerId) {
+        return playerService.getSeasonStats(playerId);
+    }
 }

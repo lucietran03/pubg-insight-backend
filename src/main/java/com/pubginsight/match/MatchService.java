@@ -23,7 +23,7 @@ public class MatchService {
     public MatchDto getMatchStatsForPlayer(String matchId, String playerId) {
         PubgMatchResponse response = pubgApiClient.findMatchById(matchId);
 
-        if (response == null) {
+        if (response == null || response.included() == null) {
             throw new MatchNotFoundException("Match '" + matchId + "' not found");
         }
 
