@@ -1,18 +1,18 @@
 # Roadmap (Weeks 7–12)
 
-High-level plan mapping the approved architecture (see `PROJECT_CONTEXT.md`) to the assignment timeline. Demo evaluation happens in Weeks 10–12, so everything AWS-related should be working well before Week 10.
+High-level plan mapping the approved architecture (see `PROJECT_CONTEXT.md`) to the assignment timeline. Real deadline per `docs/WBS.md`/`docs/Calendar.md`: Canvas submission 12-Sep, demo target 17/18-Sep.
 
 | Weeks | Focus |
 |---|---|
-| 7 | ~~Fix backend bootstrap + real health check~~ — done (`ab4b85f`) |
+| 7 | ~~Fix backend bootstrap + real health check~~ — done |
 | 7–8 | ~~PUBG API client, DTOs, Service layer (Player Search)~~ — done, verified end-to-end |
-| 8–9 | Match API (Feature 2: Match Analytics) built, not yet verified running (**current**) |
-| 9 | DynamoDB (analysis history) + S3 (caching) |
-| 10 | Gemini AI Insights integration |
-| 10–11 | Athena analytics dashboard + Elastic Beanstalk deployment (AWS Academy Learner Lab — see `PROJECT_CONTEXT.md` → AWS Environment) |
-| 11–12 | Solution Architecture Document + Project Report writeup, demo prep |
+| 8–9 | ~~Match API (Feature 2: Match Analytics) + Win Rate~~ — done, verified end-to-end |
+| 9 | ~~Gemini AI Insights (Feature 3)~~ — done, code complete, not yet live-run |
+| current | Solution Architecture Document / Project Report prose, then DynamoDB + S3 code (see below) |
+| next | AWS setup (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena) — needs Learner Lab access, owned by the user |
+| final | Solution Architecture Document + Project Report writeup, demo prep |
 
-Documentation deliverables (Solution Architecture Document, Project Report) are tracked here like any other task — they're worth 11.5/40 rubric points and should be drafted incrementally as each component is built, not written from scratch in Week 12.
+Documentation deliverables (Solution Architecture Document, Project Report) are tracked here like any other task — they're worth 11.5/40 rubric points and should be drafted incrementally as each component is built, not written from scratch at the end.
 
 ---
 
@@ -20,36 +20,39 @@ Documentation deliverables (Solution Architecture Document, Project Report) are 
 
 ## Current Goal
 
-Verify Feature 2 (Match Analytics) actually works end-to-end, the same way Player Search was verified — code review isn't enough, it needs a real run.
+Finish everything that doesn't require live AWS access (docs prose, DynamoDB/S3 code prepared-but-untested), while AWS account-level setup is a separate, user-owned track.
 
 ---
 
 ## Completed (verified against source, not commit messages)
 
-- Backend: `@SpringBootApplication` main class, real `HealthController` (`GET /health`), `CorsConfig` for the Vite dev origin.
-- Feature-based package restructure (`player/`, `health/`, `common/`, `client/pubg/`) — see `CLAUDE.md`.
-- **Feature 1 (Player Search) verified working end-to-end**: real PUBG API key configured locally, `GET /api/players/{name}` returns id/name/shardId/recentMatchIds, confirmed via the running app.
-- Frontend: Player Search UI (form + result card) built and wired to the backend, PUBG-branded MUI theme applied.
-- Feature 2 (Match Analytics) **built but not yet run**: `PubgApiClient.findMatchById`, raw match DTOs (`client/pubg/dto`), `match/` feature package (MatchDto, MatchMapper, MatchService, MatchController, MatchNotFoundException), frontend `MatchList` component wired into `PlayerSearch` showing clickable recent-match chips → stats card.
-- Assignment proposal approved by instructor.
-- Decided to deploy via the RMIT-provided AWS Academy Learner Lab, not a personal AWS account — see `PROJECT_CONTEXT.md` → AWS Environment for the constraints this implies (Lab IAM role, region, session timeouts).
+- Backend: `@SpringBootApplication` main class, real `HealthController`, `CorsConfig` for the Vite dev origin.
+- Feature-based package restructure (`player/`, `match/`, `insight/`, `health/`, `common/`, `client/pubg/`, `client/gemini/`).
+- **Feature 1 (Player Search)** — verified working end-to-end with real PUBG data.
+- **Feature 2 (Match Analytics)** — built, tested (unit + integration), demoed live via screenshot (player "TGLTN", 65 matches).
+- **Win Rate (Season Stats)** — verified live via the same screenshot.
+- **Feature 3 (AI Insights / Gemini)** — code complete: `client/gemini` (client, DTOs, config), `insight/` feature package (service composes `player`+`match`, builds a metrics-only prompt, parses Gemini's response with a tolerant fallback), frontend `AiInsights` component wired into the match detail view. Unit + integration tests added. **Not yet run against a real Gemini key** — needs a live verification pass like Player Search got.
+- Local baseline QA pass: timeout/network-failure handling, server-side error logging, frontend error-message differentiation, null-safety fix, UI redesign (centered layout, stat tiles, hero win-rate number), unit + integration tests, `check.sh` + `api-test.sh`.
+- `docs/ARCHITECTURE.md`: system context, component view, sequence diagrams (Player Search, Match Analytics, Season Stats, AI Insights), data mapping, error flow, 11 design decisions, planned AWS architecture.
+- Demo dataset: user has identified ~10 candidate active players (starting from "TGLTN").
+- Decided to deploy via the RMIT-provided AWS Academy Learner Lab, not a personal AWS account.
 
 ---
 
 ## In Progress
 
-- Testing Feature 2 end-to-end: run the backend, search a player with non-empty `recentMatchIds`, click a match chip, confirm real stats come back.
+- Solution Architecture Document (Summary + Introduction) and Project Report (Related Work, System Descriptions, Dataset/API Description, References) — drafting prose from `ARCHITECTURE.md`'s existing technical content.
 
 ---
 
-## Next
+## Next (owner noted — most of what's left needs the user's AWS Learner Lab access)
 
-- Once Match Analytics is verified: Lambda-based processing + API Gateway exposure
-- DynamoDB (analysis history) + S3 (caching)
-- Confirm the Learner Lab's actual region and note it in `PROJECT_CONTEXT.md`
+- AI: prepare DynamoDB repository code (Analysis History) and S3 client code (match/report caching) — writable now, but can't be tested without real credentials/resources.
+- User: confirm Learner Lab region; create the actual DynamoDB table, S3 bucket, Athena setup; deploy to Elastic Beanstalk; wire up API Gateway + Lambda.
+- User: run `./check.sh` and `./api-test.sh` locally to get a final confirmed-clean local baseline (the one thing from the local QA pass that couldn't be verified in the AI's sandboxed environment).
 
 ---
 
 ## Blockers
 
-None.
+None on the non-AWS track. AWS track is blocked on the user's own Learner Lab session/credentials.

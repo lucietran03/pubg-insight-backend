@@ -1,5 +1,6 @@
 package com.pubginsight.common.exception;
 
+import com.pubginsight.client.gemini.GeminiApiException;
 import com.pubginsight.client.pubg.PubgApiException;
 import com.pubginsight.match.MatchNotFoundException;
 import com.pubginsight.player.PlayerNotFoundException;
@@ -28,5 +29,12 @@ public class GlobalExceptionHandler {
         log.error("PUBG API call failed: {}", e.getMessage(), e.getCause());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(Map.of("error", "Failed to reach PUBG API. Please try again later."));
+    }
+
+    @ExceptionHandler(GeminiApiException.class)
+    public ResponseEntity<Map<String, String>> handleGeminiApiException(GeminiApiException e) {
+        log.error("Gemini API call failed: {}", e.getMessage(), e.getCause());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", "Failed to generate AI insights. Please try again later."));
     }
 }

@@ -20,16 +20,15 @@ flowchart TB
     FE["React Frontend\n(pubg-insight-frontend)"]
     BE["Spring Boot Backend\n(pubg-insight-backend)"]
     PUBG[("PUBG Developer API\n(external)")]
-    Gemini[("Google Gemini API\n(external, not yet integrated)")]
+    Gemini[("Google Gemini API\n(external)")]
     AWS[("AWS\nElastic Beanstalk / API Gateway / Lambda\nDynamoDB / S3 / Athena\n(not yet integrated — see §7)")]
 
     User -->|HTTPS| FE
     FE -->|REST/JSON, axios| BE
     BE -->|REST, Bearer token| PUBG
-    BE -.->|planned| Gemini
+    BE -->|REST, API key| Gemini
     BE -.->|planned| AWS
 
-    style Gemini stroke-dasharray: 5 5
     style AWS stroke-dasharray: 5 5
 ```
 
@@ -45,7 +44,7 @@ The backend is organized **by feature, not by technical layer** (see `CLAUDE.md`
 flowchart TB
     subgraph client["client/ — external API integrations"]
         pubg["client.pubg\nPubgApiClient, PubgApiProperties,\nPubgApiException, dto/*"]
-        gemini["client.gemini\n(placeholder — Feature 3, not built)"]
+        gemini["client.gemini\nGeminiApiClient, GeminiApiProperties,\nGeminiApiException, dto/*"]
     end
 
     subgraph common["common/ — cross-cutting concerns"]
@@ -57,14 +56,21 @@ flowchart TB
         health["health\nHealthController"]
         player["player\nPlayerController, PlayerService,\nPlayerMapper, PlayerDto,\nSeasonStatsDto, PlayerNotFoundException"]
         match["match\nMatchController, MatchService,\nMatchMapper, MatchDto,\nMatchNotFoundException"]
+        insight["insight\nInsightController, InsightService,\nInsightDto"]
     end
 
     player --> pubg
     match --> pubg
+    insight --> player
+    insight --> match
+    insight --> gemini
     exc --> player
     exc --> match
     exc --> pubg
+    exc --> gemini
 ```
+
+`insight` is a higher-level feature that composes `player` and `match` (it calls their public `Service` classes directly, reusing the season-stats and match-stats orchestration already built) rather than duplicating that logic. This is different from the sibling `player`/`match` relationship — they don't depend on each other, but a feature that needs *both* of them is free to.
 
 Notable design point: `common.exception` depends on `player` and `match` (to catch their exceptions), but `player` and `match` never depend on each other, and neither depends on `common.exception`. This keeps features independent of one another — a change to `match/` cannot break `player/`.
 
@@ -232,6 +238,48 @@ sequenceDiagram
     end
 ```
 
+### 3.4 AI Insights (Gemini)
+
+Composes Match Analytics and Season Stats — Gemini receives only the already-aggregated numbers those two produce, never raw match telemetry (per `CLAUDE.md` → AI Integration Principles).
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant FE as AiInsights.tsx
+    participant SVC as insightService.ts
+    participant C as InsightController
+    participant IS as InsightService
+    participant PS as PlayerService
+    participant MS as MatchService
+    participant GCL as GeminiApiClient
+    participant Gemini as Gemini API
+
+    U->>FE: click "Generate AI Insights"
+    FE->>SVC: getInsights(playerId, matchId)
+    SVC->>C: GET /api/players/{playerId}/matches/{matchId}/insights
+    C->>IS: generateInsights(playerId, matchId)
+    IS->>PS: getSeasonStats(playerId)
+    PS-->>IS: SeasonStatsDto
+    IS->>MS: getMatchStatsForPlayer(matchId, playerId)
+    MS-->>IS: MatchDto
+    IS->>IS: buildPrompt(match, seasonStats)\n(only aggregated numbers — no telemetry)
+    IS->>GCL: generateText(prompt)
+    GCL->>Gemini: POST /v1beta/models/{model}:generateContent
+    alt Gemini unreachable / error
+        Gemini-->>GCL: error / timeout
+        GCL-->>IS: throw GeminiApiException
+        IS-->>C: propagates
+        C-->>FE: 502 {error}
+    else Gemini responds
+        Gemini-->>GCL: 200 {candidates[0].content.parts[0].text}
+        GCL-->>IS: raw text
+        IS->>IS: parseInsight(rawText)\nregex-match SUMMARY/STRENGTHS/WEAKNESSES/RECOMMENDATIONS\n(falls back to raw text as summary if format not followed)
+        IS-->>C: InsightDto
+        C-->>FE: 200 JSON
+        FE-->>U: renders summary + chip lists
+    end
+```
+
 ---
 
 ## 4. Data Mapping (PUBG raw JSON:API → internal DTOs)
@@ -396,6 +444,12 @@ Context: assignment requires real AWS usage but a personal account carries unpre
 
 **D9 — Frontend error messages are classified by HTTP response shape, not left generic.**
 Context: QA audit found `PlayerSearch`/`MatchList`/`SeasonStats` all showed one generic message regardless of whether the real cause was "not found," "PUBG down," or "backend unreachable" — actively misleading for the second and third cases. Rationale: a small shared `getErrorMessage(err, notFoundMessage)` util branches on `err.response?.status` so a real backend outage no longer looks identical to "that player doesn't exist."
+
+**D10 — `insight` composes `player` and `match` rather than re-fetching PUBG data itself.**
+Context: AI Insights needs both season context (win rate) and a specific match's stats — both already exist as `PlayerService`/`MatchService` methods. Rationale: calling those services directly reuses the exact same PUBG-fetching, mapping, and error-handling logic instead of duplicating it inside `InsightService`; `insight` depends on `player` and `match`, but neither of those depends back on `insight` or on each other (see D1's note that this is a different relationship from sibling-feature coupling). Trade-off: generating one insight now makes at minimum 4 PUBG calls (player search is separate; season list + season stats + match) plus 1 Gemini call — acceptable for an on-demand, user-triggered action, not something to call automatically per match.
+
+**D11 — Gemini's output is parsed with a tolerant fallback, not trusted to always follow the requested format.**
+Context: the prompt asks Gemini to respond in a fixed `SUMMARY:`/`STRENGTHS:`/`WEAKNESSES:`/`RECOMMENDATIONS:` format so the backend can parse it into structured fields — but an LLM's adherence to a requested format isn't guaranteed. Rationale: `InsightService.parseInsight` regex-matches each label; if `SUMMARY:` isn't found at all (format not followed), the whole raw response is returned as the summary with empty lists rather than throwing an error — a partially-useful degraded response beats a failed request for something inherently a little fuzzy.
 
 ---
 

@@ -405,27 +405,27 @@ Follow these principles.
 
 # Current Status
 
-Verified against the actual source code as of commit `ab4b85f` (backend) — updated after the earlier audit found the backend had no application code; that has since been fixed.
+Verified against actual source code, not commit messages or prior doc claims. See `docs/ARCHITECTURE.md` for full diagrams and design rationale, and `docs/TASK.md` for the live sprint/roadmap tracker.
 
 Actually done
 
-- Backend: real `@SpringBootApplication` main class (`PubgInsightBackendApplication`), a real `HealthController` serving `GET /health` → `{status: "UP", message: "Backend Connected"}`, and a `CorsConfig` allowing `http://localhost:5173` (the Vite dev origin). This lines up with what the frontend's `App.tsx` already expects (it reads `res.data.message`).
-- Backend package skeleton created for the intended layered architecture: `client/pubg`, `client/gemini`, `dto`, `exception`, `mapper`, `model`, `repository`, `service`, `util` — each currently holds only an empty `placeholder` class, i.e. the folders exist but contain no real logic yet.
-- Frontend: Vite/React project scaffolded with folders for `api/`, `routes/`, `services/`, `contexts/`, `types/`, `components/`, `hooks/`, `layouts/`, `pages/`, `utils/` — all still empty placeholders. `App.tsx` calls `GET /health`, which should now succeed against the updated backend. Dependencies for MUI, react-router-dom, and recharts are installed but unused.
-- Assignment proposal approved by instructor.
+- **Feature 1 (Player Search)** — verified working end-to-end with real PUBG data.
+- **Feature 2 (Match Analytics)**, including **Win Rate (Season Stats)** — built, unit + integration tested, verified live via a real screenshot (player "TGLTN", 65 matches, real stats displayed).
+- **Feature 3 (AI Insights / Gemini)** — code complete (client, DTOs, `insight/` feature composing Player+Match, prompt built from aggregated metrics only, tolerant response parsing), unit + integration tested. Not yet run against a real Gemini key.
+- Frontend: full UI for the above three features, PUBG-branded MUI theme, centered/stat-tile layout after a design pass.
+- Local baseline QA: error handling for PUBG/Gemini outages and timeouts, server-side failure logging, frontend error-message differentiation by failure type, `check.sh` (compile+test) and `api-test.sh` (live HTTP smoke test) scripts.
+- Assignment proposal approved by instructor. AWS deployment target decided: RMIT Learner Lab, not a personal account.
 
 Not yet done
 
-- PUBG API client/integration (package exists, empty)
-- Any AWS integration (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena)
-- Gemini integration (package exists, empty)
-- Frontend routing, pages, or components (folders exist, empty)
-
-Note: the backend's build could not be verified end-to-end in this environment (no network access to Maven Central to resolve `spring-boot-starter-parent`), but the source itself is correct on inspection — verify with `mvn spring-boot:run` locally before assuming it boots cleanly.
+- **Feature 4 (Analysis History)** and **Feature 5 (Analytics Dashboard)** — no code yet; depend on DynamoDB/S3/Athena being set up.
+- Any AWS integration at all (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena) — application code for DynamoDB/S3 can be written without live AWS access, but needs real credentials/resources to test; Elastic Beanstalk/API Gateway/Lambda/Athena additionally need account-level setup only the user can do (Learner Lab login).
+- Frontend routing — still a single page; not needed yet since there's only one screen's worth of content, will matter once History/Dashboard need separate views.
+- Solution Architecture Document / Project Report prose (content exists in `ARCHITECTURE.md`, needs to be written as submission-ready sections).
 
 Next milestone
 
-- Confirm the backend actually boots and the frontend can reach `/health` locally, then start PUBG API integration.
+- Finish everything that doesn't need live AWS access (doc prose, DynamoDB/S3 code), while AWS account setup proceeds as a separate, user-owned track.
 
 ---
 
