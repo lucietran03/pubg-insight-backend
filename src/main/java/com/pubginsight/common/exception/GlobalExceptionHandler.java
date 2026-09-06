@@ -2,6 +2,7 @@ package com.pubginsight.common.exception;
 
 import com.pubginsight.client.dynamodb.AnalysisHistoryException;
 import com.pubginsight.client.gemini.GeminiApiException;
+import com.pubginsight.client.gemini.GeminiRateLimitException;
 import com.pubginsight.client.pubg.PubgApiException;
 import com.pubginsight.client.pubg.PubgRateLimitException;
 import com.pubginsight.match.MatchNotFoundException;
@@ -49,6 +50,16 @@ public class GlobalExceptionHandler {
         log.error("Gemini API call failed: {}", e.getMessage(), e.getCause());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(Map.of("error", "Failed to generate AI insights. Please try again later."));
+    }
+
+    @ExceptionHandler(GeminiRateLimitException.class)
+    public ResponseEntity<Map<String, String>> handleGeminiRateLimit(GeminiRateLimitException e) {
+        log.warn("Gemini API rate limit reached (retryAfterSeconds={})", e.getRetryAfterSeconds());
+        ResponseEntity.BodyBuilder builder = ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS);
+        if (e.getRetryAfterSeconds() != null) {
+            builder.header(HttpHeaders.RETRY_AFTER, String.valueOf(e.getRetryAfterSeconds()));
+        }
+        return builder.body(Map.of("error", "AI Insights rate limit reached. Please try again later."));
     }
 
     // No handler for S3CacheException on purpose: MatchService catches and soft-fails it

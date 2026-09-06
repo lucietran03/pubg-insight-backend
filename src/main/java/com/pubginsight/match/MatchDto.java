@@ -9,6 +9,7 @@ public record MatchDto(
         double headshotRate,
         double damageDealt,
         double timeSurvivedSeconds,
-        int winPlace
+        int winPlace,
+        String createdAt
 ) {
 }

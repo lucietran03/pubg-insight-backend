@@ -51,4 +51,58 @@ class MatchMapperTest {
         assertThat(dto.timeSurvivedSeconds()).isZero();
         assertThat(dto.winPlace()).isZero();
     }
+
+    @Test
+    void translatesRawPubgMapCodeToDisplayName() {
+        PubgMatchAttributes matchAttributes = new PubgMatchAttributes(
+                "2026-09-06T10:00:00Z", 1800, "squad", "Baltic_Main", "official");
+        PubgParticipantStats stats = new PubgParticipantStats(
+                "account.1", "shroud", 4, 2, 520.0, 1200.0, 1, 1, 0
+        );
+
+        MatchDto dto = mapper.toMatchDto("match-1", matchAttributes, stats);
+
+        assertThat(dto.mapName()).isEqualTo("Erangel");
+    }
+
+    @Test
+    void translatesRawPubgGameModeCodeToDisplayLabel() {
+        PubgMatchAttributes matchAttributes = new PubgMatchAttributes(
+                "2026-09-06T10:00:00Z", 1800, "duo-fpp", "Desert_Main", "official");
+        PubgParticipantStats stats = new PubgParticipantStats(
+                "account.1", "shroud", 4, 2, 520.0, 1200.0, 1, 1, 0
+        );
+
+        MatchDto dto = mapper.toMatchDto("match-1", matchAttributes, stats);
+
+        assertThat(dto.mapName()).isEqualTo("Miramar");
+        assertThat(dto.gameMode()).isEqualTo("Duo FPP");
+    }
+
+    @Test
+    void fallsBackToRawValueForUnmappedMapOrGameModeCode() {
+        PubgMatchAttributes matchAttributes = new PubgMatchAttributes(
+                "2026-09-06T10:00:00Z", 1800, "some-future-mode", "Some_Future_Map", "official");
+        PubgParticipantStats stats = new PubgParticipantStats(
+                "account.1", "shroud", 4, 2, 520.0, 1200.0, 1, 1, 0
+        );
+
+        MatchDto dto = mapper.toMatchDto("match-1", matchAttributes, stats);
+
+        assertThat(dto.mapName()).isEqualTo("Some_Future_Map");
+        assertThat(dto.gameMode()).isEqualTo("some-future-mode");
+    }
+
+    @Test
+    void passesThroughCreatedAt() {
+        PubgMatchAttributes matchAttributes = new PubgMatchAttributes(
+                "2026-09-06T10:00:00Z", 1800, "squad", "Erangel", "official");
+        PubgParticipantStats stats = new PubgParticipantStats(
+                "account.1", "shroud", 4, 2, 520.0, 1200.0, 1, 1, 0
+        );
+
+        MatchDto dto = mapper.toMatchDto("match-1", matchAttributes, stats);
+
+        assertThat(dto.createdAt()).isEqualTo("2026-09-06T10:00:00Z");
+    }
 }

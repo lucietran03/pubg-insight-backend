@@ -35,7 +35,7 @@ class InsightServiceTest {
         when(playerService.getSeasonStats("account.1"))
                 .thenReturn(new SeasonStatsDto(29, 265, 0.109));
         when(matchService.getMatchStatsForPlayer("match-1", "account.1"))
-                .thenReturn(new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1));
+                .thenReturn(new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z"));
         when(geminiApiClient.generateText(anyString())).thenReturn("""
                 SUMMARY: Solid aggressive performance with a strong finish.
                 STRENGTHS: high headshot rate, good damage output
@@ -56,7 +56,7 @@ class InsightServiceTest {
         when(playerService.getSeasonStats("account.1"))
                 .thenReturn(new SeasonStatsDto(0, 0, 0.0));
         when(matchService.getMatchStatsForPlayer("match-1", "account.1"))
-                .thenReturn(new MatchDto("match-1", "Erangel", "squad", 0, 0, 0.0, 0.0, 0.0, 50));
+                .thenReturn(new MatchDto("match-1", "Erangel", "squad", 0, 0, 0.0, 0.0, 0.0, 50, "2026-09-06T00:00:00Z"));
         when(geminiApiClient.generateText(anyString())).thenReturn("Just a plain sentence with no labels.");
 
         InsightDto result = insightService.generateInsights("account.1", "match-1");

@@ -432,14 +432,16 @@ classDiagram
     class MatchDto {
       +String matchId
       +String mapName
+      +String gameMode
       +int kills
       +int headshotKills
       +double headshotRate
       +double damageDealt
       +double timeSurvivedSeconds
       +int winPlace
+      +String createdAt
     }
-    PubgParticipantStats ..> MatchDto : MatchMapper.toMatchDto()\n(computes headshotRate, null-coalesces to 0)
+    PubgParticipantStats ..> MatchDto : MatchMapper.toMatchDto()\n(computes headshotRate, null-coalesces to 0,\ntranslates raw mapName/gameMode codes to display labels,\npasses createdAt through unchanged)
 ```
 
 ```mermaid
@@ -494,13 +496,15 @@ flowchart TD
     K --> O["Frontend: getErrorMessage(err, notFoundMsg)"]
     N --> O
     O -->|status==404| P["show notFoundMsg"]
-    O -->|status is other 4xx/5xx| Q["show 'PUBG service unavailable'"]
+    O -->|status is other 4xx/5xx| Q["show error.response.data.error\n(the backend's own message)"]
     O -->|no response at all| R["show 'Could not reach server'"]
 ```
 
 Two things this diagram makes visible that weren't true until today's fixes:
 - The `ResourceAccessException` branch (network failure / timeout) didn't exist before — such failures used to escape uncaught into a generic Spring 500.
 - The `log.error(cause)` step didn't exist before — `PubgApiException`'s real cause used to be silently discarded, which is exactly what made an earlier real debugging session (an empty API key producing an opaque 502) take much longer than it should have.
+
+`GeminiApiException`/`GeminiRateLimitException` follow the exact same shape as the `PubgApiException`/`PubgRateLimitException` branches shown above (502 for a generic Gemini failure, 429 + `Retry-After` for Gemini's own rate limit), each with its own distinct message. The frontend step `O` used to hardcode `"PUBG service unavailable"` for *any* non-404/429 response — which meant a Gemini failure was shown to the user as a PUBG failure, since both happened to map to the same HTTP status. `getErrorMessage` now reads the backend's actual `error` message instead of guessing from the status code, so this is fixed for every current and future exception type without the frontend needing to know about each one individually.
 
 ---
 
@@ -547,6 +551,12 @@ Context: both are AWS dependencies that can fail (misconfigured credentials, mis
 **D13 — `HistoryService` re-derives data by calling `MatchService`/`InsightService` again, accepting one redundant PUBG call.**
 Context: recording history needs the same match stats and insight `InsightController`'s endpoints already computed moments earlier in the same user flow. Rationale: reusing the existing services' composition (same pattern as D10) avoids duplicating PUBG-fetching/parsing logic in a third place; the cost is that `InsightService.generateInsights` internally re-calls `MatchService.getMatchStatsForPlayer`, so one `POST .../history` costs an extra PUBG match lookup beyond what was already spent generating the insight the user reviewed before deciding to save it. Accepted because saving history is an explicit, infrequent user action (not a hot path), and because the S3 match cache (D12) means that redundant lookup is often a cache hit anyway, costing zero extra PUBG calls once a match has been looked up once.
 
+**D14 — `GeminiApiClient` gets its own rate-limit exception, mirroring `PubgApiClient`'s.**
+Context: Gemini's free tier rate-limits requests just like PUBG's does, but until now a Gemini 429 fell into the same generic 502 branch as every other Gemini failure, reading as a hard failure instead of "try again shortly." Rationale: `GeminiRateLimitException` copies `PubgRateLimitException`'s shape exactly (same `Retry-After` parsing helper, same 429 + header response) — a genuinely useful case, not an invented one, since the same production rate-limit issue already happened once on the PUBG side of this exact codebase (see the `findCurrentSeasonId()` caching note in §8).
+
+**D15 — Frontend surfaces the backend's own error message instead of re-deriving one from the HTTP status code.**
+Context: a real bug was found where a Gemini 403 (misconfigured API key) reached the user as "PUBG service is temporarily unavailable" — `GlobalExceptionHandler` already returned a correct, distinct message per exception type, but `errorMessage.ts` ignored the response body and hardcoded a status-based string instead. Rationale: fixing the frontend to read `error.response.data.error` makes every current and future backend exception type automatically distinguishable to the user, with the message defined in exactly one place (the exception handler) instead of two places that can drift out of sync.
+
 ---
 
 ## 7. Not Yet Built (Planned Architecture)
@@ -592,7 +602,8 @@ Carried over from the local-baseline QA audit; not blocking, but worth being awa
 
 - `PubgApiClient` now serves three resource types (player, match, season) in one class — fine at its current size, worth splitting if a fourth (e.g. telemetry) is added.
 - `findCurrentSeasonId()` is cached for the life of the app instance (no TTL/invalidation) — fixed after real usage showed a single player search cost 8 PUBG calls (1 player + 2 season-stats + 5 match previews), exhausting the 10 req/min free-tier limit after just 1-2 searches. Caching the season id removes 1 of those calls; a restart is needed to pick up an actual season change, which is an acceptable trade-off for a course project, not a production service.
-- Match preview count (`PREVIEW_COUNT` in `MatchList.tsx`) is capped at 3 for the same rate-limit reason — a real per-search budget of roughly 1 (player) + 1 (season stats) + 3 (previews) = 5 calls, leaving headroom for ~2 searches/minute within the limit.
+- Match preview count (`PREVIEW_COUNT` in `MatchList.tsx`) is capped at 3 for the same rate-limit reason — a real per-search budget of roughly 1 (player) + 1 (season stats) + 3 (previews) = 5 calls, leaving headroom for ~2 searches/minute within the limit. Matches beyond that count are shown as a click-to-reveal list rather than eagerly fetched or labeled by raw index — see D15's UI counterpart in the frontend `CLAUDE.md`.
+- **A misconfigured/empty `GEMINI_API_KEY` produces a Gemini 403 "unregistered callers" error, not an obvious "key missing" error.** `gemini.api.key` resolves through `${GEMINI_API_KEY:placeholder-api-key}` (`application.yml`) then `${GEMINI_API_KEY:}` (`application-local.yml`, empty default) — if the env var isn't actually set wherever the app runs, the key silently becomes an empty string, `GeminiApiClient` still sends the request as `?key=`, and Google's API responds with a 403 that looks like an auth/permissions problem rather than "you forgot to set a variable." Confirmed as the root cause of a real reported issue. Fix is either exporting `GEMINI_API_KEY` in the actual run environment, or putting the literal key directly in `application-local.yml` (gitignored) the same way `PUBG_API_KEY` already works there — this is a local config issue, not something the code can detect and fix for you (an empty string is a valid config value, not a distinguishable error state).
 - **This project's Spring Boot 4.1.0 auto-configures a Jackson 3 mapper bean (`tools.jackson.databind.json.JsonMapper`), not a classic Jackson 2 `com.fasterxml.jackson.databind.ObjectMapper` bean.** Discovered via the first real `mvn test` run: `MatchService` originally constructor-injected `ObjectMapper`, expecting Spring to auto-configure one — it doesn't, in this version, so context startup failed with `NoSuchBeanDefinitionException`, cascading into 8 failing tests (every test that builds a real `MatchService`, directly or transitively). Fixed by having `MatchService` construct its own `ObjectMapper` instance directly rather than relying on Spring DI for that specific type (`pom.xml` already declares the classic `jackson-databind`/`jackson-core`/`jackson-annotations` dependencies explicitly, so the class itself is on the classpath — there's just no Spring-managed bean of it). **If any future code needs JSON (de)serialization, do the same** — don't assume `@Autowired ObjectMapper` will resolve in this project.
 - First real `mvn compile`/`mvn test` run (see above) confirmed **compile succeeded across the entire codebase**, including all the DynamoDB/S3 code written without any ability to compile it beforehand — the AWS SDK v2 class/method names used were all correct. Only the one Jackson issue above caused test failures; nothing else did.
 - `README.md` in both repos is stale (backend's still describes the old layer-based package plan and lists Spring Boot 3; frontend's is still the default Vite template) — this document supersedes them for architecture purposes, but the READMEs should eventually be updated to at least point here.

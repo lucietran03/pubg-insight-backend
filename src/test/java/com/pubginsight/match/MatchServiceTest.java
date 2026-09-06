@@ -73,7 +73,7 @@ class MatchServiceTest {
     @Test
     void cacheHitSkipsPubgCallAndReturnsMappedDto() throws Exception {
         PubgMatchResponse response = matchResponseFor("account.1");
-        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1);
+        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z");
         String cachedJson = objectMapper.writeValueAsString(response);
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1")).thenReturn(Optional.of(cachedJson));
@@ -90,7 +90,7 @@ class MatchServiceTest {
     @Test
     void cacheMissCallsPubgAndCachesTheResult() {
         PubgMatchResponse response = matchResponseFor("account.1");
-        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1);
+        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z");
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1")).thenReturn(Optional.empty());
         when(pubgApiClient.findMatchById("match-1")).thenReturn(response);
@@ -108,7 +108,7 @@ class MatchServiceTest {
     @Test
     void fallsThroughToPubgWhenCacheReadFails() {
         PubgMatchResponse response = matchResponseFor("account.1");
-        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1);
+        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z");
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1"))
                 .thenThrow(new S3CacheException("bucket not reachable", new RuntimeException("boom")));
@@ -124,7 +124,7 @@ class MatchServiceTest {
     @Test
     void fallsThroughSilentlyWhenCacheWriteFails() {
         PubgMatchResponse response = matchResponseFor("account.1");
-        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1);
+        MatchDto expectedDto = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z");
 
         when(s3MatchCacheClient.getCachedMatchJson("match-1")).thenReturn(Optional.empty());
         when(pubgApiClient.findMatchById("match-1")).thenReturn(response);

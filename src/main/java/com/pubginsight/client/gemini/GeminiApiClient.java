@@ -4,9 +4,11 @@ import com.pubginsight.client.gemini.dto.GeminiContent;
 import com.pubginsight.client.gemini.dto.GeminiGenerateContentRequest;
 import com.pubginsight.client.gemini.dto.GeminiGenerateContentResponse;
 import com.pubginsight.client.gemini.dto.GeminiPart;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -54,8 +56,28 @@ public class GeminiApiClient {
                     .flatMap(candidate -> candidate.content().parts().stream().findFirst())
                     .map(GeminiPart::text)
                     .orElseThrow(() -> new GeminiApiException("Gemini returned no usable content", null));
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw toRateLimitException(e);
         } catch (HttpStatusCodeException | ResourceAccessException e) {
             throw new GeminiApiException("Gemini API request failed", e);
         }
+    }
+
+    // Gemini's Retry-After (when present) is the delay-seconds form, not an HTTP-date -
+    // parse defensively and simply omit it if it's not a plain integer.
+    private GeminiRateLimitException toRateLimitException(HttpClientErrorException.TooManyRequests e) {
+        HttpHeaders headers = e.getResponseHeaders();
+        String retryAfterHeader = headers != null ? headers.getFirst(HttpHeaders.RETRY_AFTER) : null;
+
+        Long retryAfterSeconds = null;
+        if (retryAfterHeader != null) {
+            try {
+                retryAfterSeconds = Long.parseLong(retryAfterHeader);
+            } catch (NumberFormatException ignored) {
+                // Not a delay-seconds value - leave retryAfterSeconds null rather than guessing.
+            }
+        }
+
+        return new GeminiRateLimitException(retryAfterSeconds);
     }
 }

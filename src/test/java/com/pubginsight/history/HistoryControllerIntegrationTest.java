@@ -52,7 +52,7 @@ class HistoryControllerIntegrationTest {
     @Test
     void recordAnalysisReturns200WithSavedDto() throws Exception {
         when(matchService.getMatchStatsForPlayer("match-1", "account.1"))
-                .thenReturn(new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1));
+                .thenReturn(new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z"));
         when(insightService.generateInsights("account.1", "match-1"))
                 .thenReturn(new InsightDto("Great match.", List.of("aim"), List.of("rotations"), List.of("play safer")));
 
