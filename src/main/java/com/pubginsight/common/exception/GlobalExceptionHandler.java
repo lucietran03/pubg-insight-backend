@@ -1,5 +1,6 @@
 package com.pubginsight.common.exception;
 
+import com.pubginsight.client.dynamodb.AnalysisHistoryException;
 import com.pubginsight.client.gemini.GeminiApiException;
 import com.pubginsight.client.pubg.PubgApiException;
 import com.pubginsight.client.pubg.PubgRateLimitException;
@@ -48,5 +49,17 @@ public class GlobalExceptionHandler {
         log.error("Gemini API call failed: {}", e.getMessage(), e.getCause());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(Map.of("error", "Failed to generate AI insights. Please try again later."));
+    }
+
+    // No handler for S3CacheException on purpose: MatchService catches and soft-fails it
+    // internally (a broken cache must never break the feature), so it should never reach
+    // here. Unlike the S3 cache, DynamoDB write/read failure in HistoryService IS a real
+    // feature failure (there's nothing to fall back to), so AnalysisHistoryException is
+    // handled explicitly below.
+    @ExceptionHandler(AnalysisHistoryException.class)
+    public ResponseEntity<Map<String, String>> handleAnalysisHistoryException(AnalysisHistoryException e) {
+        log.error("DynamoDB analysis history call failed: {}", e.getMessage(), e.getCause());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", "Failed to save or load analysis history. Please try again later."));
     }
 }

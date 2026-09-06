@@ -22,3 +22,10 @@ gemini:
     base-url: https://generativelanguage.googleapis.com
     key: ${GEMINI_API_KEY:placeholder-api-key}
     model: ${GEMINI_MODEL:gemini-2.5-flash}
+
+aws:
+  region: ${AWS_REGION:us-east-1}
+  dynamodb:
+    analysis-history-table: ${DYNAMODB_ANALYSIS_HISTORY_TABLE:pubg-insight-analysis-history}
+  s3:
+    cache-bucket: ${S3_CACHE_BUCKET:pubg-insight-match-cache}

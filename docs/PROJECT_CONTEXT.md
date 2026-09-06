@@ -414,22 +414,26 @@ Verified against actual source code, not commit messages or prior doc claims. Se
 Actually done
 
 - **Feature 1 (Player Search)** — verified working end-to-end with real PUBG data.
-- **Feature 2 (Match Analytics)**, including **Win Rate (Season Stats)** — built, unit + integration tested, verified live via a real screenshot (player "TGLTN", 65 matches, real stats displayed).
+- **Feature 2 (Match Analytics)**, including **Win Rate (Season Stats)** — built, unit + integration tested, verified live via a real screenshot (player "TGLTN", 65 matches, real stats displayed). A real production bug (React duplicate-key warning) and a real backend bug (PUBG 429 mismapped to 502) were both found via live testing and fixed.
 - **Feature 3 (AI Insights / Gemini)** — code complete (client, DTOs, `insight/` feature composing Player+Match, prompt built from aggregated metrics only, tolerant response parsing), unit + integration tested. Not yet run against a real Gemini key.
-- Frontend: full UI for the above three features, PUBG-branded MUI theme, centered/stat-tile layout after a design pass.
-- Local baseline QA: error handling for PUBG/Gemini outages and timeouts, server-side failure logging, frontend error-message differentiation by failure type, `check.sh` (compile+test) and `api-test.sh` (live HTTP smoke test) scripts.
+- **Feature 4 (Analysis History)** — DynamoDB integration code complete (`client/dynamodb`, `history/` feature), unit + integration tested. **Not deployed or run against real AWS** — no table exists yet, and the code couldn't even be compiled in the environment it was written in (no network access). Treat as "ready to test," not "verified."
+- S3 match-data caching (supports Feature 2 and reduces PUBG API load) — code complete (`client/s3`, wired into `MatchService` as a cache-aside layer with soft-fail on any cache error). Same caveat: not deployed, not compiled yet.
+- Frontend: full UI for Features 1-3, PUBG-branded MUI theme, redesigned per an explicit design brief (wider layout, sectioned cards, rich match previews, reduced border radius) — see `docs/ARCHITECTURE.md` design decisions.
+- Local baseline QA: error handling for PUBG/Gemini outages, timeouts, and rate limits (429 preserved distinctly from 502/500), server-side failure logging, frontend error-message differentiation by failure type, `check.sh` (compile+test) and `api-test.sh` (live HTTP smoke test, now prints real status/body per call after a real bug in its own id-extraction regex was found and fixed).
+- Real PUBG API call volume per search reduced from 8 to ~5 (cached season id, fewer auto-loaded match previews) after live testing hit the 10 req/min free-tier limit after 1-2 searches.
+- Solution Architecture Document and Project Report prose drafted (`docs/SOLUTION_ARCHITECTURE_DOCUMENT.md`, `docs/PROJECT_REPORT.md`).
 - Assignment proposal approved by instructor. AWS deployment target decided: RMIT Learner Lab, not a personal account.
 
 Not yet done
 
-- **Feature 4 (Analysis History)** and **Feature 5 (Analytics Dashboard)** — no code yet; depend on DynamoDB/S3/Athena being set up.
-- Any AWS integration at all (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena) — application code for DynamoDB/S3 can be written without live AWS access, but needs real credentials/resources to test; Elastic Beanstalk/API Gateway/Lambda/Athena additionally need account-level setup only the user can do (Learner Lab login).
-- Frontend routing — still a single page; not needed yet since there's only one screen's worth of content, will matter once History/Dashboard need separate views.
-- Solution Architecture Document / Project Report prose (content exists in `ARCHITECTURE.md`, needs to be written as submission-ready sections).
+- **Feature 5 (Analytics Dashboard)** — no code yet; needs Athena set up and historical data to actually exist first.
+- Elastic Beanstalk, API Gateway, Lambda, Athena — no code at all; DynamoDB/S3 have code (see above) but none of the six approved AWS services have been deployed or tested against a real AWS account yet. All of this needs the user's own Learner Lab login (region confirmation, table/bucket creation, deployment).
+- Frontend routing — still a single page; will matter once History/Dashboard need separate views.
+- Running `mvn compile`/`mvn test` for the first time with real network access — this project's development environment never had network access to Maven Central, so no backend code (not just the new AWS code) has been compiler-verified yet, only reviewed by inspection.
 
 Next milestone
 
-- Finish everything that doesn't need live AWS access (doc prose, DynamoDB/S3 code), while AWS account setup proceeds as a separate, user-owned track.
+- User: confirm Learner Lab region, create the DynamoDB table and S3 bucket, run `mvn compile`/`mvn test` for the first real compilation check, then deploy to Elastic Beanstalk.
 
 ---
 

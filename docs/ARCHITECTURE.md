@@ -21,14 +21,20 @@ flowchart TB
     BE["Spring Boot Backend\n(pubg-insight-backend)"]
     PUBG[("PUBG Developer API\n(external)")]
     Gemini[("Google Gemini API\n(external)")]
-    AWS[("AWS\nElastic Beanstalk / API Gateway / Lambda\nDynamoDB / S3 / Athena\n(not yet integrated — see §7)")]
+    S3[("Amazon S3\n(match cache — code exists,\nnot yet deployed/tested live)")]
+    DDB[("DynamoDB\n(analysis history — code exists,\nnot yet deployed/tested live)")]
+    AWS[("AWS: Elastic Beanstalk / API Gateway / Lambda / Athena\n(not yet integrated — see §7)")]
 
     User -->|HTTPS| FE
     FE -->|REST/JSON, axios| BE
     BE -->|REST, Bearer token| PUBG
     BE -->|REST, API key| Gemini
+    BE -.->|AWS SDK, cache-aside| S3
+    BE -.->|AWS SDK, put/query| DDB
     BE -.->|planned| AWS
 
+    style S3 stroke-dasharray: 5 5
+    style DDB stroke-dasharray: 5 5
     style AWS stroke-dasharray: 5 5
 ```
 
@@ -43,8 +49,10 @@ The backend is organized **by feature, not by technical layer** (see `CLAUDE.md`
 ```mermaid
 flowchart TB
     subgraph client["client/ — external API integrations"]
-        pubg["client.pubg\nPubgApiClient, PubgApiProperties,\nPubgApiException, dto/*"]
+        pubg["client.pubg\nPubgApiClient, PubgApiProperties,\nPubgApiException, PubgRateLimitException, dto/*"]
         gemini["client.gemini\nGeminiApiClient, GeminiApiProperties,\nGeminiApiException, dto/*"]
+        s3["client.s3\nS3MatchCacheClient, S3ClientConfig,\nAwsS3Properties, S3CacheException"]
+        ddb["client.dynamodb\nAnalysisHistoryItem, DynamoDbClientConfig,\nAwsDynamoDbProperties, AnalysisHistoryException"]
     end
 
     subgraph common["common/ — cross-cutting concerns"]
@@ -57,22 +65,34 @@ flowchart TB
         player["player\nPlayerController, PlayerService,\nPlayerMapper, PlayerDto,\nSeasonStatsDto, PlayerNotFoundException"]
         match["match\nMatchController, MatchService,\nMatchMapper, MatchDto,\nMatchNotFoundException"]
         insight["insight\nInsightController, InsightService,\nInsightDto"]
+        history["history\nHistoryController, HistoryService,\nAnalysisHistoryRepository, AnalysisHistoryMapper,\nAnalysisHistoryDto"]
     end
 
     player --> pubg
     match --> pubg
+    match --> s3
     insight --> player
     insight --> match
     insight --> gemini
+    history --> match
+    history --> insight
+    history --> ddb
     exc --> player
     exc --> match
     exc --> pubg
     exc --> gemini
+    exc --> ddb
+
+    style s3 stroke-dasharray: 5 5
+    style ddb stroke-dasharray: 5 5
+    style history stroke-dasharray: 5 5
 ```
 
-`insight` is a higher-level feature that composes `player` and `match` (it calls their public `Service` classes directly, reusing the season-stats and match-stats orchestration already built) rather than duplicating that logic. This is different from the sibling `player`/`match` relationship — they don't depend on each other, but a feature that needs *both* of them is free to.
+`insight` and `history` are higher-level features that compose other features (calling their public `Service` classes directly, reusing orchestration already built) rather than duplicating that logic — `insight` composes `player`+`match`; `history` composes `match`+`insight`. This is different from the sibling `player`/`match` relationship — they don't depend on each other, but a feature that needs others is free to depend on them.
 
-Notable design point: `common.exception` depends on `player` and `match` (to catch their exceptions), but `player` and `match` never depend on each other, and neither depends on `common.exception`. This keeps features independent of one another — a change to `match/` cannot break `player/`.
+Notable design point: `common.exception` depends on every feature/client whose exceptions it catches, but the feature packages never depend on each other in a cycle, and none of them depend back on `common.exception`. This keeps features independent of one another — a change to `match/` cannot break `player/`.
+
+`client.s3` and `client.dynamodb` (dashed above) have real code — see §7 — but have not been deployed or tested against real AWS yet; `match`'s dependency on `s3` and `history`'s dependency on `ddb` are both live in the codebase today, just unverified end-to-end.
 
 ### Frontend structure
 
@@ -280,6 +300,76 @@ sequenceDiagram
     end
 ```
 
+### 3.5 Match caching (S3) — not yet deployed, code only
+
+Modifies the Match Analytics flow (§3.2): a cache-aside check runs before calling PUBG, since a completed match's data is immutable and not player-specific — one cached object serves every player who looks up that match.
+
+```mermaid
+sequenceDiagram
+    participant S as MatchService
+    participant S3C as S3MatchCacheClient
+    participant S3 as Amazon S3
+    participant CL as PubgApiClient
+    participant PUBG as PUBG API
+
+    S->>S3C: getCachedMatchJson(matchId)
+    alt cache hit
+        S3C->>S3: GetObject matches/{matchId}.json
+        S3-->>S3C: JSON body
+        S3C-->>S: Optional.of(json)
+        S->>S: deserialize -> PubgMatchResponse\n(skip PUBG call entirely)
+    else cache miss (NoSuchKeyException)
+        S3C-->>S: Optional.empty()
+        S->>CL: findMatchById(matchId)
+        CL->>PUBG: GET /shards/{shard}/matches/{matchId}
+        PUBG-->>CL: PubgMatchResponse
+        CL-->>S: PubgMatchResponse
+        S->>S3C: cacheMatchJson(matchId, json)
+        S3C->>S3: PutObject matches/{matchId}.json
+    else cache infra failure (S3CacheException, read OR write)
+        S3C-->>S: throws S3CacheException
+        S->>S: log.warn(...), treat as cache miss\n(a broken cache must never break the feature)
+    end
+```
+
+### 3.6 Recording analysis history (DynamoDB) — not yet deployed, code only
+
+User-triggered (not automatic) — saves a computed match+insight result so it can be retrieved later, without needing to re-fetch from PUBG/Gemini.
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant C as HistoryController
+    participant HS as HistoryService
+    participant MS as MatchService
+    participant IS as InsightService
+    participant Map as AnalysisHistoryMapper
+    participant Repo as AnalysisHistoryRepository
+    participant DDB as DynamoDB
+
+    U->>C: POST /api/players/{playerId}/matches/{matchId}/history
+    C->>HS: recordAnalysis(playerId, matchId)
+    HS->>MS: getMatchStatsForPlayer(matchId, playerId)
+    MS-->>HS: MatchDto
+    HS->>IS: generateInsights(playerId, matchId)
+    Note over IS: re-derives the same match stats internally -\n1 redundant PUBG lookup, accepted since this is\nan on-demand action, not a hot path
+    IS-->>HS: InsightDto
+    HS->>Map: toItem(playerId, matchId, match, insight, now)
+    Map-->>HS: AnalysisHistoryItem
+    HS->>Repo: save(item)
+    Repo->>DDB: PutItem
+    alt DynamoDB failure
+        DDB-->>Repo: DynamoDbException / SdkException
+        Repo-->>HS: throws AnalysisHistoryException
+        HS-->>C: propagates
+        C-->>U: 502 {error} (unlike S3, a DynamoDB failure here has no fallback)
+    else success
+        Repo-->>HS: (void)
+        HS-->>C: AnalysisHistoryDto
+        C-->>U: 200 JSON
+    end
+```
+
 ---
 
 ## 4. Data Mapping (PUBG raw JSON:API → internal DTOs)
@@ -451,11 +541,20 @@ Context: AI Insights needs both season context (win rate) and a specific match's
 **D11 — Gemini's output is parsed with a tolerant fallback, not trusted to always follow the requested format.**
 Context: the prompt asks Gemini to respond in a fixed `SUMMARY:`/`STRENGTHS:`/`WEAKNESSES:`/`RECOMMENDATIONS:` format so the backend can parse it into structured fields — but an LLM's adherence to a requested format isn't guaranteed. Rationale: `InsightService.parseInsight` regex-matches each label; if `SUMMARY:` isn't found at all (format not followed), the whole raw response is returned as the summary with empty lists rather than throwing an error — a partially-useful degraded response beats a failed request for something inherently a little fuzzy.
 
+**D12 — S3 cache failures are soft-failed; DynamoDB history failures are not.**
+Context: both are AWS dependencies that can fail (misconfigured credentials, missing table/bucket, network issues), but they play different roles. Rationale: S3 is purely an optimization — if the cache is broken, `MatchService` can still get a correct answer by calling PUBG directly, so `S3CacheException` is caught and logged inside `MatchService` itself and never reaches `GlobalExceptionHandler` (see D2's precedent: a client only understands its own service's semantics; here, the *feature* also decides a cache outage means nothing to the caller). DynamoDB, by contrast, has no fallback for `HistoryService.recordAnalysis` — if the save fails, there's no "correct answer" to give the user besides an error, so `AnalysisHistoryException` propagates and gets a real 502 from `GlobalExceptionHandler`. Trade-off: this makes the two AWS integrations look inconsistent at first glance (one swallows errors, one doesn't) unless you read this rationale — worth explaining in the demo/report rather than leaving implicit.
+
+**D13 — `HistoryService` re-derives data by calling `MatchService`/`InsightService` again, accepting one redundant PUBG call.**
+Context: recording history needs the same match stats and insight `InsightController`'s endpoints already computed moments earlier in the same user flow. Rationale: reusing the existing services' composition (same pattern as D10) avoids duplicating PUBG-fetching/parsing logic in a third place; the cost is that `InsightService.generateInsights` internally re-calls `MatchService.getMatchStatsForPlayer`, so one `POST .../history` costs an extra PUBG match lookup beyond what was already spent generating the insight the user reviewed before deciding to save it. Accepted because saving history is an explicit, infrequent user action (not a hot path), and because the S3 match cache (D12) means that redundant lookup is often a cache hit anyway, costing zero extra PUBG calls once a match has been looked up once.
+
 ---
 
 ## 7. Not Yet Built (Planned Architecture)
 
-The following are part of the approved architecture (`PROJECT_CONTEXT.md`) but have no code yet. Included here so this document stays the single reference as they land.
+The following are part of the approved architecture (`PROJECT_CONTEXT.md`). Status per service, verified against actual code:
+
+- **DynamoDB (analysis history)** and **S3 (match cache)** — **application code exists** (`client.dynamodb`, `client.s3`, and the `history` feature package are wired into `MatchService`/a new `HistoryController`). None of it has been deployed or run against a real AWS account yet — no table or bucket exists, and the code was written without network access to even compile it in the environment it was written in. Treat it as "ready to test," not "verified working."
+- **Elastic Beanstalk, API Gateway, Lambda, Athena** — no code yet at all.
 
 ```mermaid
 flowchart LR
@@ -464,16 +563,26 @@ flowchart LR
     APIGW --> Lambda["Lambda\n(PUBG data retrieval/processing)"]
     Lambda --> PUBG[("PUBG API")]
     Lambda --> Gemini[("Gemini API")]
-    EB --> DDB[("DynamoDB\nanalysis history")]
-    EB --> S3[("S3\nmatch/report cache")]
+    EB --> DDB[("DynamoDB\nanalysis history\n(code exists)")]
+    EB --> S3[("S3\nmatch/report cache\n(code exists)")]
     S3 --> Athena[("Athena\nanalytics queries")]
-    Athena --> Dashboard["Analytics Dashboard\n(frontend)"]
+    Athena --> Dashboard["Analytics Dashboard\n(frontend, not built)"]
 
     style FE fill:#333,color:#fff
     style EB fill:#f2a900,color:#000
+    style DDB stroke-dasharray: 2 2
+    style S3 stroke-dasharray: 2 2
 ```
 
-All of the above must be triggered by application code — never a manual Console/CLI step — per the rubric's automation requirement (`CLAUDE.md` → Automation is graded, manual setup is not).
+All of the above must be triggered by application code — never a manual Console/CLI step — per the rubric's automation requirement (`CLAUDE.md` → Automation is graded, manual setup is not). The DynamoDB/S3 code already follows this: `HistoryController`/`MatchService` call the AWS SDK directly, with no manual Console step in the runtime path — only the one-time table/bucket creation (allowed) remains a human action.
+
+### What's needed to actually turn DynamoDB/S3 on
+
+1. Confirm the Learner Lab's region (`docs/PROJECT_CONTEXT.md` has a TODO placeholder) and set `AWS_REGION`.
+2. Create the DynamoDB table (name matches `DYNAMODB_ANALYSIS_HISTORY_TABLE`, default `pubg-insight-analysis-history`) with partition key `playerId` (String) and sort key `matchId` (String) — one-time Console setup, allowed under the rubric.
+3. Create the S3 bucket (name matches `S3_CACHE_BUCKET`, default `pubg-insight-match-cache`) — same, one-time setup.
+4. Ensure the runtime environment (local run, or eventually Elastic Beanstalk) can resolve AWS credentials — the code relies on the SDK's default credential provider chain (Learner Lab's `LabRole` when deployed; locally, whatever `~/.aws/credentials` or environment variables are configured).
+5. Run `mvn compile`/`mvn test` for the first time with real network access — neither agent that wrote this code could do so in this project's development environment; the AWS SDK v2 class/method names used are believed correct but unverified against the real dependency.
 
 ---
 
@@ -486,3 +595,6 @@ Carried over from the local-baseline QA audit; not blocking, but worth being awa
 - Match preview count (`PREVIEW_COUNT` in `MatchList.tsx`) is capped at 3 for the same rate-limit reason — a real per-search budget of roughly 1 (player) + 1 (season stats) + 3 (previews) = 5 calls, leaving headroom for ~2 searches/minute within the limit.
 - Backend unit tests exist for the mapper/service classes (see `src/test/java`) but could not be compiled/run in the environment they were written in — verify with `mvn test` before relying on them.
 - `README.md` in both repos is stale (backend's still describes the old layer-based package plan and lists Spring Boot 3; frontend's is still the default Vite template) — this document supersedes them for architecture purposes, but the READMEs should eventually be updated to at least point here.
+- The `client/dynamodb` and `client/s3` code (AWS SDK v2 class/method names, the `dynamodb-enhanced` annotation package paths, `getObjectAsBytes`, etc.) was written entirely from memory with **zero ability to compile it** in this project's development environment (no network access to resolve Maven dependencies at all, let alone run against real AWS) — run `mvn compile` as the very first check before anything else once real network access is available, before assuming any of it is correct.
+- `S3ClientConfig` and `DynamoDbClientConfig` each independently read `@Value("${aws.region}")` — harmless duplication (written by two separate, independently-run agents that didn't see each other's code) rather than a shared `AwsProperties` record. Worth consolidating if a third AWS service config is added, not urgent at two.
+- Once DynamoDB/S3 are actually deployed, every existing `@SpringBootTest`-based integration test will, for the first time, construct real `S3Client`/`DynamoDbEnhancedClient` beans and (for tests that exercise `MatchService`) attempt a real (uncredentialed, in CI/local-without-AWS-config) S3 call that's expected to fail fast into the soft-fail path (D12) — functionally fine, but confirm it doesn't meaningfully slow down the test suite via credential-provider-chain timeouts.
