@@ -482,6 +482,7 @@ All of the above must be triggered by application code — never a manual Consol
 Carried over from the local-baseline QA audit; not blocking, but worth being aware of before building on top:
 
 - `PubgApiClient` now serves three resource types (player, match, season) in one class — fine at its current size, worth splitting if a fourth (e.g. telemetry) is added.
-- No caching of `findCurrentSeasonId()` — it's re-fetched on every season-stats call even though seasons change roughly every 2-3 months. Acceptable for now; would matter at real traffic volume.
+- `findCurrentSeasonId()` is cached for the life of the app instance (no TTL/invalidation) — fixed after real usage showed a single player search cost 8 PUBG calls (1 player + 2 season-stats + 5 match previews), exhausting the 10 req/min free-tier limit after just 1-2 searches. Caching the season id removes 1 of those calls; a restart is needed to pick up an actual season change, which is an acceptable trade-off for a course project, not a production service.
+- Match preview count (`PREVIEW_COUNT` in `MatchList.tsx`) is capped at 3 for the same rate-limit reason — a real per-search budget of roughly 1 (player) + 1 (season stats) + 3 (previews) = 5 calls, leaving headroom for ~2 searches/minute within the limit.
 - Backend unit tests exist for the mapper/service classes (see `src/test/java`) but could not be compiled/run in the environment they were written in — verify with `mvn test` before relying on them.
 - `README.md` in both repos is stale (backend's still describes the old layer-based package plan and lists Spring Boot 3; frontend's is still the default Vite template) — this document supersedes them for architecture purposes, but the READMEs should eventually be updated to at least point here.

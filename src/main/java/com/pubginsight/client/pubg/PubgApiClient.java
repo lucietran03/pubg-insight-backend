@@ -25,6 +25,11 @@ public class PubgApiClient {
     private final RestClient restClient;
     private final String defaultShard;
 
+    // The current season changes roughly every 2-3 months, so caching it for the life of
+    // the app instance saves 1 PUBG call per season-stats request - meaningful given the
+    // 10 req/min free-tier limit. A restart is enough to pick up a season change.
+    private volatile String cachedSeasonId;
+
     public PubgApiClient(PubgApiProperties properties) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
@@ -70,17 +75,25 @@ public class PubgApiClient {
     }
 
     public String findCurrentSeasonId() {
+        String cached = cachedSeasonId;
+        if (cached != null) {
+            return cached;
+        }
+
         try {
             PubgSeasonListResponse response = restClient.get()
                     .uri("/shards/{shard}/seasons", defaultShard)
                     .retrieve()
                     .body(PubgSeasonListResponse.class);
 
-            return response.data().stream()
+            String seasonId = response.data().stream()
                     .filter(season -> Boolean.TRUE.equals(season.attributes().isCurrentSeason()))
                     .map(PubgSeasonData::id)
                     .findFirst()
                     .orElseThrow(() -> new PubgApiException("No current PUBG season found", null));
+
+            cachedSeasonId = seasonId;
+            return seasonId;
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
         } catch (HttpStatusCodeException | ResourceAccessException e) {
