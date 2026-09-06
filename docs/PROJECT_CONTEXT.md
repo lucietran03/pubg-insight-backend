@@ -336,6 +336,8 @@ Alongside the working application, the assignment requires two written artifacts
 - **Summary** (0.5 pt)
 - **Introduction** (1 pt) — must cover: (i) motivations behind the idea, (ii) what the system does at a high level, (iii) who the key beneficiaries are.
 
+Draft prose for both: `docs/SOLUTION_ARCHITECTURE_DOCUMENT.md` — copy/adapt directly into the actual submission document.
+
 ## Project Report
 
 - **Related Work** (1 pt) — reference similar existing applications/products.
@@ -343,6 +345,8 @@ Alongside the working application, the assignment requires two written artifacts
 - **System Descriptions** (1 pt) — explain the purpose of each component used.
 - **Dataset / Data Structure / API Description** (1 pt) — describe the PUBG API data model, Gemini inputs/outputs, and internal data structures (DynamoDB items, S3 objects, etc.).
 - **References** (0.5 pt) — links/sources used during development.
+
+Draft prose for Related Work / System Descriptions / Dataset & API Description / References: `docs/PROJECT_REPORT.md`.
 
 Both documents live outside this repository (per assignment submission format) but should be treated as first-class deliverables tracked in `TASK.md` alongside code work.
 
