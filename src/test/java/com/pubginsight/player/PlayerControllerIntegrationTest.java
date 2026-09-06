@@ -1,6 +1,7 @@
 package com.pubginsight.player;
 
 import com.pubginsight.client.pubg.PubgApiClient;
+import com.pubginsight.client.pubg.PubgRateLimitException;
 import com.pubginsight.client.pubg.dto.PubgPlayerAttributes;
 import com.pubginsight.client.pubg.dto.PubgPlayerData;
 import com.pubginsight.client.pubg.dto.PubgPlayerListResponse;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,6 +58,16 @@ class PlayerControllerIntegrationTest {
 
         mockMvc.perform(get("/api/players/ghost"))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    void searchPlayerReturns429WithRetryAfterWhenPubgRateLimits() throws Exception {
+        when(pubgApiClient.findPlayerByName("busy")).thenThrow(new PubgRateLimitException(30L));
+
+        mockMvc.perform(get("/api/players/busy"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "30"))
                 .andExpect(jsonPath("$.error").exists());
     }
 }

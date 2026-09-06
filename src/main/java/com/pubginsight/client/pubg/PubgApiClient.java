@@ -5,6 +5,7 @@ import com.pubginsight.client.pubg.dto.PubgPlayerListResponse;
 import com.pubginsight.client.pubg.dto.PubgSeasonData;
 import com.pubginsight.client.pubg.dto.PubgSeasonListResponse;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -46,6 +47,8 @@ public class PubgApiClient {
                     .body(PubgPlayerListResponse.class);
         } catch (HttpClientErrorException.NotFound e) {
             return new PubgPlayerListResponse(List.of());
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw toRateLimitException(e);
         } catch (HttpStatusCodeException | ResourceAccessException e) {
             throw new PubgApiException("PUBG API request failed for player '" + playerName + "'", e);
         }
@@ -59,6 +62,8 @@ public class PubgApiClient {
                     .body(PubgMatchResponse.class);
         } catch (HttpClientErrorException.NotFound e) {
             return null;
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw toRateLimitException(e);
         } catch (HttpStatusCodeException | ResourceAccessException e) {
             throw new PubgApiException("PUBG API request failed for match '" + matchId + "'", e);
         }
@@ -76,6 +81,8 @@ public class PubgApiClient {
                     .map(PubgSeasonData::id)
                     .findFirst()
                     .orElseThrow(() -> new PubgApiException("No current PUBG season found", null));
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw toRateLimitException(e);
         } catch (HttpStatusCodeException | ResourceAccessException e) {
             throw new PubgApiException("PUBG API request failed for seasons list", e);
         }
@@ -89,8 +96,28 @@ public class PubgApiClient {
                     .body(PubgSeasonStatsResponse.class);
         } catch (HttpClientErrorException.NotFound e) {
             return null;
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw toRateLimitException(e);
         } catch (HttpStatusCodeException | ResourceAccessException e) {
             throw new PubgApiException("PUBG API request failed for season stats of '" + accountId + "'", e);
         }
+    }
+
+    // PUBG's Retry-After (when present) is the delay-seconds form, not an HTTP-date -
+    // parse defensively and simply omit it if it's not a plain integer.
+    private PubgRateLimitException toRateLimitException(HttpClientErrorException.TooManyRequests e) {
+        HttpHeaders headers = e.getResponseHeaders();
+        String retryAfterHeader = headers != null ? headers.getFirst(HttpHeaders.RETRY_AFTER) : null;
+
+        Long retryAfterSeconds = null;
+        if (retryAfterHeader != null) {
+            try {
+                retryAfterSeconds = Long.parseLong(retryAfterHeader);
+            } catch (NumberFormatException ignored) {
+                // Not a delay-seconds value - leave retryAfterSeconds null rather than guessing.
+            }
+        }
+
+        return new PubgRateLimitException(retryAfterSeconds);
     }
 }
