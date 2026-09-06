@@ -339,7 +339,7 @@ Alongside the working application, the assignment requires two written artifacts
 ## Project Report
 
 - **Related Work** (1 pt) — reference similar existing applications/products.
-- **System Architecture** (5 pts, the largest report criterion) — one or more diagrams that clearly show: (1) the full flow from each client interface operation through the system, (2) detailed interactions between all components, (3) the function of every component. Keep this diagram in sync as AWS integrations are added — it's worth as much as three AWS services combined.
+- **System Architecture** (5 pts, the largest report criterion) — one or more diagrams that clearly show: (1) the full flow from each client interface operation through the system, (2) detailed interactions between all components, (3) the function of every component. See `docs/ARCHITECTURE.md` for the current working set of diagrams (system context, component view, per-feature sequence diagrams, data mapping, error flow) — it's the direct source material for this section. Keep it in sync as AWS integrations are added — it's worth as much as three AWS services combined.
 - **System Descriptions** (1 pt) — explain the purpose of each component used.
 - **Dataset / Data Structure / API Description** (1 pt) — describe the PUBG API data model, Gemini inputs/outputs, and internal data structures (DynamoDB items, S3 objects, etc.).
 - **References** (0.5 pt) — links/sources used during development.
