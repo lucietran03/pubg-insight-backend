@@ -4,6 +4,8 @@ This is a click-by-click guide for getting AWS credentials from the RMIT-provide
 
 Exact button labels can shift slightly between AWS Academy versions — if something is named a little differently than described here, look for the closest match; the overall flow (Start Lab → wait for green → open AWS Details → copy credentials) has been stable for years.
 
+`docs/LEARNER_LAB.md` is the official, unedited AWS Academy readme (same for every student) — this file is the project-specific "how it applies to us" version, cross-referencing it where useful. If something here seems out of date, the official readme is the source of truth.
+
 ---
 
 ## 1. Get into the Learner Lab
@@ -108,3 +110,36 @@ Credentials alone aren't enough the first time — the table/bucket this app exp
    - Leave other settings at their defaults, click **Create bucket**.
 
 Do this once per Lab account (it persists across Lab session restarts — only the *credentials* expire, not the resources you created with them).
+
+---
+
+## 8. Deploying to Elastic Beanstalk (once the backend is ready to deploy)
+
+The official Learner Lab readme (`docs/LEARNER_LAB.md`) gives exact steps for this service — reproduced here so they're easy to find alongside the rest of this guide:
+
+1. Open the AWS Console (via the **AWS** button from the Learner Lab page), search for **Elastic Beanstalk**, click into it.
+2. Click **Create Application**.
+3. Give it an application name (e.g. `pubg-insight-backend`), choose the platform (Java / Corretto, matching this app's Java 21 runtime — pick the closest supported Java version if 21 isn't listed yet).
+4. Click **Configure more options** (don't just click straight through with defaults).
+5. Scroll to the **Security** panel, click **Edit**.
+   - **Service role**: choose **LabRole** (not "create new" — the Lab won't allow creating a custom one).
+   - If the environment is in **us-east-1**: **EC2 key pair** → choose **vockey**, **IAM instance profile** → choose **LabInstanceProfile**.
+6. Click **Save**, then click **Create app**.
+
+Supported instance sizes here are capped at **nano, micro, small, medium, large** — anything bigger gets terminated automatically, so don't pick anything larger when configuring the environment's instance type.
+
+Once created, the environment gets a stable `*.elasticbeanstalk.com` URL (per `docs/PROJECT_CONTEXT.md`'s AWS Environment notes) that survives the underlying instance restarting between Lab sessions — after a session timeout, just restart the Elastic Beanstalk environment (not recreate it) when you come back.
+
+---
+
+## 9. Other approved services — what's already confirmed
+
+Per the official readme, these all explicitly support attaching **LabRole** with no other special IAM setup needed, so when any of their setup wizards ask for a role/service-role, the answer is always "use the existing LabRole" (never "create new"):
+
+- **API Gateway**
+- **Lambda** (attach `LabRole` to any function needing to call other AWS services; capped at 10 concurrent execution environments — far above what this app needs)
+- **DynamoDB**
+- **S3**
+- **Athena**
+
+None of these need a bespoke IAM policy written for this project — that would be actively working against how the Lab is set up, not with it.

@@ -593,11 +593,14 @@ All of the above must be triggered by application code — never a manual Consol
 
 ### What's needed to actually turn DynamoDB/S3 on
 
-1. Confirm the Learner Lab's region (`docs/PROJECT_CONTEXT.md` has a TODO placeholder) and set `AWS_REGION`.
+Full click-by-click steps for all of this: `docs/LEARNER_LAB_SETUP.md` (project-specific) and `docs/LEARNER_LAB.md` (official AWS Academy readme).
+
+1. ~~Confirm the Learner Lab's region~~ — confirmed via the official readme: restricted to `us-east-1`/`us-west-2` only, and this app's existing default (`AWS_REGION:us-east-1`) already falls inside that set. Still worth double-checking which one an actual account is provisioned in via "AWS Details" the first time it's used.
 2. Create the DynamoDB table (name matches `DYNAMODB_ANALYSIS_HISTORY_TABLE`, default `pubg-insight-analysis-history`) with partition key `playerId` (String) and sort key `matchId` (String) — one-time Console setup, allowed under the rubric.
 3. Create the S3 bucket (name matches `S3_CACHE_BUCKET`, default `pubg-insight-match-cache`) — same, one-time setup.
-4. Ensure the runtime environment (local run, or eventually Elastic Beanstalk) can resolve AWS credentials — the code relies on the SDK's default credential provider chain (Learner Lab's `LabRole` when deployed; locally, whatever `~/.aws/credentials` or environment variables are configured).
-5. Run `mvn compile`/`mvn test` for the first time with real network access — neither agent that wrote this code could do so in this project's development environment; the AWS SDK v2 class/method names used are believed correct but unverified against the real dependency.
+4. Ensure the runtime environment (local run, or eventually Elastic Beanstalk) can resolve AWS credentials — the code relies on the SDK's default credential provider chain (Learner Lab's `LabRole` when deployed; locally, whatever `~/.aws/credentials` or environment variables are configured — these expire every Lab session and must be refreshed, see the setup guide).
+5. Run `mvn compile`/`mvn test` for the first time with real network access — neither agent that wrote this code could do so in this project's development environment; the AWS SDK v2 class/method names used are believed correct but unverified against the real dependency. (Update: `mvn compile` has since succeeded on the user's real machine — see §8 below.)
+6. Elastic Beanstalk, when ready to deploy: create the application, then under **Configure more options → Security**, set **Service role** to `LabRole` (never "create new" — the Lab doesn't allow it), and in `us-east-1` specifically also set **EC2 key pair** to `vockey` and **IAM instance profile** to `LabInstanceProfile`. Exact steps in `docs/LEARNER_LAB_SETUP.md` §8.
 
 ---
 
