@@ -23,13 +23,14 @@ public class PubgApiClient {
 
     private final RestClient restClient;
     private final String defaultShard;
+    private final PubgRateLimiter rateLimiter;
 
     // The current season changes roughly every 2-3 months, so caching it for the life of
     // the app instance saves 1 PUBG call per season-stats request - meaningful given the
     // 10 req/min free-tier limit. A restart is enough to pick up a season change.
     private volatile String cachedSeasonId;
 
-    public PubgApiClient(PubgApiProperties properties) {
+    public PubgApiClient(PubgApiProperties properties, PubgRateLimiter rateLimiter) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
         requestFactory.setReadTimeout(READ_TIMEOUT_MILLIS);
@@ -41,9 +42,11 @@ public class PubgApiClient {
                 .defaultHeader("Accept", PUBG_JSON_API_MEDIA_TYPE)
                 .build();
         this.defaultShard = properties.defaultShard();
+        this.rateLimiter = rateLimiter;
     }
 
     public PubgPlayerListResponse findPlayerByName(String playerName) {
+        rateLimiter.acquire();
         try {
             return restClient.get()
                     .uri("/shards/{shard}/players?filter[playerNames]={name}", defaultShard, playerName)
@@ -66,6 +69,7 @@ public class PubgApiClient {
     }
 
     public PubgMatchResponse findMatchById(String matchId) {
+        rateLimiter.acquire();
         try {
             return restClient.get()
                     .uri("/shards/{shard}/matches/{matchId}", defaultShard, matchId)
@@ -86,6 +90,7 @@ public class PubgApiClient {
             return cached;
         }
 
+        rateLimiter.acquire();
         try {
             PubgSeasonListResponse response = restClient.get()
                     .uri("/shards/{shard}/seasons", defaultShard)
@@ -108,6 +113,7 @@ public class PubgApiClient {
     }
 
     public PubgSeasonStatsResponse findSeasonStats(String accountId, String seasonId) {
+        rateLimiter.acquire();
         try {
             return restClient.get()
                     .uri("/shards/{shard}/players/{accountId}/seasons/{seasonId}", defaultShard, accountId, seasonId)
