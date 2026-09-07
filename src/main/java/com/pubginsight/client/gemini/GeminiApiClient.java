@@ -9,9 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
@@ -58,7 +57,12 @@ public class GeminiApiClient {
                     .orElseThrow(() -> new GeminiApiException("Gemini returned no usable content", null));
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
-        } catch (HttpStatusCodeException | ResourceAccessException e) {
+        } catch (RestClientException e) {
+            // Catching RestClientException itself, not just its ResourceAccessException/
+            // HttpStatusCodeException subtypes: a read timeout that happens while Spring is
+            // still reading response headers/body (readWithMessageConverters) surfaces as a
+            // plain RestClientException, not ResourceAccessException - confirmed via a real
+            // uncaught 500 in production logs before this was widened to the common superclass.
             throw new GeminiApiException("Gemini API request failed", e);
         }
     }

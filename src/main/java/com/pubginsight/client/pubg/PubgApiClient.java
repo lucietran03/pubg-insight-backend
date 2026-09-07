@@ -9,9 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
@@ -54,7 +53,14 @@ public class PubgApiClient {
             return new PubgPlayerListResponse(List.of());
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
-        } catch (HttpStatusCodeException | ResourceAccessException e) {
+        } catch (RestClientException e) {
+            // Catching RestClientException itself, not just its ResourceAccessException/
+            // HttpStatusCodeException subtypes: a read timeout that happens while Spring is
+            // still reading response headers/body (readWithMessageConverters) surfaces as a
+            // plain RestClientException, not ResourceAccessException - confirmed via a real
+            // uncaught 500 from GeminiApiClient's identical old catch clause in production
+            // logs. PubgApiClient had the same gap, just not yet triggered by its shorter
+            // 5s read timeout.
             throw new PubgApiException("PUBG API request failed for player '" + playerName + "'", e);
         }
     }
@@ -69,7 +75,7 @@ public class PubgApiClient {
             return null;
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
-        } catch (HttpStatusCodeException | ResourceAccessException e) {
+        } catch (RestClientException e) {
             throw new PubgApiException("PUBG API request failed for match '" + matchId + "'", e);
         }
     }
@@ -96,7 +102,7 @@ public class PubgApiClient {
             return seasonId;
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
-        } catch (HttpStatusCodeException | ResourceAccessException e) {
+        } catch (RestClientException e) {
             throw new PubgApiException("PUBG API request failed for seasons list", e);
         }
     }
@@ -111,7 +117,7 @@ public class PubgApiClient {
             return null;
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
-        } catch (HttpStatusCodeException | ResourceAccessException e) {
+        } catch (RestClientException e) {
             throw new PubgApiException("PUBG API request failed for season stats of '" + accountId + "'", e);
         }
     }

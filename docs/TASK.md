@@ -45,6 +45,8 @@ Everything that doesn't need live AWS access is now done. The remaining work is 
 - `docs/SOLUTION_ARCHITECTURE_DOCUMENT.md` and `docs/PROJECT_REPORT.md` drafted.
 - Repo cleanup: removed dead scaffolding (empty index files, unused assets), synced stale frontend docs with backend's maintained copies, restored `CLAUDE.md` in both repos to real ongoing instructions (had drifted into completed one-off task tickets).
 - Decided to deploy via the RMIT-provided AWS Academy Learner Lab, not a personal AWS account.
+- **First real run against live AWS + a real Gemini timeout** (from user-provided runtime logs): confirmed the S3 cache-aside soft-fail (D12) works exactly as designed against real infrastructure — every S3 call failed with an expired/invalid Learner Lab session token, and every one fell back to the PUBG API cleanly with no user-visible error, just a server-side `WARN` log. Separately, a real Gemini read timeout during response-body extraction surfaced a genuine bug: it threw a plain `RestClientException` that escaped both `PubgApiClient`'s and `GeminiApiClient`'s catch clause (which only caught the narrower `HttpStatusCodeException`/`ResourceAccessException` subtypes), reaching the servlet container as an uncaught 500. Fixed by widening both clients' fallback catch to `RestClientException` itself.
+- UI polish pass on the homepage: retryable (not dead-end) failed-match/season-stats states, `Skeleton`-shaped loading instead of spinners, a consistent resting-border convention across all cards/rows, and mobile-responsive breakpoints for the stat-tile grid and selected-match header.
 
 ---
 

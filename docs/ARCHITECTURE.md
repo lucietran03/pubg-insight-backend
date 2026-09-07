@@ -477,7 +477,7 @@ flowchart TD
     B -->|"404 (findPlayerByName)"| C["return empty PubgPlayerListResponse"]
     B -->|"404 (findMatchById / findSeasonStats)"| D["return null"]
     B -->|"other 4xx/5xx"| E["throw PubgApiException"]
-    B -->|"network failure / timeout\n(ResourceAccessException)"| E
+    B -->|"network failure / timeout\n(RestClientException)"| E
     B -->|200| F["return parsed response"]
 
     C --> G["Service layer checks emptiness"]
@@ -500,9 +500,11 @@ flowchart TD
     O -->|no response at all| R["show 'Could not reach server'"]
 ```
 
-Two things this diagram makes visible that weren't true until today's fixes:
-- The `ResourceAccessException` branch (network failure / timeout) didn't exist before — such failures used to escape uncaught into a generic Spring 500.
+Two things this diagram makes visible that weren't true until an earlier fix:
+- The generic network-failure branch didn't exist at all before — such failures used to escape uncaught into a generic Spring 500.
 - The `log.error(cause)` step didn't exist before — `PubgApiException`'s real cause used to be silently discarded, which is exactly what made an earlier real debugging session (an empty API key producing an opaque 502) take much longer than it should have.
+
+That branch was originally implemented as `catch (HttpStatusCodeException | ResourceAccessException e)`, which turned out to be an incomplete fix: a real production log showed a Gemini read timeout that occurred *while Spring was still reading the response body* (`RestClient`'s `readWithMessageConverters`) throwing a plain `RestClientException` — not a `ResourceAccessException` — which is only thrown for I/O failures during request *execution* (connect/send). That plain `RestClientException` fell through both branches of the union catch and reached the servlet container uncaught, producing a raw Spring error body instead of `GeminiApiException` → 502. Both `PubgApiClient` and `GeminiApiClient` now catch `RestClientException` itself (the common superclass of `HttpStatusCodeException`, `ResourceAccessException`, and everything else `RestClient` can throw) instead of enumerating subtypes — `PubgApiClient` had the identical gap, just not yet triggered, since its 5s read timeout leaves less time for a slow body to trip this path than Gemini's 15s one.
 
 `GeminiApiException`/`GeminiRateLimitException` follow the exact same shape as the `PubgApiException`/`PubgRateLimitException` branches shown above (502 for a generic Gemini failure, 429 + `Retry-After` for Gemini's own rate limit), each with its own distinct message. The frontend step `O` used to hardcode `"PUBG service unavailable"` for *any* non-404/429 response — which meant a Gemini failure was shown to the user as a PUBG failure, since both happened to map to the same HTTP status. `getErrorMessage` now reads the backend's actual `error` message instead of guessing from the status code, so this is fixed for every current and future exception type without the frontend needing to know about each one individually.
 
@@ -609,3 +611,5 @@ Carried over from the local-baseline QA audit; not blocking, but worth being awa
 - `README.md` in both repos is stale (backend's still describes the old layer-based package plan and lists Spring Boot 3; frontend's is still the default Vite template) — this document supersedes them for architecture purposes, but the READMEs should eventually be updated to at least point here.
 - `S3ClientConfig` and `DynamoDbClientConfig` each independently read `@Value("${aws.region}")` — harmless duplication (written by two separate, independently-run agents that didn't see each other's code) rather than a shared `AwsProperties` record. Worth consolidating if a third AWS service config is added, not urgent at two.
 - Once DynamoDB/S3 are actually deployed, every existing `@SpringBootTest`-based integration test will, for the first time, construct real `S3Client`/`DynamoDbEnhancedClient` beans and (for tests that exercise `MatchService`) attempt a real (uncredentialed, in CI/local-without-AWS-config) S3 call that's expected to fail fast into the soft-fail path (D12) — functionally fine, but confirm it doesn't meaningfully slow down the test suite via credential-provider-chain timeouts.
+- **Confirmed live**: a real run against the actual Learner Lab S3 bucket produced `S3Exception: The provided token is malformed or otherwise invalid` on every cache read/write — this is an **expired/stale AWS Learner Lab session token** in the local AWS credentials (the Lab issues temporary credentials that expire every few hours and must be refreshed from the Lab's "AWS Details" panel), not a code bug. The D12 soft-fail path handled it exactly as designed: every match lookup logged a `WARN` and fell back to the PUBG API with no user-visible failure. No action needed in code; if this reappears, refresh the Learner Lab credentials first before assuming it's a regression.
+- A real Gemini read timeout during response-body extraction was found to throw a plain `RestClientException` that escaped both clients' original `catch (HttpStatusCodeException | ResourceAccessException e)` clause uncaught — see §5 for the full explanation and fix (both clients now catch `RestClientException` directly).
