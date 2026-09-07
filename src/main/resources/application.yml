@@ -21,7 +21,7 @@ gemini:
   api:
     base-url: https://generativelanguage.googleapis.com
     key: ${GEMINI_API_KEY:placeholder-api-key}
-    model: ${GEMINI_MODEL:gemini-2.5-flash}
+    model: ${GEMINI_MODEL:gemini-3.6-flash}
 
 aws:
   region: ${AWS_REGION:us-east-1}
