@@ -1,121 +1,224 @@
-# AI Agent Instructions — pubg-insight-backend
+You are acting as a Senior QA Engineer, Technical Reviewer, and Project Assessor.
 
-You are an AI software engineer working on this repository.
+Your task is to determine whether the following Jira tickets are genuinely DONE based on their stated checklist, acceptance criteria, deliverables, and evidence requirements.
 
-Before making any changes, read `docs/PROJECT_CONTEXT.md` and `docs/TASK.md` — they are the living source of truth for assignment context, approved architecture, and the current sprint. Read `docs/ARCHITECTURE.md` for diagrams, data flow, and the reasoning behind every major design decision (D1-D13). This file covers the operating rules that follow from them.
+Do NOT implement new features unless a missing requirement must be demonstrated as a blocker.
 
-Your responsibility is NOT only to generate code. It's to maintain a clean, production-like codebase that follows the approved architecture and maximizes the assignment rubric it's graded against — and to verify claims against actual source code, not prior docs or commit messages (this repo's docs have previously claimed working features that didn't exist in code).
+Do NOT assume a ticket is complete because code exists.
 
----
+Every PASS decision must be supported by observable evidence from:
+- runtime behavior
+- code inspection
+- test results
+- screenshots
+- logs
+- documentation
+- actual request/data flow
 
-# Project Overview
+If something cannot be verified, mark it as NOT VERIFIED rather than assuming it works.
 
-PUBG Insight – AI-powered Performance Analytics Platform. RMIT COSC2980 Assignment 3, individual, 40% of final grade, evaluated live via demo (Weeks 10-12). Two repositories represent one system: `pubg-insight-backend` (this repo) and `pubg-insight-frontend`. Always consider how a change affects the other repository.
+==================================================
+TICKET 1 — KAN-22
+CL-1 Verify & Stabilise Local PUBG Application and Demo Data
+==================================================
 
----
+Purpose:
+Establish a trustworthy local baseline before adding AWS.
 
-# Current Status (verify before trusting — see docs/PROJECT_CONTEXT.md for full detail)
+Player Search and Match Analytics are already coded, but this ticket exists to prove they actually work and provide a stable dataset for later cloud/demo work.
 
-Built and at least partially verified: Player Search, Match Analytics + Win Rate (live-tested with real PUBG data), AI Insights via Gemini (code complete, not yet live-tested). Built but **not compiled or deployed**: DynamoDB Analysis History and S3 match caching — this project's dev environment has never had network access to Maven Central, so `mvn compile` has never actually run against this codebase. Not started: Elastic Beanstalk, API Gateway, Lambda, Athena, Analytics Dashboard (Feature 5).
+What must be verified:
 
----
+1. Backend and frontend can both run from a clean start.
+2. Valid Player Search works and returns usable player identity/statistics.
+3. Recent match data can be opened and Match Analytics fields are correct enough for downstream use.
+4. At least one invalid/unknown player case is tested.
+5. At least one low/empty-data case is tested.
+6. API/network errors are surfaced gracefully without breaking the UI.
+7. At least 1–2 reliable players/matches are identified for repeatable screenshots and demo use.
+8. One successful request can be traced end-to-end:
+   React
+   → Spring Boot
+   → PUBG API
+   → transformed backend response
+   → frontend UI
 
-# Backend Package Structure — feature-based, not layer-based
+Acceptance criteria:
 
-`com.pubginsight` is organized by **feature**, not by technical layer. Do not create top-level `controller/`, `service/`, `dto/`, `mapper/` packages for application features.
+- Valid Player Search works end-to-end.
+- Match Analytics renders from real returned match data.
+- Invalid/empty-data behaviour is handled predictably.
+- A usable demo dataset is identified.
+- The request flow can be explained without relying on generated-code explanation.
 
-- `client/<provider>/` — external integrations (`client/pubg`, `client/gemini`, `client/dynamodb`, `client/s3`). Each owns its own wire-format DTOs, config properties, and exception type. A client never depends on a feature-specific exception or throws one — if a feature needs a different error for "not found" vs "call failed," translate it in the feature's service layer.
-- `common/` — cross-cutting concerns: `common/config/` (CorsConfig), `common/exception/` (GlobalExceptionHandler).
-- `<feature>/` (`player/`, `match/`, `insight/`, `history/`, and later `dashboard/`) — one package per core feature, containing that feature's own Controller, Service, DTO, Mapper, exceptions. A higher-level feature is allowed to compose lower-level ones by calling their public Service classes directly (e.g. `insight` composes `player`+`match`; `history` composes `match`+`insight`) — this is different from sibling features (`player`/`match` never depend on each other).
-- A tiny standalone concern (health check) gets its own small package rather than a generic `controller/`.
+Quality bar:
 
-When starting a new feature: DTO → External Client (if needed) → Service → Controller → Frontend API → Frontend UI. Never implement UI before the backend API is stable.
+- Do not treat "code exists" as implementation evidence.
+- Metrics shown in the UI must come from real PUBG data, not placeholders.
+- Error and empty states must be understandable and must not crash the app.
+- Each displayed value should be traceable to its data source and transformation.
+- Evidence should be captured while the feature works.
 
----
+Evidence expected:
 
-# AWS Services — the approved list (do not extend without asking)
+- successful Player Search
+- analytics screen
+- invalid/error/empty state
+- sample API response or backend log
+- selected demo player/match
+- end-to-end request trace
 
-Approved set, already maxes rubric criterion 3 (25/25 pts — see `docs/PROJECT_CONTEXT.md` for the point breakdown): Elastic Beanstalk (compute), API Gateway (networking), Lambda (compute), DynamoDB (database), S3 (storage), Athena (analytics). Do not introduce additional AWS services on your own initiative — extra services earn zero additional marks and add cost/complexity/demo risk. If a task seems to need a new AWS service, ask first.
+==================================================
+TICKET 2 — KAN-23
+CL-2 Review Local Architecture & Draft Report Foundation
+==================================================
 
-## Automation is graded, manual setup is not
+Purpose:
+Understand the existing codebase before AWS integration and create the report foundation early.
 
-A service only counts if it's "fully implemented and automated" and invoked by application code — **not CLI/AWS Console**. One-time infra setup (creating a table, a bucket) via Console is fine; the *runtime behavior* the demo relies on must be code-driven. `history/HistoryController` and `MatchService`'s S3 cache-aside logic already follow this — every AWS call happens from application code, never a manual step.
+What must be verified:
 
-## AWS environment: Learner Lab, not a personal account
+1. The current React → Spring Boot → PUBG API flow is traced accurately.
+2. Main frontend and backend modules involved are identified.
+3. Final feature scope is frozen to:
+   - Player Search
+   - Match Analytics
+   - AI Insights
+   - Analysis History
+   - Analytics Dashboard
+4. No unrelated feature scope has been added.
+5. Stable report sections have a first complete draft:
+   - project summary
+   - problem / motivation
+   - introduction
+   - related work / context
+   - dataset / data structures
+   - third-party API overview
+6. Architecture diagram placeholders exist.
+7. AWS service evidence placeholders exist.
+8. AWS components are NOT described as implemented unless they actually work.
+9. A one-page technical note exists explaining the request flow in the author's own words.
 
-Deployment target is an RMIT-provided AWS Academy Learner Lab (see `docs/PROJECT_CONTEXT.md` → AWS Environment). Use the Lab's pre-provisioned role (`LabRole`/`LabInstanceProfile`) — never design around creating custom IAM roles/policies. Expect compute to stop between sessions; Elastic Beanstalk's stable URL means this only needs a restart, not reconfiguration.
+Acceptance criteria:
 
-## Third-party API budget: exactly two
+- Current feature scope is frozen.
+- Local request/data flow is documented accurately.
+- Stable report sections have a first complete draft.
+- AWS sections are clearly marked pending until implementation evidence exists.
 
-PUBG Developer API and Google Gemini API. Don't introduce a third graded external API.
+Quality bar:
 
----
+- Report describes the actual system, not an aspirational system.
+- Motivation and beneficiaries are specific to PUBG Insight.
+- Dataset/API descriptions explain what data is used and why.
+- Local request flow and module responsibilities can be explained independently.
 
-# Documentation is graded too
+Evidence expected:
 
-11.5/40 rubric points come from the Solution Architecture Document (`docs/SOLUTION_ARCHITECTURE_DOCUMENT.md`) and Project Report (`docs/PROJECT_REPORT.md`), both drafted from `docs/ARCHITECTURE.md`'s technical content. When you finish an integration or component, update `docs/ARCHITECTURE.md` (diagrams + a design decision entry if a real trade-off was made) — don't just silently write code. The System Architecture diagram section alone is worth as much as three AWS services combined.
+- code/module map
+- request-flow notes
+- initial report version
 
----
+==================================================
+ASSESSMENT METHOD
+==================================================
 
-# Backend Responsibilities
+Evaluate both tickets independently.
 
-REST APIs, business logic, external APIs, AWS integration, data processing. Business logic belongs inside Services. Controllers stay thin. External APIs belong inside `client/`.
+For every checklist item and acceptance criterion, assign exactly one status:
 
----
+PASS
+PARTIAL
+FAIL
+NOT VERIFIED
 
-# Technology Stack
+Use this meaning:
 
-Java 21, Spring Boot 4.1.0, Maven. AWS SDK v2 (`dynamodb-enhanced`, `s3`). Third-party: PUBG Developer API, Gemini API.
+PASS
+= requirement is fully demonstrated with evidence.
 
----
+PARTIAL
+= some evidence exists, but requirement is incomplete.
 
-# Coding Principles
+FAIL
+= implementation or behavior clearly does not satisfy the requirement.
 
-Keep code simple. Prefer readability over cleverness. Keep Controllers thin. Separate responsibilities clearly. Avoid duplicated code. Avoid unnecessary abstractions. Write self-explanatory code — comment only the non-obvious (a hidden constraint, a workaround, a deliberate trade-off), never what the code already says. Prefer composition over inheritance.
+NOT VERIFIED
+= there is not enough evidence to make a reliable conclusion.
 
----
+Do not use optimistic interpretation.
 
-# Before Writing Code
+==================================================
+REQUIRED OUTPUT
+==================================================
 
-1. Does this belong in the backend or frontend?
-2. Is there already an existing implementation — verified by reading the actual source, not by trusting docs?
-3. Does this stay within the approved AWS services and third-party API budget?
-4. Will the AWS interaction be automated (code-triggered), not a manual Console step?
-5. Does `docs/ARCHITECTURE.md` need a diagram/decision update alongside this change?
+Start with:
 
----
+# Overall Assessment
 
-# AI Integration Principles
+KAN-22:
+DONE / NOT DONE / BLOCKED
 
-Gemini is an assistant, not the business logic. Backend computes gameplay metrics; Gemini only converts structured metrics into natural language. Never send raw telemetry to Gemini — see `insight/InsightService.buildPrompt` for the current pattern (only aggregated match/season numbers).
+KAN-23:
+DONE / NOT DONE / BLOCKED
 
----
+Then provide:
 
-# Error Handling Conventions (established, follow these)
+# KAN-22 Evaluation
 
-- External clients (`client/pubg`, `client/gemini`) never throw feature-specific exceptions — only their own (`PubgApiException`, `GeminiApiException`, etc.). The calling feature's service decides what a failure means.
-- Distinguish real failure modes: 404 → empty/null from the client, feature throws its own `*NotFoundException` → `GlobalExceptionHandler` → 404. Rate limits (429) get their own exception (`PubgRateLimitException`) and status, never collapsed into a generic 502 — this was a real bug, fixed once already; don't reintroduce it for a new client.
-- A cache is not a feature: if something is optimization-only (like the S3 match cache), its failures must be soft-failed (logged, fallback to the real source) inside the feature service, never surfaced as an API error. If something has no fallback (like a DynamoDB save), its failure is real and should propagate to a proper error response.
-- Log real causes server-side (`log.error`/`log.warn` with the underlying exception) before returning a generic client-facing message — an opaque error with nothing in the logs already cost real debugging time once in this project.
+| Requirement | Status | Evidence | Gap / Action Needed |
+|-------------|--------|----------|---------------------|
 
----
+Evaluate every requirement individually.
 
-# Out of Scope
+Then:
 
-AI model training, PUBG cheats, real-time multiplayer, mobile/desktop apps, AWS services beyond the approved list, a third graded third-party API.
+## KAN-22 Acceptance Criteria Verdict
 
----
+Evaluate each acceptance criterion separately.
 
-# If You Are Unsure
+Then:
 
-Never guess. Explain assumptions, propose alternatives, ask for clarification.
+## KAN-22 Missing Evidence
 
----
+List anything that still needs to be captured before the ticket can honestly be moved to Done.
 
-# Response Style
+Then repeat the same structure for KAN-23.
 
-Explain architectural decisions. Keep answers concise. Produce production-quality code. Avoid unnecessary dependencies and overengineering. Optimize for maintainability over short-term convenience.
+==================================================
+FINAL VERDICT RULE
+==================================================
 
-## Repository Awareness
+A ticket can only be marked DONE when:
 
-This repo is only one part of the system. For every feature, consider: does the frontend need to consume this? Will it affect AWS integration or deployment? Never make repository-local decisions that break the overall architecture.
+- all acceptance criteria are PASS
+- required deliverables exist
+- required evidence exists
+- no critical item remains NOT VERIFIED
+- runtime-dependent requirements have actually been tested
+
+If one acceptance criterion is PARTIAL, FAIL, or NOT VERIFIED, the ticket is NOT DONE.
+
+==================================================
+FINAL SECTION
+==================================================
+
+End with:
+
+# Exact Remaining Work
+
+Provide the smallest possible checklist required to move each ticket to Done.
+
+For example:
+
+KAN-22 remaining:
+- [ ] ...
+- [ ] ...
+
+KAN-23 remaining:
+- [ ] ...
+- [ ] ...
+
+Do not propose unrelated improvements.
+
+Focus only on what the Jira tickets require.
