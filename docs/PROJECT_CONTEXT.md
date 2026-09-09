@@ -274,7 +274,7 @@ using historical data.
 Deployment target is the **RMIT-provided AWS Academy Learner Lab**, not a personal AWS account — chosen deliberately to avoid real billing risk while cost per-service isn't yet known. This has practical implications for how the AWS integrations below must be built:
 
 - **IAM**: confirmed via the official Learner Lab readme (`docs/LEARNER_LAB.md`) — "Extremely limited access. You cannot create users or groups. You cannot create roles, except that you can create service-linked roles." A pre-provisioned `LabRole`/`LabInstanceProfile` exists and every one of our approved services (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena) explicitly "can assume the LabRole IAM role" — so every service setup screen that asks for a role/service-role/execution-role should be pointed at `LabRole` (or `LabInstanceProfile` where an instance profile specifically is asked for, e.g. EC2/Elastic Beanstalk), never a custom one.
-- **Region**: confirmed via the official readme — service access is restricted to **us-east-1 and us-west-2 only** (not necessarily locked to just one of the two). Check the account's actual active region via the "AWS Details" panel once a Lab session is started; this app's existing default (`AWS_REGION:us-east-1` in `application.yml`) already falls inside the allowed set, so no code change is needed unless the account turns out to be provisioned in `us-west-2` instead.
+- **Region**: **confirmed as `us-east-1`** (verified against the actual Learner Lab account's "AWS Details" panel) — matches this app's existing default (`AWS_REGION:us-east-1` in `application.yml`), so no code change was needed.
 - **Sessions time out**: compute resources can stop when a Lab session ends and need restarting before use (e.g. before a demo). Elastic Beanstalk mitigates the worst of this — its environment gets a stable URL (`*.elasticbeanstalk.com`) that survives the underlying EC2 instance restarting or getting a new IP between sessions, so we don't need to reconfigure anything, just restart the environment if it was stopped. Credentials for local development (`~/.aws/credentials`) are separate from this and expire every session regardless — see `docs/LEARNER_LAB_SETUP.md`.
 - Budget is capped by the Lab itself, so cost overruns aren't a real risk here — but avoid leaving expensive resources (e.g. Athena queries over large scans) running unnecessarily anyway, as good practice. The official readme also warns that exceeding certain hard limits (e.g. 20+ concurrent EC2 instances) can get the whole Lab account disabled — stay well under any documented limit, not just close to it.
 - Lambda specifically: max 10 concurrent execution environment instances per the official readme — irrelevant at this app's demo scale, but worth knowing if load-testing is ever considered.
@@ -435,7 +435,7 @@ Not yet done
 
 Next milestone
 
-- User: re-run `mvn test` to confirm the ObjectMapper fix, then confirm Learner Lab region, create the DynamoDB table and S3 bucket, then deploy to Elastic Beanstalk.
+- User: re-run `mvn test` to confirm the ObjectMapper fix, create the DynamoDB table and S3 bucket (region already confirmed as `us-east-1`), then deploy to Elastic Beanstalk.
 
 ---
 

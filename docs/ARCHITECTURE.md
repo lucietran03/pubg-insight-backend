@@ -595,7 +595,7 @@ All of the above must be triggered by application code — never a manual Consol
 
 Full click-by-click steps for all of this: `docs/LEARNER_LAB_SETUP.md` (project-specific) and `docs/LEARNER_LAB.md` (official AWS Academy readme).
 
-1. ~~Confirm the Learner Lab's region~~ — confirmed via the official readme: restricted to `us-east-1`/`us-west-2` only, and this app's existing default (`AWS_REGION:us-east-1`) already falls inside that set. Still worth double-checking which one an actual account is provisioned in via "AWS Details" the first time it's used.
+1. ~~Confirm the Learner Lab's region~~ — done, confirmed as `us-east-1`, matching this app's existing default.
 2. Create the DynamoDB table (name matches `DYNAMODB_ANALYSIS_HISTORY_TABLE`, default `pubg-insight-analysis-history`) with partition key `playerId` (String) and sort key `matchId` (String) — one-time Console setup, allowed under the rubric.
 3. Create the S3 bucket (name matches `S3_CACHE_BUCKET`, default `pubg-insight-match-cache`) — same, one-time setup.
 4. Ensure the runtime environment (local run, or eventually Elastic Beanstalk) can resolve AWS credentials — the code relies on the SDK's default credential provider chain (Learner Lab's `LabRole` when deployed; locally, whatever `~/.aws/credentials` or environment variables are configured — these expire every Lab session and must be refreshed, see the setup guide).

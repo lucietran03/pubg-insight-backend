@@ -62,11 +62,10 @@ Re-verifying the ObjectMapper fix with another `mvn test` run — fixed by inspe
 Step-by-step, click-by-click instructions for all Learner Lab/credentials steps below: **`docs/LEARNER_LAB_SETUP.md`**.
 
 1. Re-run `mvn test` to confirm the ObjectMapper fix resolves all 8 previously-failing tests.
-2. Confirm the Learner Lab's actual region (fill in the TODO in `PROJECT_CONTEXT.md`) — shown in the Lab's "AWS Details" panel, see the setup guide.
-3. Create the DynamoDB table (`pubg-insight-analysis-history` by default, partition key `playerId`, sort key `matchId`) and S3 bucket (`pubg-insight-match-cache` by default) — one-time Console setup, allowed under the rubric.
-4. Verify DynamoDB/S3 actually work against real AWS (search a player, view a match, save analysis history, confirm a second lookup of the same match is a cache hit).
-5. Deploy to Elastic Beanstalk, wire up API Gateway + Lambda, set up Athena — all still fully unbuilt.
-6. Build Feature 5 (Analytics Dashboard) once Athena has real historical data to query.
+2. Create the DynamoDB table (`pubg-insight-analysis-history` by default, partition key `playerId`, sort key `matchId`) and S3 bucket (`pubg-insight-match-cache` by default, must be globally-unique — see setup guide) — one-time Console setup, allowed under the rubric. **In progress**: Learner Lab credentials confirmed working (real run against live AWS now fails with `NoSuchBucketException`, not a credentials error) — the bucket itself just hasn't been created yet.
+3. Verify DynamoDB/S3 actually work against real AWS (search a player, view a match, save analysis history, confirm a second lookup of the same match is a cache hit).
+4. Deploy to Elastic Beanstalk, wire up API Gateway + Lambda, set up Athena — all still fully unbuilt.
+5. Build Feature 5 (Analytics Dashboard) once Athena has real historical data to query.
 
 ---
 
