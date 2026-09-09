@@ -1,145 +1,81 @@
-# AWS Academy Learner Lab — step-by-step setup guide
+# AWS Academy Learner Lab — setup guide
 
-This is a click-by-click guide for getting AWS credentials from the RMIT-provided AWS Academy Learner Lab and putting them where this app can use them. Written for someone who has never used AWS Academy before.
+Two situations, two sections. Find yours, skip the rest:
 
-Exact button labels can shift slightly between AWS Academy versions — if something is named a little differently than described here, look for the closest match; the overall flow (Start Lab → wait for green → open AWS Details → copy credentials) has been stable for years.
+- **First time ever** → do [A] then [B], in that order.
+- **Every other time you sit down to work** → just do [A].
 
-`docs/LEARNER_LAB.md` is the official, unedited AWS Academy readme (same for every student) — this file is the project-specific "how it applies to us" version, cross-referencing it where useful. If something here seems out of date, the official readme is the source of truth.
-
----
-
-## 1. Get into the Learner Lab
-
-1. Log into **AWS Academy** at `https://awsacademy.instructure.com` (or via the link RMIT gave you — it may go through Canvas first, then hand off to AWS Academy).
-2. On the left sidebar, click **Courses**, then click into your course (something like *"AWS Academy Learner Lab - Foundation Services"* or whatever your instructor named it).
-3. Click **Modules** in the course's left sidebar.
-4. Find and click the module item literally called **Learner Lab** (sometimes shown as "Learner Lab - Foundation Services" or similar — it's the one that opens the lab launcher, not a reading/quiz item).
-
-This opens the **Learner Lab launcher page** — a mostly-white page with a black **Start Lab** button near the top, and a light gray/green circle icon next to the word **AWS** near the top right.
+`docs/LEARNER_LAB.md` is the official, unedited AWS Academy readme — the source of truth if anything here looks outdated. Exact button labels can shift slightly between versions; if something's named a little differently, look for the closest match.
 
 ---
 
-## 2. Start the lab
+## [A] Every session: start the lab, get fresh credentials
 
-1. Click the black **Start Lab** button.
-2. Wait. A small circle icon next to the **AWS** text will be **gray/orange while starting**, then turn **green** once the lab environment is ready. This usually takes 1–3 minutes — don't click anything else while waiting.
-3. Once the circle is green, the lab is running. It stays running for a limited time (commonly a few hours per session, shown as a countdown timer on this same page) — if it times out, you just repeat this whole guide to start a new session and get fresh credentials.
+Credentials expire every session (a few hours) — repeat this every time, even if you did it yesterday.
 
----
-
-## 3. Get your AWS credentials
-
-You do **not** need to log into the AWS Console with a username/password — the Lab gives you short-lived credentials directly.
-
-1. Still on the Learner Lab page, click the **AWS Details** button (it appears near the top once the lab is started/green — sometimes it's a link that just says "AWS Details", sometimes it's next to or replaces the "AWS" text/circle you saw in step 2).
-2. A panel opens showing:
-   - **Region** — a string like `us-east-1`. **Write this down** — you need it for `AWS_REGION` (see step 5 below).
-   - An **AWS CLI** section with a **Show** link/button.
-3. Click **Show** under the AWS CLI section. It reveals a text block that looks like this (values below are examples, not real):
+1. Log into **AWS Academy** (`awsacademy.instructure.com`, or via the RMIT/Canvas link).
+2. **Courses** → your course → **Modules** → click **Learner Lab**.
+3. Click the black **Start Lab** button.
+4. Wait for the circle next to **AWS** to turn **green** (1–3 min). Don't click anything else meanwhile.
+5. Click **AWS Details**.
+6. Note the **Region** shown (e.g. `us-east-1`) — see step 9 below.
+7. Under **AWS CLI**, click **Show**. Copy the whole 4-line block:
    ```
    [default]
-   aws_access_key_id=ASIAABCDEFGHIJK12345
-   aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-   aws_session_token=FQoGZXIvYXdzEBEaDMlong/random/string...
+   aws_access_key_id=...
+   aws_secret_access_key=...
+   aws_session_token=...
    ```
-4. Select and copy that **entire block** (all 4 lines, including the `[default]` line).
-
-If instead of "AWS Details" you see a button that just says **AWS** and clicking it opens the AWS Management Console directly in a new tab — that also works fine for one-off manual checks (e.g. confirming a DynamoDB table exists), but for this app to run locally you still need the copied credentials block from "AWS Details", not just console access.
-
----
-
-## 4. Put the credentials where your machine can find them
-
-The AWS SDK (used by this backend) looks for credentials in `~/.aws/credentials` by default.
-
-1. Open a terminal.
-2. Check if the file/folder already exist:
+8. Paste it into `~/.aws/credentials` on your machine, **replacing** anything already there (an old block left in this file causes the exact "token is malformed or otherwise invalid" error — always fully overwrite, never append).
    ```bash
-   mkdir -p ~/.aws
+   nano ~/.aws/credentials   # or open in any editor
    ```
-   (safe to run even if `~/.aws` already exists — it does nothing in that case)
-3. Open `~/.aws/credentials` in any text editor (create it if it doesn't exist):
-   ```bash
-   nano ~/.aws/credentials
-   ```
-   (or open it in VS Code / IntelliJ / any editor you prefer)
-4. **Replace the entire contents of the file** with the block you copied in step 3.4 above — if the file already has an old `[default]` block from a previous session, delete it first (old, expired credentials left in the file will get picked up instead of the new ones and cause the exact "token is malformed or otherwise invalid" error seen before).
-5. Save and close the file.
-
-**This step must be repeated every time you start a new Lab session** — the credentials are temporary and stop working when the session ends or times out (usually after a few hours). If you restart work on a different day, assume you need to redo steps 2–4.
+9. Region only needs setting once (it doesn't change between sessions): `export AWS_REGION=us-east-1` in your shell profile (`~/.zshrc`), matching whatever step 6 showed. If you skip this, the app defaults to `us-east-1` anyway.
+10. Run the backend. Search a player, open a match. Check the console:
+    - See `S3Exception: The provided token is malformed...` → credentials are stale, redo steps 3–8.
+    - No such warning → AWS calls are going through.
 
 ---
 
-## 5. Set the region for this app
+## [B] First time ever: create the S3 bucket + DynamoDB table
 
-The region from step 3.2 (e.g. `us-east-1`) needs to reach the app too:
+Do this **once**, after completing [A] at least once (you need working credentials to reach the AWS Console). It survives every future session — only the credentials from [A] expire, not what you create here.
 
-- **Easiest**: set it as an environment variable before running the backend:
-  ```bash
-  export AWS_REGION=us-east-1   # replace with your actual region from AWS Details
-  ```
-  (add this line to your shell profile, e.g. `~/.zshrc`, so you don't have to re-type it every terminal session — though you'll still need to redo step 4 for credentials each Lab session)
-- **Alternative**: set it directly in `src/main/resources/application-local.yml` under `aws.region:` (see that file — it currently reads `${AWS_REGION:us-east-1}`, so if you don't export the env var, it silently falls back to `us-east-1` as a default; only relevant if the Lab actually gives you a different region).
+**S3 bucket:**
+1. Click the **AWS** button (opens the AWS Console).
+2. Search **S3** in the top bar → click into it → **Create bucket**.
+3. Name it `pubg-insight-match-cache`.
+   - S3 names must be **globally unique across all of AWS** — if that name's taken, add a suffix, e.g. `pubg-insight-match-cache-nghi2026`.
+   - If you used a suffix, add this to `application-local.yml`:
+     ```yaml
+     aws:
+       s3:
+         cache-bucket: pubg-insight-match-cache-nghi2026
+     ```
+4. Leave everything else default → **Create bucket**.
 
----
+**DynamoDB table:**
+1. Search **DynamoDB** in the Console's top bar → click into it → **Create table**.
+2. Table name: `pubg-insight-analysis-history`.
+3. Partition key: `playerId`, type **String**.
+4. Sort key: `matchId`, type **String**.
+5. Leave everything else default → **Create table**.
 
-## 6. Verify it worked
-
-1. Run the backend locally as usual.
-2. Search for a player and view one of their matches — this triggers an S3 cache read/write in `MatchService`.
-3. Check the backend's console/log output:
-   - If you see `S3 match cache read failed ... falling back to PUBG API` with a `WARN` and a cause like `S3Exception: The provided token is malformed or otherwise invalid` → credentials are still wrong/expired, redo steps 2–4.
-   - If you see no such warning at all → the S3 cache is working. The app still functions correctly either way (see `docs/ARCHITECTURE.md` design decision D12) — this step is just to confirm the AWS integration itself is live, not just still falling back.
-
----
-
-## 7. One-time setup: create the actual DynamoDB table and S3 bucket
-
-Credentials alone aren't enough the first time — the table/bucket this app expects don't exist until you create them once. This is manual Console setup, which is explicitly allowed by the assignment rubric (only the *runtime* behavior needs to be automated, not initial resource creation).
-
-1. Click the **AWS** button/link from the Learner Lab page (opens the AWS Console, already logged in).
-2. In the Console's top search bar, type **DynamoDB** and click into that service.
-3. Click **Create table**.
-   - Table name: `pubg-insight-analysis-history` (must match `DYNAMODB_ANALYSIS_HISTORY_TABLE` in `application.yml`, or set that env var to whatever you name it instead)
-   - Partition key: `playerId`, type **String**
-   - Sort key: `matchId`, type **String**
-   - Leave other settings at their defaults, click **Create table**.
-4. Back in the Console's search bar, type **S3** and click into that service.
-5. Click **Create bucket**.
-   - Bucket name: `pubg-insight-match-cache` (must match `S3_CACHE_BUCKET` in `application.yml`, or set that env var instead — note S3 bucket names must be globally unique across all of AWS, so you may need to add a suffix, e.g. `pubg-insight-match-cache-yourname`, and update the env var to match)
-   - Leave other settings at their defaults, click **Create bucket**.
-
-Do this once per Lab account (it persists across Lab session restarts — only the *credentials* expire, not the resources you created with them).
+Done — restart the backend and both AWS integrations should work.
 
 ---
 
-## 8. Deploying to Elastic Beanstalk (once the backend is ready to deploy)
+## Later (not needed yet — deployment step)
 
-The official Learner Lab readme (`docs/LEARNER_LAB.md`) gives exact steps for this service — reproduced here so they're easy to find alongside the rest of this guide:
+Elastic Beanstalk deployment, once the backend is actually ready to go live:
 
-1. Open the AWS Console (via the **AWS** button from the Learner Lab page), search for **Elastic Beanstalk**, click into it.
-2. Click **Create Application**.
-3. Give it an application name (e.g. `pubg-insight-backend`), choose the platform (Java / Corretto, matching this app's Java 21 runtime — pick the closest supported Java version if 21 isn't listed yet).
-4. Click **Configure more options** (don't just click straight through with defaults).
-5. Scroll to the **Security** panel, click **Edit**.
-   - **Service role**: choose **LabRole** (not "create new" — the Lab won't allow creating a custom one).
-   - If the environment is in **us-east-1**: **EC2 key pair** → choose **vockey**, **IAM instance profile** → choose **LabInstanceProfile**.
-6. Click **Save**, then click **Create app**.
+1. AWS Console → search **Elastic Beanstalk** → **Create Application**.
+2. Name it, pick the Java/Corretto platform (closest match to Java 21).
+3. **Configure more options** → **Security** panel → **Edit**:
+   - **Service role** → `LabRole` (never "create new" — the Lab blocks it).
+   - In `us-east-1`: **EC2 key pair** → `vockey`, **IAM instance profile** → `LabInstanceProfile`.
+4. **Save** → **Create app**.
 
-Supported instance sizes here are capped at **nano, micro, small, medium, large** — anything bigger gets terminated automatically, so don't pick anything larger when configuring the environment's instance type.
+Instance size is capped at nano/micro/small/medium/large — anything bigger gets auto-terminated.
 
-Once created, the environment gets a stable `*.elasticbeanstalk.com` URL (per `docs/PROJECT_CONTEXT.md`'s AWS Environment notes) that survives the underlying instance restarting between Lab sessions — after a session timeout, just restart the Elastic Beanstalk environment (not recreate it) when you come back.
-
----
-
-## 9. Other approved services — what's already confirmed
-
-Per the official readme, these all explicitly support attaching **LabRole** with no other special IAM setup needed, so when any of their setup wizards ask for a role/service-role, the answer is always "use the existing LabRole" (never "create new"):
-
-- **API Gateway**
-- **Lambda** (attach `LabRole` to any function needing to call other AWS services; capped at 10 concurrent execution environments — far above what this app needs)
-- **DynamoDB**
-- **S3**
-- **Athena**
-
-None of these need a bespoke IAM policy written for this project — that would be actively working against how the Lab is set up, not with it.
+Every approved service (API Gateway, Lambda, DynamoDB, S3, Athena) already supports attaching `LabRole` directly — whenever a setup wizard asks for a role, the answer is always the existing `LabRole`, never a custom one.
