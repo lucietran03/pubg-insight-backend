@@ -5,7 +5,7 @@ Two situations, two sections. Find yours, skip the rest:
 - **First time ever** → do [A] then [B], in that order.
 - **Every other time you sit down to work** → just do [A].
 
-`docs/LEARNER_LAB.md` is the official, unedited AWS Academy readme — the source of truth if anything here looks outdated. Exact button labels can shift slightly between versions; if something's named a little differently, look for the closest match.
+`docs/decisions/LEARNER_LAB.md` is the official, unedited AWS Academy readme — the source of truth if anything here looks outdated. Exact button labels can shift slightly between versions; if something's named a little differently, look for the closest match.
 
 ---
 

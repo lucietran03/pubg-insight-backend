@@ -273,9 +273,9 @@ using historical data.
 
 Deployment target is the **RMIT-provided AWS Academy Learner Lab**, not a personal AWS account — chosen deliberately to avoid real billing risk while cost per-service isn't yet known. This has practical implications for how the AWS integrations below must be built:
 
-- **IAM**: confirmed via the official Learner Lab readme (`docs/LEARNER_LAB.md`) — "Extremely limited access. You cannot create users or groups. You cannot create roles, except that you can create service-linked roles." A pre-provisioned `LabRole`/`LabInstanceProfile` exists and every one of our approved services (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena) explicitly "can assume the LabRole IAM role" — so every service setup screen that asks for a role/service-role/execution-role should be pointed at `LabRole` (or `LabInstanceProfile` where an instance profile specifically is asked for, e.g. EC2/Elastic Beanstalk), never a custom one.
+- **IAM**: confirmed via the official Learner Lab readme (`docs/decisions/LEARNER_LAB.md`) — "Extremely limited access. You cannot create users or groups. You cannot create roles, except that you can create service-linked roles." A pre-provisioned `LabRole`/`LabInstanceProfile` exists and every one of our approved services (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena) explicitly "can assume the LabRole IAM role" — so every service setup screen that asks for a role/service-role/execution-role should be pointed at `LabRole` (or `LabInstanceProfile` where an instance profile specifically is asked for, e.g. EC2/Elastic Beanstalk), never a custom one.
 - **Region**: **confirmed as `us-east-1`** (verified against the actual Learner Lab account's "AWS Details" panel) — matches this app's existing default (`AWS_REGION:us-east-1` in `application.yml`), so no code change was needed.
-- **Sessions time out**: compute resources can stop when a Lab session ends and need restarting before use (e.g. before a demo). Elastic Beanstalk mitigates the worst of this — its environment gets a stable URL (`*.elasticbeanstalk.com`) that survives the underlying EC2 instance restarting or getting a new IP between sessions, so we don't need to reconfigure anything, just restart the environment if it was stopped. Credentials for local development (`~/.aws/credentials`) are separate from this and expire every session regardless — see `docs/LEARNER_LAB_SETUP.md`.
+- **Sessions time out**: compute resources can stop when a Lab session ends and need restarting before use (e.g. before a demo). Elastic Beanstalk mitigates the worst of this — its environment gets a stable URL (`*.elasticbeanstalk.com`) that survives the underlying EC2 instance restarting or getting a new IP between sessions, so we don't need to reconfigure anything, just restart the environment if it was stopped. Credentials for local development (`~/.aws/credentials`) are separate from this and expire every session regardless — see `docs/decisions/LEARNER_LAB_SETUP.md`.
 - Budget is capped by the Lab itself, so cost overruns aren't a real risk here — but avoid leaving expensive resources (e.g. Athena queries over large scans) running unnecessarily anyway, as good practice. The official readme also warns that exceeding certain hard limits (e.g. 20+ concurrent EC2 instances) can get the whole Lab account disabled — stay well under any documented limit, not just close to it.
 - Lambda specifically: max 10 concurrent execution environment instances per the official readme — irrelevant at this app's demo scale, but worth knowing if load-testing is ever considered.
 
@@ -337,17 +337,17 @@ Alongside the working application, the assignment requires two written artifacts
 - **Summary** (0.5 pt)
 - **Introduction** (1 pt) — must cover: (i) motivations behind the idea, (ii) what the system does at a high level, (iii) who the key beneficiaries are.
 
-Draft prose for both: `docs/SOLUTION_ARCHITECTURE_DOCUMENT.md` — copy/adapt directly into the actual submission document.
+Draft prose for both: `docs/deliverables/SOLUTION_ARCHITECTURE_DOCUMENT.md` — copy/adapt directly into the actual submission document.
 
 ## Project Report
 
 - **Related Work** (1 pt) — reference similar existing applications/products.
-- **System Architecture** (5 pts, the largest report criterion) — one or more diagrams that clearly show: (1) the full flow from each client interface operation through the system, (2) detailed interactions between all components, (3) the function of every component. See `docs/ARCHITECTURE.md` for the current working set of diagrams (system context, component view, per-feature sequence diagrams, data mapping, error flow) — it's the direct source material for this section. Keep it in sync as AWS integrations are added — it's worth as much as three AWS services combined.
+- **System Architecture** (5 pts, the largest report criterion) — one or more diagrams that clearly show: (1) the full flow from each client interface operation through the system, (2) detailed interactions between all components, (3) the function of every component. See `docs/deliverables/ARCHITECTURE.md` for the current working set of diagrams (system context, component view, per-feature sequence diagrams, data mapping, error flow) — it's the direct source material for this section. Keep it in sync as AWS integrations are added — it's worth as much as three AWS services combined.
 - **System Descriptions** (1 pt) — explain the purpose of each component used.
 - **Dataset / Data Structure / API Description** (1 pt) — describe the PUBG API data model, Gemini inputs/outputs, and internal data structures (DynamoDB items, S3 objects, etc.).
 - **References** (0.5 pt) — links/sources used during development.
 
-Draft prose for Related Work / System Descriptions / Dataset & API Description / References: `docs/PROJECT_REPORT.md`.
+Draft prose for Related Work / System Descriptions / Dataset & API Description / References: `docs/deliverables/PROJECT_REPORT.md`.
 
 Both documents live outside this repository (per assignment submission format) but should be treated as first-class deliverables tracked in `TASK.md` alongside code work.
 
@@ -410,7 +410,7 @@ Follow these principles.
 
 # Current Status
 
-Verified against actual source code, not commit messages or prior doc claims. See `docs/ARCHITECTURE.md` for full diagrams and design rationale, and `docs/TASK.md` for the live sprint/roadmap tracker.
+Verified against actual source code, not commit messages or prior doc claims. See `docs/deliverables/ARCHITECTURE.md` for full diagrams and design rationale, and `docs/decisions/TASK.md` for the live sprint/roadmap tracker.
 
 Actually done
 
@@ -419,11 +419,11 @@ Actually done
 - **Feature 3 (AI Insights / Gemini)** — code complete (client, DTOs, `insight/` feature composing Player+Match, prompt built from aggregated metrics only, tolerant response parsing), unit + integration tested. Not yet run against a real Gemini key.
 - **Feature 4 (Analysis History)** — DynamoDB integration code complete (`client/dynamodb`, `history/` feature), unit + integration tested, **compile confirmed** by a real `mvn test` run. **Not deployed or run against real AWS** — no table exists yet. Treat as "compiles, ready to test," not "verified against AWS."
 - S3 match-data caching (supports Feature 2 and reduces PUBG API load) — code complete (`client/s3`, wired into `MatchService` as a cache-aside layer with soft-fail on any cache error), **compile confirmed**. Same caveat: not deployed against real AWS yet.
-- **First real `mvn compile`/`mvn test` run completed** — compile succeeded across the entire codebase (including all AWS code written without any prior ability to compile it). One real bug found and fixed: `MatchService` assumed Spring would auto-configure a classic Jackson `ObjectMapper` bean, but this Spring Boot version configures a different (Jackson 3) mapper type instead, so no such bean existed — this broke 8 tests (every test building a real `MatchService`). Fixed by having `MatchService` construct its own `ObjectMapper` directly. See `docs/ARCHITECTURE.md` §8 for detail — this is a real environment fact future Jackson-using code needs to know about.
-- Frontend: full UI for Features 1-3, PUBG-branded MUI theme, redesigned per an explicit design brief (wider layout, sectioned cards, rich match previews, reduced border radius) — see `docs/ARCHITECTURE.md` design decisions.
+- **First real `mvn compile`/`mvn test` run completed** — compile succeeded across the entire codebase (including all AWS code written without any prior ability to compile it). One real bug found and fixed: `MatchService` assumed Spring would auto-configure a classic Jackson `ObjectMapper` bean, but this Spring Boot version configures a different (Jackson 3) mapper type instead, so no such bean existed — this broke 8 tests (every test building a real `MatchService`). Fixed by having `MatchService` construct its own `ObjectMapper` directly. See `docs/deliverables/ARCHITECTURE.md` §8 for detail — this is a real environment fact future Jackson-using code needs to know about.
+- Frontend: full UI for Features 1-3, PUBG-branded MUI theme, redesigned per an explicit design brief (wider layout, sectioned cards, rich match previews, reduced border radius) — see `docs/deliverables/ARCHITECTURE.md` design decisions.
 - Local baseline QA: error handling for PUBG/Gemini outages, timeouts, and rate limits (429 preserved distinctly from 502/500), server-side failure logging, frontend error-message differentiation by failure type, `check.sh` (compile+test) and `api-test.sh` (live HTTP smoke test, now prints real status/body per call after a real bug in its own id-extraction regex was found and fixed).
 - Real PUBG API call volume per search reduced from 8 to ~5 (cached season id, fewer auto-loaded match previews) after live testing hit the 10 req/min free-tier limit after 1-2 searches.
-- Solution Architecture Document and Project Report prose drafted (`docs/SOLUTION_ARCHITECTURE_DOCUMENT.md`, `docs/PROJECT_REPORT.md`).
+- Solution Architecture Document and Project Report prose drafted (`docs/deliverables/SOLUTION_ARCHITECTURE_DOCUMENT.md`, `docs/deliverables/PROJECT_REPORT.md`).
 - Assignment proposal approved by instructor. AWS deployment target decided: RMIT Learner Lab, not a personal account.
 
 Not yet done

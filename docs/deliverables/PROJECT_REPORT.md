@@ -1,6 +1,6 @@
 # Project Report — PUBG Insight
 
-> Submission-ready prose for the Project Report deliverable sections that aren't the System Architecture diagrams themselves (those live in `docs/ARCHITECTURE.md` and are referenced, not duplicated, below). Covers Related Work (1 pt), System Descriptions (1 pt), Dataset/Data Structure/API Description (1 pt), References (0.5 pt) — see `PROJECT_CONTEXT.md` → Deliverables.
+> Submission-ready prose for the Project Report deliverable sections that aren't the System Architecture diagrams themselves (those live in `docs/deliverables/ARCHITECTURE.md` and are referenced, not duplicated, below). Covers Related Work (1 pt), System Descriptions (1 pt), Dataset/Data Structure/API Description (1 pt), References (0.5 pt) — see `PROJECT_CONTEXT.md` → Deliverables.
 
 ---
 
@@ -18,7 +18,7 @@ Several existing tools already surface PUBG gameplay statistics pulled from the 
 
 ## System Descriptions
 
-Each major component and the purpose it serves (see `docs/ARCHITECTURE.md` §2 for the full package/dependency diagram):
+Each major component and the purpose it serves (see `docs/deliverables/ARCHITECTURE.md` §2 for the full package/dependency diagram):
 
 | Component | Purpose |
 |---|---|
@@ -49,7 +49,7 @@ The primary data source. A JSON:API-formatted REST API (`https://api.pubg.com`) 
 - `GET /shards/{shard}/seasons` — lists all seasons; used to find the one flagged `isCurrentSeason: true`.
 - `GET /shards/{shard}/players/{accountId}/seasons/{seasonId}` — returns `gameModeStats`, a per-game-mode (solo/duo/squad and their FPP variants) breakdown of wins and rounds played for that season, which this project sums across all modes into a single win rate.
 
-Full request/response shapes and how they map onto this app's own DTOs are diagrammed in `docs/ARCHITECTURE.md` §4 (Data Mapping).
+Full request/response shapes and how they map onto this app's own DTOs are diagrammed in `docs/deliverables/ARCHITECTURE.md` §4 (Data Mapping).
 
 ### Google Gemini API
 
@@ -64,7 +64,7 @@ The backend never exposes either external API's raw shape to the frontend. Every
 - `MatchDto` — matchId, mapName, gameMode, kills, headshotKills, headshotRate, damageDealt, timeSurvivedSeconds, winPlace.
 - `InsightDto` — summary, strengths, weaknesses, recommendations.
 
-**Planned** (not yet implemented — see `docs/ARCHITECTURE.md` §7): a DynamoDB item shape for stored analysis history (player id, match id, computed metrics, timestamp) and an S3 object convention for cached PUBG match responses, to be defined when Features 4/5 are built.
+**Planned** (not yet implemented — see `docs/deliverables/ARCHITECTURE.md` §7): a DynamoDB item shape for stored analysis history (player id, match id, computed metrics, timestamp) and an S3 object convention for cached PUBG match responses, to be defined when Features 4/5 are built.
 
 ---
 

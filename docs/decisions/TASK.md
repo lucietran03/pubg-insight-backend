@@ -1,6 +1,6 @@
 # Roadmap (Weeks 7–12)
 
-High-level plan mapping the approved architecture (see `PROJECT_CONTEXT.md`) to the assignment timeline. Real deadline per `docs/WBS.md`/`docs/Calendar.md`: Canvas submission 12-Sep, demo target 17/18-Sep.
+High-level plan mapping the approved architecture (see `PROJECT_CONTEXT.md`) to the assignment timeline. Real deadline per `docs/decisions/WBS.md`/`docs/decisions/Calendar.md`: Canvas submission 12-Sep, demo target 17/18-Sep.
 
 | Weeks | Focus |
 |---|---|
@@ -39,10 +39,10 @@ Everything that doesn't need live AWS access is now done. The remaining work is 
 - PUBG API call volume reduced from 8 to ~5 calls per player search (cached `findCurrentSeasonId()`, reduced match-preview prefetch count) after live testing hit the 10 req/min rate limit after 1-2 searches.
 - Frontend UI redesigned per an explicit design brief: wider layout, sectioned cards (Player Overview / Season Performance / Recent Matches), rich match previews for the most recent few matches, reduced border radius, API-status indicator.
 - `api-test.sh` had its own real bug fixed (JSON id-extraction regex silently failed on spaced JSON, causing checks to be skipped while still reporting "0 failed") — now prints real status/body per call and surfaces skips as warnings.
-- `docs/ARCHITECTURE.md`: system context, component view, 6 sequence diagrams (Player Search, Match Analytics, Season Stats, AI Insights, S3 caching, DynamoDB history), data mapping, error flow, 15 design decisions, planned AWS architecture with a concrete "what's needed to turn it on" checklist, plus the Jackson/ObjectMapper and Gemini-empty-key environment gotchas for future code.
+- `docs/deliverables/ARCHITECTURE.md`: system context, component view, 6 sequence diagrams (Player Search, Match Analytics, Season Stats, AI Insights, S3 caching, DynamoDB history), data mapping, error flow, 15 design decisions, planned AWS architecture with a concrete "what's needed to turn it on" checklist, plus the Jackson/ObjectMapper and Gemini-empty-key environment gotchas for future code.
 - Real bug fixed: a Gemini 403 (empty `GEMINI_API_KEY` at runtime — a local config issue, not a code bug) was being shown to the user as "PUBG service is temporarily unavailable." Root cause was the frontend's `errorMessage.ts` hardcoding a message per HTTP status instead of reading the backend's own distinct per-exception message. Fixed frontend-side (surface `error.response.data.error`); also added a Gemini-specific rate-limit exception (`GeminiRateLimitException`, mirroring the existing PUBG one).
 - Homepage layout pass: wider (`xl`) container with a real top bar, standalone search bar section, grouped Player Overview identity block, an explicit 3-column Recent Matches preview grid (was leaving dead space), and a click-to-reveal list for older matches (was a wall of meaningless "Match N" pills) — backed by a new `MatchDto.createdAt` field and backend-side map-code/game-mode-code → display-label translation (`MatchMapper`) so the frontend never sees raw PUBG codes like `Baltic_Main`.
-- `docs/SOLUTION_ARCHITECTURE_DOCUMENT.md` and `docs/PROJECT_REPORT.md` drafted.
+- `docs/deliverables/SOLUTION_ARCHITECTURE_DOCUMENT.md` and `docs/deliverables/PROJECT_REPORT.md` drafted.
 - Repo cleanup: removed dead scaffolding (empty index files, unused assets), synced stale frontend docs with backend's maintained copies, restored `CLAUDE.md` in both repos to real ongoing instructions (had drifted into completed one-off task tickets).
 - Decided to deploy via the RMIT-provided AWS Academy Learner Lab, not a personal AWS account.
 - **First real run against live AWS + a real Gemini timeout** (from user-provided runtime logs): confirmed the S3 cache-aside soft-fail (D12) works exactly as designed against real infrastructure — every S3 call failed with an expired/invalid Learner Lab session token, and every one fell back to the PUBG API cleanly with no user-visible error, just a server-side `WARN` log. Separately, a real Gemini read timeout during response-body extraction surfaced a genuine bug: it threw a plain `RestClientException` that escaped both `PubgApiClient`'s and `GeminiApiClient`'s catch clause (which only caught the narrower `HttpStatusCodeException`/`ResourceAccessException` subtypes), reaching the servlet container as an uncaught 500. Fixed by widening both clients' fallback catch to `RestClientException` itself.
@@ -59,7 +59,7 @@ Re-verifying the ObjectMapper fix with another `mvn test` run — fixed by inspe
 
 ## Next (all user-owned — needs Learner Lab access)
 
-Step-by-step, click-by-click instructions for all Learner Lab/credentials steps below: **`docs/LEARNER_LAB_SETUP.md`**.
+Step-by-step, click-by-click instructions for all Learner Lab/credentials steps below: **`docs/decisions/LEARNER_LAB_SETUP.md`**.
 
 1. Re-run `mvn test` to confirm the ObjectMapper fix resolves all 8 previously-failing tests.
 2. Create the DynamoDB table (`pubg-insight-analysis-history` by default, partition key `playerId`, sort key `matchId`) and S3 bucket (`pubg-insight-match-cache` by default, must be globally-unique — see setup guide) — one-time Console setup, allowed under the rubric. **In progress**: Learner Lab credentials confirmed working (real run against live AWS now fails with `NoSuchBucketException`, not a credentials error) — the bucket itself just hasn't been created yet.

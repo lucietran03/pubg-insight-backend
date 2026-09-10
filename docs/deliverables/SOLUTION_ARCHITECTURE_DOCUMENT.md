@@ -1,6 +1,6 @@
 # Solution Architecture Document — PUBG Insight
 
-> Submission-ready prose for the assignment's Solution Architecture Document deliverable (Summary 0.5 pt, Introduction 1 pt — see `PROJECT_CONTEXT.md` → Deliverables). Architecture diagrams referenced throughout live in `docs/ARCHITECTURE.md`; copy/adapt the sections below directly into the actual submission document.
+> Submission-ready prose for the assignment's Solution Architecture Document deliverable (Summary 0.5 pt, Introduction 1 pt — see `PROJECT_CONTEXT.md` → Deliverables). Architecture diagrams referenced throughout live in `docs/deliverables/ARCHITECTURE.md`; copy/adapt the sections below directly into the actual submission document.
 
 ---
 
