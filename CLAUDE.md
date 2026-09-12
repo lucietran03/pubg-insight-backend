@@ -1,185 +1,371 @@
-==================================================
-IMPORTANT SCOPE BOUNDARY — NOT YET BUILT
-==================================================
+The application has improved compared to the previous version, but it still feels like a collection of statistic cards rather than an AI-powered player analysis platform.
 
-There are several V2 features that are part of the long-term product vision but are NOT yet implemented.
+I want you to redesign the UI with a stronger product thinking and information hierarchy. Do NOT simply restyle components. Reconsider how information should be presented so the user naturally understands the story of their performance.
 
-Do NOT build these features as part of this UI task unless explicitly instructed.
+Keep the existing dark theme and color palette. Don't redesign the visual identity. Focus on layout, hierarchy, spacing, typography and interaction.
 
-Do NOT fake missing backend data.
+----------------------------------------------------
+1. PLAYER OVERVIEW
+----------------------------------------------------
 
-Do NOT create frontend-only workarounds that cause excessive PUBG API calls.
+The Player Overview card currently feels visually unbalanced.
 
-The current task is only to improve the existing comparison UI and AI Insights presentation using data that already exists.
+Current problems:
 
-The following features remain future work:
+- The player name is pushed too far left while the rest of the card is centered, making the entire layout look misaligned.
+- The "Platform: STEAM" badge feels oversized.
+- "118 matches in the last 14 days" sits awkwardly with too much empty space around it.
 
---------------------------------------------------
-1. SEASON TREND CHARTS
---------------------------------------------------
+Please redesign this card.
 
-Current state:
+Suggestions:
 
-The current Season Performance implementation only compares:
+- Align player name, platform, and metadata into one coherent visual block.
+- Reduce the size of the platform badge.
+- Add subtle icons where appropriate.
+- Reduce wasted whitespace.
+- Make the card feel like a premium player profile instead of just displaying three text fields.
 
-Current Season
-vs
-Previous Season
+----------------------------------------------------
+2. SEASON PERFORMANCE CARD
+----------------------------------------------------
 
-using a single before/after delta per metric through the existing SeasonComparison logic.
+The "Frontline Eliminator" archetype badge currently sits awkwardly and feels disconnected from the rest of the content.
 
-This is NOT yet a real time-series implementation.
+Instead:
 
-The V2 vision eventually wants trend charts for metrics such as:
+- Give the archetype a proper visual identity.
+- Add confidence or classification if available.
+- Visually connect the archetype to the season statistics below.
+- The eye should naturally move:
 
-- win rate
-- average damage
-- K/D
-- headshot rate
-- survival performance
+Archetype
+↓
 
-However, PUBG does not provide a native "last N weeks" statistics endpoint.
+Short explanation
 
-The realistic future implementation would therefore use multiple historical seasons as the available time points.
+↓
 
-This requires a backend change first.
+Hero metric (Win Rate)
 
-Current backend behavior only retrieves ONE previous season.
+↓
 
-Relevant backend logic includes:
+Supporting season stats
 
-- PubgApiClient.findPreviousSeasonId()
-- PlayerService.getSeasonStats()
+Avoid making everything centered equally.
 
-Future implementation should fetch several previous seasons and expose them through a dedicated historical-season response.
+----------------------------------------------------
+3. SECTION TITLES
+----------------------------------------------------
 
-IMPORTANT:
+Section titles such as
 
-Do NOT build a frontend trend chart using fabricated or duplicated points.
+PLAYER OVERVIEW
+SEASON PERFORMANCE
+PERFORMANCE BREAKDOWN
+PERFORMANCE RADAR
+RECENT MATCHES
 
-Do NOT simulate historical data.
+are too subtle.
 
-Do NOT turn the current current-vs-previous delta into a fake line chart.
+They currently blend into the background.
 
-For this task, preserve the existing season comparison behavior.
+Please improve them by:
 
---------------------------------------------------
-2. DEEP INSIGHTS
---------------------------------------------------
+- increasing hierarchy
+- better spacing
+- subtle accent color or divider
+- stronger typography
 
-The V2 product vision includes derived insights such as:
+without making them loud.
 
-- favorite map
-- highest-performing map
-- lowest-performing map
-- preferred game mode
-- longest survival streak
-- most aggressive match
-- highest-damage match
-- most efficient win
-- teammate synergy
-- other cross-match behavioral patterns
+The user should instantly recognize where each section begins.
 
-These are NOT currently available as aggregated backend analytics.
+----------------------------------------------------
+4. PERFORMANCE BREAKDOWN
+----------------------------------------------------
 
-MatchDto already contains useful match-level data such as:
+This section wastes horizontal space.
 
-- mapName
-- gameMode
-- kills
-- damage
-- placement
-- survival
-- other per-match statistics
+Instead of placing six stat cards in a single horizontal row, redesign the layout.
 
-However, meaningful Deep Insights require aggregation across multiple matches.
+Preferred layout:
 
-Preferred future architecture:
+LEFT (about 45%)
 
-Backend
-→ aggregate cached/recent match data
-→ derive cross-match insights
-→ return one dedicated Deep Insights response
+Six statistic cards arranged in
 
-Do NOT implement this by making the frontend fetch every match individually.
+2 columns
+×
+3 rows
 
-Do NOT create an N-request frontend loop.
+RIGHT (about 55%)
 
-This is especially important because PUBG API access is rate-limited and repeated requests should be minimized.
+Radar chart
 
-Deep Insights require a new backend aggregation endpoint before they should be built in the frontend.
+This creates a much more balanced composition.
 
-For this task:
+The radar chart should become the visual centerpiece.
 
-Do NOT add fake Favorite Map, Best Map, Streak, Most Aggressive Match, etc. unless the backend already exposes real derived values.
+Also improve the radar chart itself.
 
---------------------------------------------------
-3. BADGES / ACHIEVEMENTS / PROGRESS RINGS
---------------------------------------------------
+Currently it looks like a default chart library.
 
-This is the only future area that may be implemented frontend-only because much of the required data already exists.
+Make it feel like a premium game analytics visualization while keeping readability.
 
-Possible future presentation ideas:
+----------------------------------------------------
+5. RECENT MATCH CARDS
+----------------------------------------------------
 
-- archetype badge
-- high Top 10 rate badge
-- high win-rate badge
-- strong combat performance badge
-- above-season-average match badge
-- high survival performance badge
+Each recent match card still feels flat.
 
-These may use already available:
+The layout should improve.
 
-- archetype
-- radar scores
-- match-vs-season deltas
-- season statistics
+Especially:
 
-However:
+- Damage should be aligned bottom-right.
+- Kills and damage shouldn't float together.
 
-Do NOT claim achievements that cannot be proven by the available data.
+Instead think like a match summary card.
+
+Example hierarchy:
+
+Top
+
+Placement
+
+Date
+
+Mode badge
+
+Middle
+
+Map
+
+Bottom Left
+
+Kills
+
+Bottom Right
+
+Damage
+
+The user should be able to compare matches very quickly just by scanning.
+
+----------------------------------------------------
+6. MATCH DETAIL HEADER
+----------------------------------------------------
+
+Current layout:
+
+Placement
+#1
+
+Map
+Erangel
+
+Mode
+Time
+
+feels awkward.
+
+Please redesign the hero header.
+
+Think more like
+
+LEFT
+
+Placement
+#1
+
+CENTER
+
+Map
+
+Erangel
+
+RIGHT
+
+Mode badge
+
+Date
+
+or another layout that establishes a stronger visual hierarchy.
+
+The placement should be the first thing users notice.
+
+----------------------------------------------------
+7. MATCH VS SEASON CARDS
+----------------------------------------------------
+
+The comparison cards have greatly improved.
+
+I like the direction.
+
+However the percentage value still doesn't stand out enough.
+
+Please redesign them so that:
+
+Largest element
+
+▲149%
+
+Secondary
+
+Damage dealt
+
+Caption
+
+vs season average
+
+The percentage should dominate visually.
+
+Treat it as the key insight rather than another label.
+
+----------------------------------------------------
+8. AI INSIGHTS (MOST IMPORTANT)
+----------------------------------------------------
+
+This is currently the weakest part of the product.
+
+Right now it feels like AI dumped text into multiple boxes.
+
+It does NOT feel like an experienced PUBG coach reviewing a student's gameplay.
+
+I do NOT want generic summaries.
+
+I want a coaching experience.
+
+Think like:
+
+A former esports coach.
+
+A professional PUBG analyst.
+
+Someone reviewing a VOD with a player.
+
+The entire section should guide the player step-by-step.
+
+The current information architecture is poor because every section has equal importance.
+
+Instead create a narrative.
 
 For example:
 
-"Personal Best Damage"
+1.
+Overall Verdict
 
-should only be displayed if historical match data confirms that it is actually the player's personal best.
+One sentence.
 
-If this cannot be verified, use evidence-based wording such as:
+How good was this match?
 
-"High Damage Match"
+How unusual compared to the player's normal level?
 
-or
+2.
+What You Did Well
 
-"Above Season Average"
+2-4 actionable strengths.
 
-Badges are not part of the current required redesign unless they clearly improve the existing UI without introducing new logic or scope.
+Explain WHY.
 
---------------------------------------------------
-CURRENT TASK BOUNDARY
---------------------------------------------------
+3.
+What Hurt Your Performance
 
-For the current redesign, focus ONLY on:
+Real weaknesses.
 
-1. The "vs season average" comparison UI.
+Not generic.
 
-2. The existing AI Insights presentation:
-    - AI Performance Summary
-    - Strengths
-    - Weaknesses
-    - Recommendations
-    - Playstyle Analysis
-    - Season Progress
-    - Risk Factors
-    - Training Priorities
+Prioritize by impact.
 
-Use only data that the current frontend/backend already provides.
+4.
+Key Coaching Advice
 
-If you discover that a desired visual element requires unavailable backend data:
+Only 2-3 recommendations.
 
-- do not fake it
-- do not hardcode it
-- do not derive it incorrectly in the frontend
-- clearly mark it as a future backend dependency
+Concrete.
 
-Preserve product correctness over visual completeness.
+Specific.
+
+Actionable.
+
+5.
+Playstyle Diagnosis
+
+What kind of player is this?
+
+How does today's match reinforce or contradict the season profile?
+
+6.
+Long-term Development
+
+Based on season statistics,
+
+what should the player practice over the next weeks?
+
+Not this match only.
+
+----------------------------------------------------
+9. REDUCE REPETITION
+----------------------------------------------------
+
+Currently every AI section is just:
+
+Title
+
+Paragraph
+
+Tags
+
+Title
+
+Paragraph
+
+Tags
+
+Title
+
+Paragraph
+
+Tags
+
+This becomes exhausting to read.
+
+Introduce more visual variety.
+
+Different card styles.
+
+Different layouts.
+
+Different hierarchy.
+
+Different iconography.
+
+Different spacing.
+
+The UI should naturally guide the eye.
+
+----------------------------------------------------
+10. OVERALL GOAL
+----------------------------------------------------
+
+Imagine Riot Games, OP.GG, Mobalytics, Blitz.gg or Tracker.gg hired you to redesign this page.
+
+The objective is NOT to display more data.
+
+The objective is to make the player understand:
+
+Who am I?
+
+How did I perform?
+
+What was different this match?
+
+Why?
+
+What should I improve next?
+
+Every screen should tell a story rather than simply displaying statistics.
+
+Do not add placeholder features that require backend support.
+
+Only redesign using the data already available.
