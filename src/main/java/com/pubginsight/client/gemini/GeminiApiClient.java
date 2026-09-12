@@ -26,7 +26,7 @@ public class GeminiApiClient {
     private static final int READ_TIMEOUT_MILLIS = 15000;
 
     private final RestClient restClient;
-    private final String model;
+    private final List<String> models;
     private final String apiKey;
 
     public GeminiApiClient(GeminiApiProperties properties) {
@@ -38,11 +38,41 @@ public class GeminiApiClient {
                 .baseUrl(properties.baseUrl())
                 .requestFactory(requestFactory)
                 .build();
-        this.model = properties.model();
+        this.models = properties.models();
         this.apiKey = properties.key();
+
+        if (models.isEmpty()) {
+            // Fail fast at startup rather than looping zero times and throwing a null
+            // lastFailure the first time a request comes in.
+            throw new IllegalStateException("gemini.api.models must contain at least one model");
+        }
     }
 
+    // Tries each configured model in priority order. Quota/rate-limit failures are
+    // per-model, not per-application, so a busy or exhausted model is a reason to try the
+    // next one rather than give up - the last real failure (not a synthesized one) is
+    // what propagates if every model is down, since GlobalExceptionHandler needs the
+    // actual exception type (e.g. GeminiRateLimitException's retryAfterSeconds) to render
+    // the right status.
     public String generateText(String prompt) {
+        RuntimeException lastFailure = null;
+
+        for (String model : models) {
+            try {
+                return callModel(model, prompt);
+            } catch (GeminiRateLimitException | GeminiApiException e) {
+                log.warn("Gemini model '{}' failed ({}), trying next model", model, e.getClass().getSimpleName());
+                lastFailure = e;
+            }
+        }
+
+        throw lastFailure;
+    }
+
+    // Extracted as its own method (rather than inlined in the loop above) so a unit test
+    // can override this single seam to exercise the failover logic without a real
+    // RestClient call, API key, or quota.
+    String callModel(String model, String prompt) {
         GeminiGenerateContentRequest request = new GeminiGenerateContentRequest(
                 List.of(new GeminiContent(List.of(new GeminiPart(prompt)))));
 
@@ -67,7 +97,7 @@ public class GeminiApiClient {
             // still reading response headers/body (readWithMessageConverters) surfaces as a
             // plain RestClientException, not ResourceAccessException - confirmed via a real
             // uncaught 500 in production logs before this was widened to the common superclass.
-            throw new GeminiApiException("Gemini API request failed", e);
+            throw new GeminiApiException("Gemini API request failed for model '" + model + "'", e);
         }
     }
 
