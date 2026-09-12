@@ -49,6 +49,10 @@ public class OfflineInsightWriter {
             recommendations.add("practice aim to improve headshot rate");
         }
 
-        return new InsightDto(summary, strengths, weaknesses, recommendations, "offline");
+        // No Gemini call to draw from in offline mode, so the V2 coach sections
+        // (playstyle/seasonProgress/riskFactors/trainingPriorities) are left empty rather
+        // than guessed at - same "never fabricate" rule as the original 4 sections above.
+        return new InsightDto(summary, strengths, weaknesses, recommendations,
+                "", "", List.of(), List.of(), "offline");
     }
 }

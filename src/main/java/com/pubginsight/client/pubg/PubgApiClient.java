@@ -25,10 +25,16 @@ public class PubgApiClient {
     private final String defaultShard;
     private final PubgRateLimiter rateLimiter;
 
-    // The current season changes roughly every 2-3 months, so caching it for the life of
-    // the app instance saves 1 PUBG call per season-stats request - meaningful given the
-    // 10 req/min free-tier limit. A restart is enough to pick up a season change.
-    private volatile String cachedSeasonId;
+    // The current (and previous) season changes roughly every 2-3 months, so caching both
+    // for the life of the app instance saves 1 PUBG call per season-stats request -
+    // meaningful given the 10 req/min free-tier limit. A restart is enough to pick up a
+    // season change.
+    private volatile SeasonIds cachedSeasonIds;
+
+    // previousSeasonId is null when the current season is the account's/shard's very
+    // first season (e.g. a brand-new game) - there is nothing before it to compare against.
+    private record SeasonIds(String currentSeasonId, String previousSeasonId) {
+    }
 
     public PubgApiClient(PubgApiProperties properties, PubgRateLimiter rateLimiter) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -85,7 +91,18 @@ public class PubgApiClient {
     }
 
     public String findCurrentSeasonId() {
-        String cached = cachedSeasonId;
+        return loadSeasonIds().currentSeasonId();
+    }
+
+    // Returns null when the current season has no season before it (e.g. a brand-new
+    // game/shard with only one season released so far) - callers should treat that as
+    // "no previous season to compare against" rather than an error.
+    public String findPreviousSeasonId() {
+        return loadSeasonIds().previousSeasonId();
+    }
+
+    private SeasonIds loadSeasonIds() {
+        SeasonIds cached = cachedSeasonIds;
         if (cached != null) {
             return cached;
         }
@@ -97,14 +114,29 @@ public class PubgApiClient {
                     .retrieve()
                     .body(PubgSeasonListResponse.class);
 
-            String seasonId = response.data().stream()
-                    .filter(season -> Boolean.TRUE.equals(season.attributes().isCurrentSeason()))
-                    .map(PubgSeasonData::id)
-                    .findFirst()
-                    .orElseThrow(() -> new PubgApiException("No current PUBG season found", null));
+            List<PubgSeasonData> seasons = response.data();
+            int currentIndex = -1;
+            for (int i = 0; i < seasons.size(); i++) {
+                if (Boolean.TRUE.equals(seasons.get(i).attributes().isCurrentSeason())) {
+                    currentIndex = i;
+                    break;
+                }
+            }
 
-            cachedSeasonId = seasonId;
-            return seasonId;
+            if (currentIndex == -1) {
+                throw new PubgApiException("No current PUBG season found", null);
+            }
+
+            // PubgSeasonAttributes exposes no numeric/sortable ordering field (just
+            // isCurrentSeason/isOffseason) - PUBG returns the seasons list in chronological
+            // order, so the entry immediately before the current one in the array is "the
+            // previous season". Index 0 (no predecessor) means there is no previous season.
+            String currentSeasonId = seasons.get(currentIndex).id();
+            String previousSeasonId = currentIndex > 0 ? seasons.get(currentIndex - 1).id() : null;
+
+            SeasonIds seasonIds = new SeasonIds(currentSeasonId, previousSeasonId);
+            cachedSeasonIds = seasonIds;
+            return seasonIds;
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
         } catch (RestClientException e) {

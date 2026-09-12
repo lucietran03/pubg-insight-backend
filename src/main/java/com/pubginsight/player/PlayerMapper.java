@@ -95,8 +95,30 @@ public class PlayerMapper {
                 avgSurvivalSeconds,
                 longestKillMeters,
                 radar,
-                classifyArchetype(radar)
+                classifyArchetype(radar),
+                null
         );
+    }
+
+    // Percentage delta of each comparable metric between the current and previous season.
+    // Guards against a zero previous-season value (e.g. a metric that never triggered,
+    // such as a 0% headshot rate) by reporting 0% change instead of dividing by zero -
+    // there's no meaningful "percent change" from a zero baseline.
+    public SeasonComparison computeSeasonComparison(SeasonStatsDto current, SeasonStatsDto previous) {
+        return new SeasonComparison(
+                percentDelta(current.winRate(), previous.winRate()),
+                percentDelta(current.avgDamage(), previous.avgDamage()),
+                percentDelta(current.killDeathRatio(), previous.killDeathRatio()),
+                percentDelta(current.headshotRate(), previous.headshotRate()),
+                percentDelta(current.top10Rate(), previous.top10Rate())
+        );
+    }
+
+    private static double percentDelta(double currentValue, double previousValue) {
+        if (previousValue == 0.0) {
+            return 0.0;
+        }
+        return ((currentValue - previousValue) / previousValue) * 100.0;
     }
 
     private static double scale(double value, double ceiling) {

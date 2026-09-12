@@ -47,7 +47,8 @@ class InsightServiceTest {
                 wins, roundsPlayed, winRate,
                 300.0, 1.5, 0.3, 0.4, 600.0, 150.0,
                 new RadarScores(50, 50, 50, 50, 50, 50),
-                "Balanced Operator"
+                "Balanced Operator",
+                null
         );
     }
 
@@ -62,6 +63,10 @@ class InsightServiceTest {
                 STRENGTHS: high headshot rate, good damage output
                 WEAKNESSES: low survival time
                 RECOMMENDATIONS: rotate earlier, play more passively in the late game
+                PLAYSTYLE: A Balanced Operator who leans on damage output more than pure precision.
+                SEASON_PROGRESS: Win rate is trending upward over recent rounds.
+                RISK_FACTORS: dying before the final circles, overextending for kills
+                TRAINING_PRIORITIES: circle rotation timing, disciplined positioning
                 """);
 
         InsightDto result = insightService.generateInsights("account.1", "match-1");
@@ -70,6 +75,34 @@ class InsightServiceTest {
         assertThat(result.strengths()).containsExactly("high headshot rate", "good damage output");
         assertThat(result.weaknesses()).containsExactly("low survival time");
         assertThat(result.recommendations()).containsExactly("rotate earlier", "play more passively in the late game");
+        assertThat(result.playstyle()).contains("Balanced Operator");
+        assertThat(result.seasonProgress()).contains("Win rate is trending upward");
+        assertThat(result.riskFactors()).containsExactly("dying before the final circles", "overextending for kills");
+        assertThat(result.trainingPriorities()).containsExactly("circle rotation timing", "disciplined positioning");
+        assertThat(result.source()).isEqualTo("gemini");
+    }
+
+    @Test
+    void omitsNewCoachSectionsWhenGeminiDoesNotIncludeThem() {
+        when(playerService.getSeasonStats("account.1"))
+                .thenReturn(seasonStats(29, 265, 0.109));
+        when(matchService.getMatchStatsForPlayer("match-1", "account.1"))
+                .thenReturn(new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z"));
+        when(geminiApiClient.generateText(anyString())).thenReturn("""
+                SUMMARY: Solid aggressive performance with a strong finish.
+                STRENGTHS: high headshot rate
+                WEAKNESSES: low survival time
+                RECOMMENDATIONS: rotate earlier
+                """);
+
+        InsightDto result = insightService.generateInsights("account.1", "match-1");
+
+        // Gemini didn't return the new labels this time - each missing section stays
+        // empty rather than being defaulted to placeholder text.
+        assertThat(result.playstyle()).isEmpty();
+        assertThat(result.seasonProgress()).isEmpty();
+        assertThat(result.riskFactors()).isEmpty();
+        assertThat(result.trainingPriorities()).isEmpty();
         assertThat(result.source()).isEqualTo("gemini");
     }
 
@@ -87,6 +120,10 @@ class InsightServiceTest {
         assertThat(result.strengths()).isEmpty();
         assertThat(result.weaknesses()).isEmpty();
         assertThat(result.recommendations()).isEmpty();
+        assertThat(result.playstyle()).isEmpty();
+        assertThat(result.seasonProgress()).isEmpty();
+        assertThat(result.riskFactors()).isEmpty();
+        assertThat(result.trainingPriorities()).isEmpty();
         assertThat(result.source()).isEqualTo("gemini");
     }
 
@@ -116,7 +153,8 @@ class InsightServiceTest {
     void fallsBackToOfflineInsightWhenGeminiIsUnavailableAndDoesNotCacheIt() {
         SeasonStatsDto stats = seasonStats(0, 0, 0.0);
         MatchDto match = new MatchDto("match-2", "Erangel", "squad", 0, 0, 0.0, 100.0, 200.0, 50, "2026-09-06T00:00:00Z");
-        InsightDto offlineInsight = new InsightDto("Offline summary.", List.of(), List.of("short survival time"), List.of(), "offline");
+        InsightDto offlineInsight = new InsightDto("Offline summary.", List.of(), List.of("short survival time"), List.of(),
+                "", "", List.of(), List.of(), "offline");
 
         when(playerService.getSeasonStats("account.1")).thenReturn(stats);
         when(matchService.getMatchStatsForPlayer("match-2", "account.1")).thenReturn(match);

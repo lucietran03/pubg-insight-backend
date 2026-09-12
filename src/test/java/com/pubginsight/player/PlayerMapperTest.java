@@ -112,4 +112,56 @@ class PlayerMapperTest {
         assertThat(dto.headshotRate()).isZero();
         assertThat(dto.archetype()).isEqualTo("Balanced Operator");
     }
+
+    @Test
+    void toSeasonStatsDtoLeavesPreviousSeasonComparisonNull() {
+        // toSeasonStatsDto() maps a single season in isolation - it has no visibility into
+        // any other season, so previousSeasonComparison always starts null here. It's
+        // PlayerService's job (it's the one holding both seasons) to attach a comparison
+        // via withPreviousSeasonComparison() afterwards.
+        PubgGameModeStats squad = new PubgGameModeStats(
+                5, 50, 45, 60, 10, 20, 15000.0, 25000.0, 900.0, 120.0, 20, 5, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
+        PubgSeasonStatsAttributes attributes = new PubgSeasonStatsAttributes(Map.of("squad", squad));
+
+        SeasonStatsDto dto = mapper.toSeasonStatsDto(attributes);
+
+        assertThat(dto.previousSeasonComparison()).isNull();
+    }
+
+    @Test
+    void computesSeasonComparisonAsPercentageDeltas() {
+        SeasonStatsDto current = seasonStats(0.2, 300.0, 2.0, 0.4, 0.5);
+        SeasonStatsDto previous = seasonStats(0.1, 250.0, 1.0, 0.5, 0.25);
+
+        SeasonComparison comparison = mapper.computeSeasonComparison(current, previous);
+
+        assertThat(comparison.winRateDeltaPct()).isCloseTo(100.0, within(0.001));
+        assertThat(comparison.avgDamageDeltaPct()).isCloseTo(20.0, within(0.001));
+        assertThat(comparison.killDeathRatioDeltaPct()).isCloseTo(100.0, within(0.001));
+        assertThat(comparison.headshotRateDeltaPct()).isCloseTo(-20.0, within(0.001));
+        assertThat(comparison.top10RateDeltaPct()).isCloseTo(100.0, within(0.001));
+    }
+
+    @Test
+    void computeSeasonComparisonGuardsAgainstZeroPreviousSeasonMetrics() {
+        // Every previous-season metric is 0 - there is no meaningful "percent change" from
+        // a zero baseline, so each delta should come back as 0% rather than NaN/Infinity.
+        SeasonStatsDto current = seasonStats(0.2, 300.0, 2.0, 0.4, 0.5);
+        SeasonStatsDto previous = seasonStats(0.0, 0.0, 0.0, 0.0, 0.0);
+
+        SeasonComparison comparison = mapper.computeSeasonComparison(current, previous);
+
+        assertThat(comparison.winRateDeltaPct()).isZero();
+        assertThat(comparison.avgDamageDeltaPct()).isZero();
+        assertThat(comparison.killDeathRatioDeltaPct()).isZero();
+        assertThat(comparison.headshotRateDeltaPct()).isZero();
+        assertThat(comparison.top10RateDeltaPct()).isZero();
+    }
+
+    private static SeasonStatsDto seasonStats(
+            double winRate, double avgDamage, double killDeathRatio, double headshotRate, double top10Rate) {
+        return new SeasonStatsDto(
+                0, 0, winRate, avgDamage, killDeathRatio, headshotRate, top10Rate, 0.0, 0.0,
+                new RadarScores(0, 0, 0, 0, 0, 0), "Balanced Operator", null);
+    }
 }

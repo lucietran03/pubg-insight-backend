@@ -6,6 +6,7 @@ import com.pubginsight.client.gemini.GeminiRateLimitException;
 import com.pubginsight.match.MatchDto;
 import com.pubginsight.match.MatchService;
 import com.pubginsight.player.PlayerService;
+import com.pubginsight.player.RadarScores;
 import com.pubginsight.player.SeasonStatsDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,11 @@ public class InsightService {
     }
 
     private String buildPrompt(MatchDto match, SeasonStatsDto seasonStats) {
+        RadarScores radar = seasonStats.radar();
+        String damageDelta = describeDeltaVsSeasonAverage(match.damageDealt(), seasonStats.avgDamage());
+        String survivalDelta = describeDeltaVsSeasonAverage(match.timeSurvivedSeconds(), seasonStats.avgSurvivalSeconds());
+        String headshotRateDelta = describeDeltaVsSeasonAverage(match.headshotRate(), seasonStats.headshotRate());
+
         return """
                 You are a PUBG performance coach. Based ONLY on the aggregated stats below \
                 (you are not given raw match telemetry), respond in EXACTLY this format, one \
@@ -84,6 +90,10 @@ public class InsightService {
                 STRENGTHS: <comma-separated list>
                 WEAKNESSES: <comma-separated list>
                 RECOMMENDATIONS: <comma-separated list>
+                PLAYSTYLE: <one short paragraph explaining how this player's archetype and radar shape reflect the way they play>
+                SEASON_PROGRESS: <one short paragraph commenting on their season aggregate stats>
+                RISK_FACTORS: <comma-separated list of things that could be going wrong, drawn from weak radar axes or negative deltas below>
+                TRAINING_PRIORITIES: <comma-separated list of concrete next-focus areas>
 
                 Match stats:
                 - Map: %s (%s)
@@ -93,12 +103,44 @@ public class InsightService {
                 - Damage dealt: %.0f
                 - Survived: %.0f seconds
 
+                This match compared with this player's season average:
+                - Damage dealt: %s
+                - Survival time: %s
+                - Headshot rate: %s
+
                 Season context (all game modes combined):
                 - Win rate: %.1f%% (%d wins / %d rounds played)
+                - Average damage per match: %.0f
+                - Kill/death ratio: %.2f
+                - Headshot rate: %.0f%%
+                - Top 10 rate: %.0f%%
+                - Average survival time: %.0f seconds
+                - Longest confirmed kill: %.0f meters
+
+                Player profile (derived deterministically from season stats, not by you):
+                - Archetype: %s
+                - Radar scores (0-100 scale, higher is stronger): Combat %.0f, Survival %.0f, Precision %.0f, Aggression %.0f, Support %.0f, Consistency %.0f
                 """.formatted(
                 match.mapName(), match.gameMode(), match.winPlace(), match.kills(),
                 match.headshotRate() * 100, match.damageDealt(), match.timeSurvivedSeconds(),
-                seasonStats.winRate() * 100, seasonStats.wins(), seasonStats.roundsPlayed());
+                damageDelta, survivalDelta, headshotRateDelta,
+                seasonStats.winRate() * 100, seasonStats.wins(), seasonStats.roundsPlayed(),
+                seasonStats.avgDamage(), seasonStats.killDeathRatio(), seasonStats.headshotRate() * 100,
+                seasonStats.top10Rate() * 100, seasonStats.avgSurvivalSeconds(), seasonStats.longestKillMeters(),
+                seasonStats.archetype(),
+                radar.combat(), radar.survival(), radar.precision(), radar.aggression(), radar.support(), radar.consistency());
+    }
+
+    // Percentage change of this match's value versus the player's season average for the
+    // same metric. Only ever compares numbers PlayerService/MatchService already computed -
+    // never invents a season average that isn't on SeasonStatsDto. Guards against a zero
+    // season average (e.g. a brand-new player) rather than dividing by zero.
+    private String describeDeltaVsSeasonAverage(double matchValue, double seasonAverage) {
+        if (seasonAverage == 0) {
+            return "no season average available yet";
+        }
+        double percentChange = ((matchValue - seasonAverage) / seasonAverage) * 100;
+        return "%+.0f%% vs season average".formatted(percentChange);
     }
 
     private InsightDto parseInsight(String rawText) {
@@ -106,15 +148,25 @@ public class InsightService {
         if (summary.isEmpty()) {
             // Gemini didn't follow the requested format - fall back to showing the raw
             // text as the summary rather than failing the whole request. Still a genuine
-            // Gemini response, so it keeps the "gemini" source.
-            return new InsightDto(rawText.trim(), List.of(), List.of(), List.of(), GEMINI_SOURCE);
+            // Gemini response, so it keeps the "gemini" source. The new sections have
+            // nothing reliable to extract from an unstructured response, so they're left
+            // empty rather than guessed at.
+            return new InsightDto(rawText.trim(), List.of(), List.of(), List.of(),
+                    "", "", List.of(), List.of(), GEMINI_SOURCE);
         }
 
+        // Each section below follows the same tolerant rule as SUMMARY/STRENGTHS/etc.:
+        // if Gemini omits a label, extractSection/extractList simply returns "" / List.of()
+        // for it - never a fabricated placeholder.
         return new InsightDto(
                 summary,
                 extractList(rawText, "STRENGTHS"),
                 extractList(rawText, "WEAKNESSES"),
                 extractList(rawText, "RECOMMENDATIONS"),
+                extractSection(rawText, "PLAYSTYLE"),
+                extractSection(rawText, "SEASON_PROGRESS"),
+                extractList(rawText, "RISK_FACTORS"),
+                extractList(rawText, "TRAINING_PRIORITIES"),
                 GEMINI_SOURCE);
     }
 
