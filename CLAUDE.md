@@ -1,446 +1,185 @@
-# PUBG Insight V2 - Product Redesign Prompt
+==================================================
+IMPORTANT SCOPE BOUNDARY — NOT YET BUILT
+==================================================
 
-You have full access to the current PUBG Insight frontend and backend repositories.
+There are several V2 features that are part of the long-term product vision but are NOT yet implemented.
 
-The current implementation technically works, but **the product experience is disappointing**. It feels like a statistics viewer with an AI summary rather than an AI-powered performance analytics platform.
+Do NOT build these features as part of this UI task unless explicitly instructed.
 
-I want you to completely rethink the product from a user experience perspective.
+Do NOT fake missing backend data.
 
-Do **NOT** simply redesign the UI. Instead, redesign the **entire information architecture, analytics system, and insight generation workflow**.
+Do NOT create frontend-only workarounds that cause excessive PUBG API calls.
 
-Imagine this is a commercial SaaS product competing with PUBG Mobile Career Results, OP.GG, Tracker.gg, Mobalytics, Blitz.gg, etc.
+The current task is only to improve the existing comparison UI and AI Insights presentation using data that already exists.
 
-The goal is to make users think:
+The following features remain future work:
 
-> "Wow, this application really understands how I play."
+--------------------------------------------------
+1. SEASON TREND CHARTS
+--------------------------------------------------
 
-instead of
+Current state:
 
-> "It just displayed some numbers and ChatGPT summarized them."
+The current Season Performance implementation only compares:
 
----
+Current Season
+vs
+Previous Season
 
-# Current Problems
+using a single before/after delta per metric through the existing SeasonComparison logic.
 
-The current dashboard has several major issues.
+This is NOT yet a real time-series implementation.
 
-## 1. It only displays raw data.
+The V2 vision eventually wants trend charts for metrics such as:
 
-It mostly shows:
+- win rate
+- average damage
+- K/D
+- headshot rate
+- survival performance
 
+However, PUBG does not provide a native "last N weeks" statistics endpoint.
+
+The realistic future implementation would therefore use multiple historical seasons as the available time points.
+
+This requires a backend change first.
+
+Current backend behavior only retrieves ONE previous season.
+
+Relevant backend logic includes:
+
+- PubgApiClient.findPreviousSeasonId()
+- PlayerService.getSeasonStats()
+
+Future implementation should fetch several previous seasons and expose them through a dedicated historical-season response.
+
+IMPORTANT:
+
+Do NOT build a frontend trend chart using fabricated or duplicated points.
+
+Do NOT simulate historical data.
+
+Do NOT turn the current current-vs-previous delta into a fake line chart.
+
+For this task, preserve the existing season comparison behavior.
+
+--------------------------------------------------
+2. DEEP INSIGHTS
+--------------------------------------------------
+
+The V2 product vision includes derived insights such as:
+
+- favorite map
+- highest-performing map
+- lowest-performing map
+- preferred game mode
+- longest survival streak
+- most aggressive match
+- highest-damage match
+- most efficient win
+- teammate synergy
+- other cross-match behavioral patterns
+
+These are NOT currently available as aggregated backend analytics.
+
+MatchDto already contains useful match-level data such as:
+
+- mapName
+- gameMode
 - kills
 - damage
 - placement
-- survival time
-- win rate
+- survival
+- other per-match statistics
 
-These are merely API values.
+However, meaningful Deep Insights require aggregation across multiple matches.
 
-There is almost no analysis.
+Preferred future architecture:
 
-The AI summary simply rewrites those values into sentences.
+Backend
+→ aggregate cached/recent match data
+→ derive cross-match insights
+→ return one dedicated Deep Insights response
 
-Example:
+Do NOT implement this by making the frontend fetch every match individually.
 
-> "You achieved #1 with 14 kills."
+Do NOT create an N-request frontend loop.
 
-This is not an insight.
+This is especially important because PUBG API access is rate-limited and repeated requests should be minimized.
 
----
+Deep Insights require a new backend aggregation endpoint before they should be built in the frontend.
 
-## 2. No player identity
+For this task:
 
-After using the application, users still don't know:
+Do NOT add fake Favorite Map, Best Map, Streak, Most Aggressive Match, etc. unless the backend already exposes real derived values.
 
-- what kind of player they are
-- what their strengths are
-- what they consistently do well
-- what has improved over time
-- what is getting worse
+--------------------------------------------------
+3. BADGES / ACHIEVEMENTS / PROGRESS RINGS
+--------------------------------------------------
 
-There is no overall player profile.
+This is the only future area that may be implemented frontend-only because much of the required data already exists.
 
----
+Possible future presentation ideas:
 
-## 3. No comparisons
+- archetype badge
+- high Top 10 rate badge
+- high win-rate badge
+- strong combat performance badge
+- above-season-average match badge
+- high survival performance badge
 
-Everything is displayed independently.
+These may use already available:
 
-The application never answers questions like:
+- archetype
+- radar scores
+- match-vs-season deltas
+- season statistics
 
-- Is this match better than my average?
-- Is my season improving?
-- Am I becoming more aggressive?
-- Is my aim getting better?
-- Is this actually an exceptional match?
+However:
 
-Without comparisons, numbers have no meaning.
-
----
-
-## 4. The interface lacks visual storytelling.
-
-Currently everything is:
-
-Card
-
-↓
-
-Numbers
-
-↓
-
-More cards
-
-↓
-
-AI paragraph
-
-The page has no hierarchy.
-
-Nothing immediately catches attention.
-
-Nothing feels premium.
-
----
-
-# Vision
-
-I want PUBG Insight to become an AI Performance Analytics Platform.
-
-The application should have multiple analytical layers.
-
-Each layer answers a different question.
-
----
-
-# Layer 1 — Player Identity
-
-Instead of only showing win rate and matches played, build an overall player profile.
-
-Examples:
-
-- Player Archetype
-- Playing Style
-- Strength Profile
-- Performance Grade
-- Overall Rating
+Do NOT claim achievements that cannot be proven by the available data.
 
 For example:
 
-Frontline Eliminator
+"Personal Best Damage"
 
-Precision Hunter
+should only be displayed if historical match data confirms that it is actually the player's personal best.
 
-Survival Specialist
+If this cannot be verified, use evidence-based wording such as:
 
-Squad Anchor
-
-Aggressive Fragger
-
-Balanced Operator
-
-These titles should be generated deterministically from statistics.
-
-Gemini should only explain WHY.
-
----
-
-# Layer 2 — Performance Radar
-
-Build a radar (hexagon) chart similar to PUBG Mobile.
-
-Possible dimensions:
-
-Combat
-
-Survival
-
-Precision
-
-Aggression
-
-Support
-
-Consistency
-
-Each dimension should be calculated from multiple statistics.
-
-Do not invent random values.
-
-Create meaningful formulas.
-
-Allow comparisons between:
-
-Current Match vs Last 50 Matches
+"High Damage Match"
 
 or
 
-Current Season vs Previous Season
+"Above Season Average"
 
-The radar chart should become the centerpiece of the dashboard.
+Badges are not part of the current required redesign unless they clearly improve the existing UI without introducing new logic or scope.
 
----
+--------------------------------------------------
+CURRENT TASK BOUNDARY
+--------------------------------------------------
 
-# Layer 3 — Match Intelligence
+For the current redesign, focus ONLY on:
 
-A match page should not simply display:
+1. The "vs season average" comparison UI.
 
-14 kills
+2. The existing AI Insights presentation:
+    - AI Performance Summary
+    - Strengths
+    - Weaknesses
+    - Recommendations
+    - Playstyle Analysis
+    - Season Progress
+    - Risk Factors
+    - Training Priorities
 
-1435 damage
+Use only data that the current frontend/backend already provides.
 
-26 minutes
+If you discover that a desired visual element requires unavailable backend data:
 
-Instead, explain why this match mattered.
+- do not fake it
+- do not hardcode it
+- do not derive it incorrectly in the frontend
+- clearly mark it as a future backend dependency
 
-Example:
-
-Compared with your recent 50 matches:
-
-+210% kills
-
-+180% damage
-
-+35% survival
-
--4% headshot rate
-
-Then explain:
-
-"This victory was driven by exceptional positioning and sustained damage rather than precision shooting."
-
-That is insight.
-
----
-
-# Layer 4 — Season Intelligence
-
-Transform the season section into a real analytics dashboard.
-
-Include:
-
-Win rate trend
-
-Average damage trend
-
-Placement trend
-
-K/D trend
-
-Headshot trend
-
-Aggression trend
-
-Consistency trend
-
-Performance score trend
-
-Highlight:
-
-What improved
-
-What declined
-
-What remained stable
-
-Generate conclusions automatically.
-
----
-
-# Layer 5 — AI Coach
-
-Instead of summarizing statistics, Gemini should behave like a coach.
-
-It should answer questions such as:
-
-Why did this match perform well?
-
-What habits should continue?
-
-What mistakes appear repeatedly?
-
-Which metrics are improving?
-
-Which metrics are declining?
-
-What should the player focus on next?
-
-Recommendations must reference actual metrics.
-
-Avoid generic gaming advice.
-
----
-
-# Layer 6 — Deep Insights
-
-Explore additional insights derived from PUBG API data.
-
-Potential examples:
-
-Favorite map
-
-Favorite game mode
-
-Highest performing map
-
-Lowest performing map
-
-Favorite teammate
-
-Most successful squad
-
-Longest survival streak
-
-Most aggressive match
-
-Highest clutch potential
-
-Highest damage match
-
-Most efficient win
-
-Weapon preferences
-
-Playtime distribution
-
-Heatmaps (if feasible)
-
-Session trends
-
-Peak performance hours
-
-Consistency score
-
-Top 10 conversion rate
-
-Average survival percentile
-
-Risk profile
-
-Decision profile
-
-Create as many meaningful insights as possible.
-
----
-
-# Layer 7 — Visual Storytelling
-
-The dashboard should immediately communicate:
-
-Who this player is
-
-How they play
-
-How they have improved
-
-How this match compares
-
-What should happen next
-
-Think beyond cards.
-
-Use:
-
-Charts
-
-Progress rings
-
-Radar charts
-
-Trend graphs
-
-Badges
-
-Achievements
-
-Performance timelines
-
-Heat indicators
-
-Comparisons
-
-Sections with strong visual hierarchy.
-
-Avoid pages that are just lists of numbers.
-
----
-
-# Layer 8 — AI Report
-
-At the end of the page, generate a comprehensive AI report.
-
-Instead of:
-
-"You got 14 kills."
-
-Generate sections such as:
-
-Performance Summary
-
-Strengths
-
-Weaknesses
-
-Playstyle Analysis
-
-Season Progress
-
-Match Comparison
-
-Risk Factors
-
-Recommendations
-
-Training Priorities
-
-The report should feel like something written by a professional esports coach.
-
----
-
-# Technical Expectations
-
-Please redesign:
-
-- information architecture
-- UX flow
-- UI hierarchy
-- analytical metrics
-- derived statistics
-- AI prompting
-- frontend components
-- backend calculations
-
-Only use insights that can be supported by PUBG API data or valid derived metrics.
-
-Do not fabricate unavailable data.
-
-When comparing statistics, clearly explain how each metric is calculated.
-
----
-
-# Deliverables
-
-Please provide:
-
-1. Complete redesigned dashboard structure.
-
-2. Wireframe of the new dashboard.
-
-3. Component hierarchy.
-
-4. New backend-derived metrics.
-
-5. Formulas for every calculated score.
-
-6. Database changes if needed.
-
-7. API changes.
-
-8. Frontend implementation plan.
-
-9. Gemini prompt redesign.
-
-10. Step-by-step implementation roadmap from the current version to this new version.
-
-The final product should feel like a polished commercial analytics platform rather than a university assignment. Focus on creating genuine analytical value instead of simply displaying API data.
+Preserve product correctness over visual completeness.
