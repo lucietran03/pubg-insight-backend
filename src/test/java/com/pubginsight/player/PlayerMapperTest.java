@@ -1,15 +1,19 @@
 package com.pubginsight.player;
 
+import com.pubginsight.client.pubg.dto.PubgGameModeStats;
 import com.pubginsight.client.pubg.dto.PubgPlayerAttributes;
 import com.pubginsight.client.pubg.dto.PubgPlayerData;
 import com.pubginsight.client.pubg.dto.PubgPlayerRelationships;
 import com.pubginsight.client.pubg.dto.PubgRelationshipData;
 import com.pubginsight.client.pubg.dto.PubgResourceIdentifier;
+import com.pubginsight.client.pubg.dto.PubgSeasonStatsAttributes;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 class PlayerMapperTest {
 
@@ -44,5 +48,68 @@ class PlayerMapperTest {
         PlayerDto dto = mapper.toPlayerDto(data);
 
         assertThat(dto.recentMatchIds()).isEmpty();
+    }
+
+    @Test
+    void aggregatesSeasonStatsAcrossGameModesAndClassifiesArchetype() {
+        // Sums to: wins=7, rounds=70, kills=75, headshot=25, damage=18000, timeSurvived=33000,
+        // top10s=25, assists=10, revives=5, longestKill=max(120,80)=120 - chosen so precision
+        // (headshot rate 25/75=33%) is clearly the standout axis over the others.
+        PubgGameModeStats squad = new PubgGameModeStats(
+                5, 50, 45, 60, 10, 20, 15000.0, 25000.0, 900.0, 120.0, 20, 5, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
+        PubgGameModeStats solo = new PubgGameModeStats(
+                2, 20, 18, 15, 0, 5, 3000.0, 8000.0, 400.0, 80.0, 5, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
+        PubgSeasonStatsAttributes attributes = new PubgSeasonStatsAttributes(Map.of("squad", squad, "solo", solo));
+
+        SeasonStatsDto dto = mapper.toSeasonStatsDto(attributes);
+
+        assertThat(dto.wins()).isEqualTo(7);
+        assertThat(dto.roundsPlayed()).isEqualTo(70);
+        assertThat(dto.winRate()).isCloseTo(0.1, within(0.0001));
+        assertThat(dto.avgDamage()).isCloseTo(257.14, within(0.01));
+        assertThat(dto.killDeathRatio()).isCloseTo(1.1905, within(0.001));
+        assertThat(dto.headshotRate()).isCloseTo(0.3333, within(0.001));
+        assertThat(dto.top10Rate()).isCloseTo(0.3571, within(0.001));
+        assertThat(dto.longestKillMeters()).isEqualTo(120.0);
+
+        // Precision (headshot rate 33% against a 50% ceiling) is the standout axis.
+        assertThat(dto.radar().precision()).isGreaterThan(dto.radar().combat());
+        assertThat(dto.radar().precision()).isGreaterThan(dto.radar().support());
+        assertThat(dto.archetype()).isEqualTo("Precision Hunter");
+    }
+
+    @Test
+    void classifiesFlatProfileAsBalancedOperator() {
+        // Every axis lands on exactly 50 against its own ceiling (see PlayerMapper's
+        // scale() constants) - kills/round=1.0, damage/round=250, headshot rate=25%,
+        // survival/round=600s, support/round=0.5, top10 rate=50%.
+        PubgGameModeStats squad = new PubgGameModeStats(
+                10, 100, 90, 100, 30, 25, 25000.0, 60000.0, 1000.0, 100.0, 50, 20, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
+        PubgSeasonStatsAttributes attributes = new PubgSeasonStatsAttributes(Map.of("squad", squad));
+
+        SeasonStatsDto dto = mapper.toSeasonStatsDto(attributes);
+
+        assertThat(dto.radar().combat()).isCloseTo(50.0, within(0.01));
+        assertThat(dto.radar().survival()).isCloseTo(50.0, within(0.01));
+        assertThat(dto.radar().precision()).isCloseTo(50.0, within(0.01));
+        assertThat(dto.radar().aggression()).isCloseTo(50.0, within(0.01));
+        assertThat(dto.radar().support()).isCloseTo(50.0, within(0.01));
+        assertThat(dto.radar().consistency()).isCloseTo(50.0, within(0.01));
+        assertThat(dto.archetype()).isEqualTo("Balanced Operator");
+    }
+
+    @Test
+    void avoidsDivisionByZeroWhenNoRoundsPlayed() {
+        PubgGameModeStats empty = new PubgGameModeStats(
+                0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
+        PubgSeasonStatsAttributes attributes = new PubgSeasonStatsAttributes(Map.of("squad", empty));
+
+        SeasonStatsDto dto = mapper.toSeasonStatsDto(attributes);
+
+        assertThat(dto.winRate()).isZero();
+        assertThat(dto.avgDamage()).isZero();
+        assertThat(dto.killDeathRatio()).isZero();
+        assertThat(dto.headshotRate()).isZero();
+        assertThat(dto.archetype()).isEqualTo("Balanced Operator");
     }
 }
