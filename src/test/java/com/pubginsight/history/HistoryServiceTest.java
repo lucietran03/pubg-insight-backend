@@ -40,7 +40,7 @@ class HistoryServiceTest {
     @Test
     void recordAnalysisComposesMatchAndInsightThenSaves() {
         MatchDto match = new MatchDto("match-1", "Erangel", "squad", 4, 2, 0.5, 520.0, 1200.0, 1, "2026-09-06T00:00:00Z");
-        InsightDto insight = new InsightDto("Great match.", List.of("aim"), List.of("rotations"), List.of("play safer"));
+        InsightDto insight = new InsightDto("Great match.", List.of("aim"), List.of("rotations"), List.of("play safer"), "gemini");
         AnalysisHistoryItem item = new AnalysisHistoryItem("account.1", "match-1", "Erangel", "squad",
                 4, 0.5, 520.0, 1200.0, 1, "Great match.",
                 List.of("aim"), List.of("rotations"), List.of("play safer"), "2026-09-06T00:00:00Z");
