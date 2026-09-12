@@ -1,11 +1,9 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
     name: pubg-insight-backend
-  profiles:
-    active: local
 
 logging:
   level:
