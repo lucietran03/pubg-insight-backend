@@ -1,224 +1,446 @@
-You are acting as a Senior QA Engineer, Technical Reviewer, and Project Assessor.
+# PUBG Insight V2 - Product Redesign Prompt
 
-Your task is to determine whether the following Jira tickets are genuinely DONE based on their stated checklist, acceptance criteria, deliverables, and evidence requirements.
+You have full access to the current PUBG Insight frontend and backend repositories.
 
-Do NOT implement new features unless a missing requirement must be demonstrated as a blocker.
+The current implementation technically works, but **the product experience is disappointing**. It feels like a statistics viewer with an AI summary rather than an AI-powered performance analytics platform.
 
-Do NOT assume a ticket is complete because code exists.
+I want you to completely rethink the product from a user experience perspective.
 
-Every PASS decision must be supported by observable evidence from:
-- runtime behavior
-- code inspection
-- test results
-- screenshots
-- logs
-- documentation
-- actual request/data flow
+Do **NOT** simply redesign the UI. Instead, redesign the **entire information architecture, analytics system, and insight generation workflow**.
 
-If something cannot be verified, mark it as NOT VERIFIED rather than assuming it works.
+Imagine this is a commercial SaaS product competing with PUBG Mobile Career Results, OP.GG, Tracker.gg, Mobalytics, Blitz.gg, etc.
 
-==================================================
-TICKET 1 — KAN-22
-CL-1 Verify & Stabilise Local PUBG Application and Demo Data
-==================================================
+The goal is to make users think:
 
-Purpose:
-Establish a trustworthy local baseline before adding AWS.
+> "Wow, this application really understands how I play."
 
-Player Search and Match Analytics are already coded, but this ticket exists to prove they actually work and provide a stable dataset for later cloud/demo work.
+instead of
 
-What must be verified:
+> "It just displayed some numbers and ChatGPT summarized them."
 
-1. Backend and frontend can both run from a clean start.
-2. Valid Player Search works and returns usable player identity/statistics.
-3. Recent match data can be opened and Match Analytics fields are correct enough for downstream use.
-4. At least one invalid/unknown player case is tested.
-5. At least one low/empty-data case is tested.
-6. API/network errors are surfaced gracefully without breaking the UI.
-7. At least 1–2 reliable players/matches are identified for repeatable screenshots and demo use.
-8. One successful request can be traced end-to-end:
-   React
-   → Spring Boot
-   → PUBG API
-   → transformed backend response
-   → frontend UI
+---
 
-Acceptance criteria:
+# Current Problems
 
-- Valid Player Search works end-to-end.
-- Match Analytics renders from real returned match data.
-- Invalid/empty-data behaviour is handled predictably.
-- A usable demo dataset is identified.
-- The request flow can be explained without relying on generated-code explanation.
+The current dashboard has several major issues.
 
-Quality bar:
+## 1. It only displays raw data.
 
-- Do not treat "code exists" as implementation evidence.
-- Metrics shown in the UI must come from real PUBG data, not placeholders.
-- Error and empty states must be understandable and must not crash the app.
-- Each displayed value should be traceable to its data source and transformation.
-- Evidence should be captured while the feature works.
+It mostly shows:
 
-Evidence expected:
+- kills
+- damage
+- placement
+- survival time
+- win rate
 
-- successful Player Search
-- analytics screen
-- invalid/error/empty state
-- sample API response or backend log
-- selected demo player/match
-- end-to-end request trace
+These are merely API values.
 
-==================================================
-TICKET 2 — KAN-23
-CL-2 Review Local Architecture & Draft Report Foundation
-==================================================
+There is almost no analysis.
 
-Purpose:
-Understand the existing codebase before AWS integration and create the report foundation early.
+The AI summary simply rewrites those values into sentences.
 
-What must be verified:
+Example:
 
-1. The current React → Spring Boot → PUBG API flow is traced accurately.
-2. Main frontend and backend modules involved are identified.
-3. Final feature scope is frozen to:
-   - Player Search
-   - Match Analytics
-   - AI Insights
-   - Analysis History
-   - Analytics Dashboard
-4. No unrelated feature scope has been added.
-5. Stable report sections have a first complete draft:
-   - project summary
-   - problem / motivation
-   - introduction
-   - related work / context
-   - dataset / data structures
-   - third-party API overview
-6. Architecture diagram placeholders exist.
-7. AWS service evidence placeholders exist.
-8. AWS components are NOT described as implemented unless they actually work.
-9. A one-page technical note exists explaining the request flow in the author's own words.
+> "You achieved #1 with 14 kills."
 
-Acceptance criteria:
+This is not an insight.
 
-- Current feature scope is frozen.
-- Local request/data flow is documented accurately.
-- Stable report sections have a first complete draft.
-- AWS sections are clearly marked pending until implementation evidence exists.
+---
 
-Quality bar:
+## 2. No player identity
 
-- Report describes the actual system, not an aspirational system.
-- Motivation and beneficiaries are specific to PUBG Insight.
-- Dataset/API descriptions explain what data is used and why.
-- Local request flow and module responsibilities can be explained independently.
+After using the application, users still don't know:
 
-Evidence expected:
+- what kind of player they are
+- what their strengths are
+- what they consistently do well
+- what has improved over time
+- what is getting worse
 
-- code/module map
-- request-flow notes
-- initial report version
+There is no overall player profile.
 
-==================================================
-ASSESSMENT METHOD
-==================================================
+---
 
-Evaluate both tickets independently.
+## 3. No comparisons
 
-For every checklist item and acceptance criterion, assign exactly one status:
+Everything is displayed independently.
 
-PASS
-PARTIAL
-FAIL
-NOT VERIFIED
+The application never answers questions like:
 
-Use this meaning:
+- Is this match better than my average?
+- Is my season improving?
+- Am I becoming more aggressive?
+- Is my aim getting better?
+- Is this actually an exceptional match?
 
-PASS
-= requirement is fully demonstrated with evidence.
+Without comparisons, numbers have no meaning.
 
-PARTIAL
-= some evidence exists, but requirement is incomplete.
+---
 
-FAIL
-= implementation or behavior clearly does not satisfy the requirement.
+## 4. The interface lacks visual storytelling.
 
-NOT VERIFIED
-= there is not enough evidence to make a reliable conclusion.
+Currently everything is:
 
-Do not use optimistic interpretation.
+Card
 
-==================================================
-REQUIRED OUTPUT
-==================================================
+↓
 
-Start with:
+Numbers
 
-# Overall Assessment
+↓
 
-KAN-22:
-DONE / NOT DONE / BLOCKED
+More cards
 
-KAN-23:
-DONE / NOT DONE / BLOCKED
+↓
 
-Then provide:
+AI paragraph
 
-# KAN-22 Evaluation
+The page has no hierarchy.
 
-| Requirement | Status | Evidence | Gap / Action Needed |
-|-------------|--------|----------|---------------------|
+Nothing immediately catches attention.
 
-Evaluate every requirement individually.
+Nothing feels premium.
 
-Then:
+---
 
-## KAN-22 Acceptance Criteria Verdict
+# Vision
 
-Evaluate each acceptance criterion separately.
+I want PUBG Insight to become an AI Performance Analytics Platform.
 
-Then:
+The application should have multiple analytical layers.
 
-## KAN-22 Missing Evidence
+Each layer answers a different question.
 
-List anything that still needs to be captured before the ticket can honestly be moved to Done.
+---
 
-Then repeat the same structure for KAN-23.
+# Layer 1 — Player Identity
 
-==================================================
-FINAL VERDICT RULE
-==================================================
+Instead of only showing win rate and matches played, build an overall player profile.
 
-A ticket can only be marked DONE when:
+Examples:
 
-- all acceptance criteria are PASS
-- required deliverables exist
-- required evidence exists
-- no critical item remains NOT VERIFIED
-- runtime-dependent requirements have actually been tested
-
-If one acceptance criterion is PARTIAL, FAIL, or NOT VERIFIED, the ticket is NOT DONE.
-
-==================================================
-FINAL SECTION
-==================================================
-
-End with:
-
-# Exact Remaining Work
-
-Provide the smallest possible checklist required to move each ticket to Done.
+- Player Archetype
+- Playing Style
+- Strength Profile
+- Performance Grade
+- Overall Rating
 
 For example:
 
-KAN-22 remaining:
-- [ ] ...
-- [ ] ...
+Frontline Eliminator
 
-KAN-23 remaining:
-- [ ] ...
-- [ ] ...
+Precision Hunter
 
-Do not propose unrelated improvements.
+Survival Specialist
 
-Focus only on what the Jira tickets require.
+Squad Anchor
+
+Aggressive Fragger
+
+Balanced Operator
+
+These titles should be generated deterministically from statistics.
+
+Gemini should only explain WHY.
+
+---
+
+# Layer 2 — Performance Radar
+
+Build a radar (hexagon) chart similar to PUBG Mobile.
+
+Possible dimensions:
+
+Combat
+
+Survival
+
+Precision
+
+Aggression
+
+Support
+
+Consistency
+
+Each dimension should be calculated from multiple statistics.
+
+Do not invent random values.
+
+Create meaningful formulas.
+
+Allow comparisons between:
+
+Current Match vs Last 50 Matches
+
+or
+
+Current Season vs Previous Season
+
+The radar chart should become the centerpiece of the dashboard.
+
+---
+
+# Layer 3 — Match Intelligence
+
+A match page should not simply display:
+
+14 kills
+
+1435 damage
+
+26 minutes
+
+Instead, explain why this match mattered.
+
+Example:
+
+Compared with your recent 50 matches:
+
++210% kills
+
++180% damage
+
++35% survival
+
+-4% headshot rate
+
+Then explain:
+
+"This victory was driven by exceptional positioning and sustained damage rather than precision shooting."
+
+That is insight.
+
+---
+
+# Layer 4 — Season Intelligence
+
+Transform the season section into a real analytics dashboard.
+
+Include:
+
+Win rate trend
+
+Average damage trend
+
+Placement trend
+
+K/D trend
+
+Headshot trend
+
+Aggression trend
+
+Consistency trend
+
+Performance score trend
+
+Highlight:
+
+What improved
+
+What declined
+
+What remained stable
+
+Generate conclusions automatically.
+
+---
+
+# Layer 5 — AI Coach
+
+Instead of summarizing statistics, Gemini should behave like a coach.
+
+It should answer questions such as:
+
+Why did this match perform well?
+
+What habits should continue?
+
+What mistakes appear repeatedly?
+
+Which metrics are improving?
+
+Which metrics are declining?
+
+What should the player focus on next?
+
+Recommendations must reference actual metrics.
+
+Avoid generic gaming advice.
+
+---
+
+# Layer 6 — Deep Insights
+
+Explore additional insights derived from PUBG API data.
+
+Potential examples:
+
+Favorite map
+
+Favorite game mode
+
+Highest performing map
+
+Lowest performing map
+
+Favorite teammate
+
+Most successful squad
+
+Longest survival streak
+
+Most aggressive match
+
+Highest clutch potential
+
+Highest damage match
+
+Most efficient win
+
+Weapon preferences
+
+Playtime distribution
+
+Heatmaps (if feasible)
+
+Session trends
+
+Peak performance hours
+
+Consistency score
+
+Top 10 conversion rate
+
+Average survival percentile
+
+Risk profile
+
+Decision profile
+
+Create as many meaningful insights as possible.
+
+---
+
+# Layer 7 — Visual Storytelling
+
+The dashboard should immediately communicate:
+
+Who this player is
+
+How they play
+
+How they have improved
+
+How this match compares
+
+What should happen next
+
+Think beyond cards.
+
+Use:
+
+Charts
+
+Progress rings
+
+Radar charts
+
+Trend graphs
+
+Badges
+
+Achievements
+
+Performance timelines
+
+Heat indicators
+
+Comparisons
+
+Sections with strong visual hierarchy.
+
+Avoid pages that are just lists of numbers.
+
+---
+
+# Layer 8 — AI Report
+
+At the end of the page, generate a comprehensive AI report.
+
+Instead of:
+
+"You got 14 kills."
+
+Generate sections such as:
+
+Performance Summary
+
+Strengths
+
+Weaknesses
+
+Playstyle Analysis
+
+Season Progress
+
+Match Comparison
+
+Risk Factors
+
+Recommendations
+
+Training Priorities
+
+The report should feel like something written by a professional esports coach.
+
+---
+
+# Technical Expectations
+
+Please redesign:
+
+- information architecture
+- UX flow
+- UI hierarchy
+- analytical metrics
+- derived statistics
+- AI prompting
+- frontend components
+- backend calculations
+
+Only use insights that can be supported by PUBG API data or valid derived metrics.
+
+Do not fabricate unavailable data.
+
+When comparing statistics, clearly explain how each metric is calculated.
+
+---
+
+# Deliverables
+
+Please provide:
+
+1. Complete redesigned dashboard structure.
+
+2. Wireframe of the new dashboard.
+
+3. Component hierarchy.
+
+4. New backend-derived metrics.
+
+5. Formulas for every calculated score.
+
+6. Database changes if needed.
+
+7. API changes.
+
+8. Frontend implementation plan.
+
+9. Gemini prompt redesign.
+
+10. Step-by-step implementation roadmap from the current version to this new version.
+
+The final product should feel like a polished commercial analytics platform rather than a university assignment. Focus on creating genuine analytical value instead of simply displaying API data.
