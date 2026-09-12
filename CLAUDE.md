@@ -1,371 +1,599 @@
-The application has improved compared to the previous version, but it still feels like a collection of statistic cards rather than an AI-powered player analysis platform.
+You are acting as a Senior Product Designer and Senior Frontend Engineer.
 
-I want you to redesign the UI with a stronger product thinking and information hierarchy. Do NOT simply restyle components. Reconsider how information should be presented so the user naturally understands the story of their performance.
+You are improving the current PUBG Insight dashboard UI.
 
-Keep the existing dark theme and color palette. Don't redesign the visual identity. Focus on layout, hierarchy, spacing, typography and interaction.
+This is NOT a full redesign and NOT a backend task.
 
-----------------------------------------------------
-1. PLAYER OVERVIEW
-----------------------------------------------------
+Keep the existing dark PUBG-inspired visual identity, current color palette, and general component system.
 
-The Player Overview card currently feels visually unbalanced.
+Your job is to improve:
 
-Current problems:
+1. Player Overview
+2. Season Performance
+3. AI Coach Report consistency
+4. AI analysis loading experience
+5. Result reveal animation
 
-- The player name is pushed too far left while the rest of the card is centered, making the entire layout look misaligned.
-- The "Platform: STEAM" badge feels oversized.
-- "118 matches in the last 14 days" sits awkwardly with too much empty space around it.
+Do not build unrelated features.
+Do not fake missing backend data.
+Do not modify backend APIs unless a frontend bug absolutely requires it.
 
-Please redesign this card.
+==================================================
+1. PLAYER OVERVIEW — FIX THE LAYOUT
+   ==================================================
 
-Suggestions:
+The current Player Overview card still looks visually disconnected.
 
-- Align player name, platform, and metadata into one coherent visual block.
-- Reduce the size of the platform badge.
-- Add subtle icons where appropriate.
-- Reduce wasted whitespace.
-- Make the card feel like a premium player profile instead of just displaying three text fields.
+Current layout:
 
-----------------------------------------------------
-2. SEASON PERFORMANCE CARD
-----------------------------------------------------
+Avatar on the far left
 
-The "Frontline Eliminator" archetype badge currently sits awkwardly and feels disconnected from the rest of the content.
+Player name starts much further to the right
 
-Instead:
+Metadata sits underneath
 
-- Give the archetype a proper visual identity.
-- Add confidence or classification if available.
-- Visually connect the archetype to the season statistics below.
-- The eye should naturally move:
+This creates a large empty gap and makes the card feel misaligned.
+
+Current example:
+
+PLAYER OVERVIEW
+
+[T avatar]          TGLTN
+
+                  STEAM · 119 matches (14 days)
+
+This should instead feel like one compact profile block.
+
+Preferred structure:
+
+[T avatar]   TGLTN
+STEAM
+119 matches · last 14 days
+
+Requirements:
+
+- Group avatar, player name, platform, and match metadata tightly.
+- Use consistent horizontal and vertical alignment.
+- Reduce unnecessary empty space.
+- Platform metadata should remain secondary.
+- Do not use an oversized badge for STEAM.
+- Make the card feel like a premium player profile header rather than unrelated text elements placed inside one container.
+- Preserve current data and functionality.
+
+==================================================
+2. SEASON PERFORMANCE — FIX THE HIERARCHY
+   ==================================================
+
+The current archetype section still has weak hierarchy.
+
+Current layout places:
+
+Frontline Eliminator
+Combat 100/100 · Dominant trait
+
+on almost the same visual line.
+
+This makes the archetype and supporting metadata compete with each other.
+
+The intended hierarchy should be:
+
+Frontline Eliminator
+
+Supporting metadata:
+Combat 100/100
+Dominant trait
+
+Short archetype description
+
+Then:
+
+25.0%
+
+Season Win Rate
+5 wins · 20 rounds
+
+The eye should naturally move:
 
 Archetype
 ↓
-
-Short explanation
-
+Why this archetype exists
 ↓
-
-Hero metric (Win Rate)
-
+Hero season metric
 ↓
+Supporting statistics
 
-Supporting season stats
+Requirements:
 
-Avoid making everything centered equally.
+- Treat "Frontline Eliminator" as the hero title.
+- Move "Combat 100/100", "Dominant trait", or similar descriptors into secondary metadata.
+- Avoid forcing them onto the same visual line as the archetype.
+- The archetype section should feel intentional and premium.
+- Keep the win rate as the major numerical focal point.
+- Do not add unavailable data.
 
-----------------------------------------------------
-3. SECTION TITLES
-----------------------------------------------------
+==================================================
+3. SECTION TITLE HIERARCHY
+   ==================================================
 
-Section titles such as
+Section titles such as:
 
 PLAYER OVERVIEW
 SEASON PERFORMANCE
 PERFORMANCE BREAKDOWN
 PERFORMANCE RADAR
 RECENT MATCHES
+AI INSIGHTS / AI COACH REPORT
 
-are too subtle.
+should clearly communicate section boundaries.
 
-They currently blend into the background.
+The current yellow accent line direction is good.
 
-Please improve them by:
+Keep it, but establish a consistent section-heading component.
 
-- increasing hierarchy
-- better spacing
-- subtle accent color or divider
-- stronger typography
+Each major section should use the same:
 
-without making them loud.
+- title typography
+- accent treatment
+- spacing above/below
+- capitalization rules
 
-The user should instantly recognize where each section begins.
+Do not let some section titles look like headings and others look like small labels.
 
-----------------------------------------------------
-4. PERFORMANCE BREAKDOWN
-----------------------------------------------------
+==================================================
+4. AI INSIGHTS — ADD A REAL TOP-LEVEL HEADING
+   ==================================================
 
-This section wastes horizontal space.
+The AI section currently starts too quietly.
 
-Instead of placing six stat cards in a single horizontal row, redesign the layout.
+Create a clear top-level section header such as:
 
-Preferred layout:
+AI INSIGHTS
 
-LEFT (about 45%)
+or
 
-Six statistic cards arranged in
+AI COACH REPORT
 
-2 columns
-×
-3 rows
+Under it, optionally add a short muted descriptor such as:
 
-RIGHT (about 55%)
+Personalized analysis based on this match and current season performance.
 
-Radar chart
+This should clearly introduce a new major section of the page.
 
-This creates a much more balanced composition.
+The heading must be visually consistent with other major section headings.
 
-The radar chart should become the visual centerpiece.
+==================================================
+5. AI COACH REPORT — CURRENT CORE PROBLEM
+   ==================================================
 
-Also improve the radar chart itself.
+The current AI Coach Report is better than before, but the CONTENT FORMAT is inconsistent.
 
-Currently it looks like a default chart library.
+Currently:
 
-Make it feel like a premium game analytics visualization while keeping readability.
+- "What You Did Well" uses checklist-style items
+- "What Hurt Your Performance" uses warning-style items
+- "Key Coaching Advice" uses numbered steps
+- "Playstyle Diagnosis" uses an italic paragraph
+- "Long-Term Development" uses a paragraph plus another bullet list
 
-----------------------------------------------------
-5. RECENT MATCH CARDS
-----------------------------------------------------
+Every subsection uses a different internal format.
 
-Each recent match card still feels flat.
+This makes the user constantly re-learn how to read the next section.
 
-The layout should improve.
+The report should feel like one coherent coaching document.
 
-Especially:
+==================================================
+6. CREATE A CONSISTENT AI REPORT DESIGN SYSTEM
+   ==================================================
 
-- Damage should be aligned bottom-right.
-- Kills and damage shouldn't float together.
+Use only a few repeatable content patterns.
 
-Instead think like a match summary card.
+Preferred system:
 
-Example hierarchy:
+A. NARRATIVE CARD
 
-Top
+Used for:
+- Overall Verdict
+- Playstyle Diagnosis
+- Long-Term Development
 
-Placement
+Structure:
 
-Date
+SECTION TITLE
 
-Mode badge
+1 concise paragraph
 
-Middle
+Optional supporting metric/evidence row
 
-Map
+All narrative sections should share the same visual structure.
 
-Bottom Left
+--------------------------------------------------
 
-Kills
+B. EVIDENCE LIST
 
-Bottom Right
+Used for:
+- What You Did Well
+- What Hurt Your Performance
 
-Damage
+Structure:
 
-The user should be able to compare matches very quickly just by scanning.
+Icon + Insight title
+Optional short evidence/context
 
-----------------------------------------------------
-6. MATCH DETAIL HEADER
-----------------------------------------------------
+Example:
 
-Current layout:
+✓ Exceptional combat output
+17 kills · 1,981 damage
 
-Placement
-#1
+✓ Strong survival
+27 min · significantly above season baseline
 
-Map
-Erangel
+or:
 
-Mode
-Time
+! Inconsistent match performance
+High peak performance but low season consistency
 
-feels awkward.
+Strengths and weaknesses should visually mirror each other structurally.
 
-Please redesign the hero header.
+Do not make one a simple list and the other a completely different card system.
 
-Think more like
+--------------------------------------------------
 
-LEFT
+C. ACTION PLAN
 
-Placement
-#1
+Used for:
+- Key Coaching Advice
+- Training Priorities
 
-CENTER
+Use ranked actionable steps.
 
-Map
+Example:
 
-Erangel
+01
+Improve mid-game positioning
 
-RIGHT
+WHY
+Your strongest matches occur when aggression does not compromise survival.
 
-Mode badge
+FOCUS
+Consistency / survival
 
-Date
+02
+Improve precision under pressure
 
-or another layout that establishes a stronger visual hierarchy.
+WHY
+Headshot performance declines relative to the seasonal baseline.
 
-The placement should be the first thing users notice.
+FOCUS
+Crosshair placement
 
-----------------------------------------------------
-7. MATCH VS SEASON CARDS
-----------------------------------------------------
+These should feel like actual coaching instructions.
 
-The comparison cards have greatly improved.
+Do not render recommendations as generic pills.
 
-I like the direction.
+==================================================
+7. LIMIT CONTENT DENSITY
+   ==================================================
 
-However the percentage value still doesn't stand out enough.
+The AI report should not feel like an AI text dump.
 
-Please redesign them so that:
+A player should be able to scan the report quickly.
 
-Largest element
-
-▲149%
-
-Secondary
-
-Damage dealt
-
-Caption
-
-vs season average
-
-The percentage should dominate visually.
-
-Treat it as the key insight rather than another label.
-
-----------------------------------------------------
-8. AI INSIGHTS (MOST IMPORTANT)
-----------------------------------------------------
-
-This is currently the weakest part of the product.
-
-Right now it feels like AI dumped text into multiple boxes.
-
-It does NOT feel like an experienced PUBG coach reviewing a student's gameplay.
-
-I do NOT want generic summaries.
-
-I want a coaching experience.
-
-Think like:
-
-A former esports coach.
-
-A professional PUBG analyst.
-
-Someone reviewing a VOD with a player.
-
-The entire section should guide the player step-by-step.
-
-The current information architecture is poor because every section has equal importance.
-
-Instead create a narrative.
+Prioritize information.
 
 For example:
 
-1.
-Overall Verdict
+- Maximum 3–4 strengths
+- Maximum 3 weaknesses
+- Maximum 3 coaching recommendations
+- Maximum 3 training priorities
 
-One sentence.
+If the AI response contains more items, prioritize the most useful ones in the frontend rather than showing everything with equal importance.
 
-How good was this match?
+Avoid long walls of text.
 
-How unusual compared to the player's normal level?
+==================================================
+8. MAKE AI INSIGHTS EVIDENCE-BASED
+   ==================================================
 
-2.
-What You Did Well
+The UI should make it obvious WHY an insight exists.
 
-2-4 actionable strengths.
+Where data is already available, connect conclusions to metrics.
 
-Explain WHY.
+Example:
 
-3.
-What Hurt Your Performance
+High Combat Output
 
-Real weaknesses.
+17 kills
+1,981 damage
 
-Not generic.
+rather than only:
 
-Prioritize by impact.
+"High combat output"
 
-4.
-Key Coaching Advice
+Likewise:
 
-Only 2-3 recommendations.
+Low precision relative to baseline
 
-Concrete.
+13% headshot rate
+48% below season average
 
-Specific.
+This should help the player learn from the report.
 
-Actionable.
+Do not invent evidence that the current backend does not provide.
 
-5.
-Playstyle Diagnosis
+==================================================
+9. AI REPORT STORY FLOW
+   ==================================================
 
-What kind of player is this?
+The final report should read naturally from top to bottom.
 
-How does today's match reinforce or contradict the season profile?
+Recommended sequence:
 
-6.
-Long-term Development
+AI INSIGHTS
 
-Based on season statistics,
+1. OVERALL VERDICT
+   What kind of match was this?
 
-what should the player practice over the next weeks?
+2. WHAT YOU DID WELL
+   What worked?
 
-Not this match only.
+3. WHAT HURT YOUR PERFORMANCE
+   What limited the result?
 
-----------------------------------------------------
-9. REDUCE REPETITION
-----------------------------------------------------
+4. KEY COACHING ADVICE
+   What should you change immediately?
 
-Currently every AI section is just:
+5. PLAYSTYLE DIAGNOSIS
+   What kind of player are you?
 
-Title
+6. LONG-TERM DEVELOPMENT
+   What should you train over the next several matches / season?
 
-Paragraph
+The player should finish the report understanding:
 
-Tags
+- what happened
+- why
+- what mattered most
+- what to improve next
 
-Title
+==================================================
+10. AI ANALYSIS LOADING EXPERIENCE
+    ==================================================
 
-Paragraph
+Add a premium loading experience when the user requests AI analysis.
 
-Tags
+The current experience should NOT be:
 
-Title
+click button
+→ generic spinner
+→ report appears
 
-Paragraph
+I want the loading sequence to feel like the system is actively analyzing performance.
 
-Tags
+Target duration:
 
-This becomes exhausting to read.
+approximately 2.5–3 seconds minimum visual sequence
 
-Introduce more visual variety.
+Important:
 
-Different card styles.
+Do not artificially delay actual API results unnecessarily if the API request takes longer.
 
-Different layouts.
+If the backend finishes faster than the visual sequence, complete the visual progression naturally.
 
-Different hierarchy.
+If the backend takes longer, remain in the final processing state until the response arrives.
 
-Different iconography.
+==================================================
+11. LOADING UI DIRECTION
+    ==================================================
 
-Different spacing.
+Avoid a generic circular spinner by itself.
 
-The UI should naturally guide the eye.
+Use a combination of:
 
-----------------------------------------------------
-10. OVERALL GOAL
-----------------------------------------------------
+- animated analysis indicator
+- progress bar
+- percentage
+- rotating / animated radar or tactical graphic if appropriate
+- sequential processing messages
 
-Imagine Riot Games, OP.GG, Mobalytics, Blitz.gg or Tracker.gg hired you to redesign this page.
+Example stages:
 
-The objective is NOT to display more data.
+Connecting to performance data...
 
-The objective is to make the player understand:
+Fetching recent match history...
 
-Who am I?
+Computing season baselines...
 
-How did I perform?
+Comparing match performance...
 
-What was different this match?
+Analyzing player archetype...
 
-Why?
+Generating coaching recommendations...
 
-What should I improve next?
+Finalizing AI report...
 
-Every screen should tell a story rather than simply displaying statistics.
+The messages should update sequentially.
 
-Do not add placeholder features that require backend support.
+Example visual:
 
-Only redesign using the data already available.
+ANALYZING PERFORMANCE
+
+██████░░░░ 62%
+
+Comparing match performance against your season baseline...
+
+==================================================
+12. LOADING ANIMATION QUALITY
+    ==================================================
+
+The animation should match the existing PUBG design language.
+
+Use:
+
+- dark background
+- yellow accent
+- subtle motion
+- smooth progress transitions
+- understated glow if needed
+- tactical / analytical feeling
+
+Avoid:
+
+- playful bouncing loaders
+- neon cyberpunk effects
+- huge spinning icons
+- distracting particles
+- excessive animation
+
+Optional strong direction:
+
+Animate a simplified radar chart during analysis.
+
+For example:
+
+Combat
+Precision
+Aggression
+Support
+Consistency
+Survival
+
+Radar lines can draw progressively while stages complete.
+
+Do not make the animation overly complex if it harms maintainability.
+
+==================================================
+13. STAGGERED RESULT REVEAL
+    ==================================================
+
+When analysis completes, do not render the entire dashboard instantly.
+
+Use a subtle staggered reveal.
+
+Example:
+
+Player Overview
+fade / slide in
+
+100ms later
+
+Season Performance
+
+100ms later
+
+Performance Breakdown + Radar
+
+100ms later
+
+Recent Matches
+
+100ms later
+
+AI Insights
+
+The effect should be subtle and fast.
+
+Approximate stagger:
+80–150ms between major sections.
+
+Also animate radar values from 0 to their final score when practical.
+
+Do not make users wait for animations after the data is ready.
+
+==================================================
+14. ACCESSIBILITY / UX
+    ==================================================
+
+Respect:
+
+prefers-reduced-motion
+
+If reduced motion is enabled:
+
+- skip stagger animation
+- skip radar drawing animation
+- use simple fade or immediate render
+- keep progress messages usable
+
+Loading state must remain understandable without animation.
+
+==================================================
+15. IMPORTANT SCOPE BOUNDARY
+    ==================================================
+
+Do NOT implement future V2 features that require backend work.
+
+Specifically, do NOT build:
+
+- fake multi-season trend charts
+- Deep Insights such as favorite map / best map / teammate synergy unless backend already exposes them
+- frontend loops that fetch many matches individually
+- fabricated achievements
+- fake historical data
+
+Current task is UI/UX only.
+
+Use the existing data model and API responses.
+
+If a requested visual requires unavailable data, clearly state the dependency instead of inventing data.
+
+==================================================
+16. IMPLEMENTATION APPROACH
+    ==================================================
+
+Before coding:
+
+1. Inspect the current components.
+2. Identify which component renders:
+    - Player Overview
+    - Season Performance
+    - AI Coach Report
+    - loading state
+3. Explain the exact UX problems.
+4. Propose the new component hierarchy.
+5. State what components can be reused.
+6. State what should be refactored.
+
+Then implement incrementally.
+
+Do not rewrite unrelated components.
+
+Do not change backend contracts.
+
+Do not replace Material UI.
+
+Avoid unnecessary new dependencies.
+
+==================================================
+FINAL ACCEPTANCE CRITERIA
+==================================================
+
+The task is complete only when:
+
+- Player Overview no longer looks horizontally disconnected.
+- Avatar, player name, platform, and match metadata form one coherent profile block.
+- Frontline Eliminator is clearly the hero archetype.
+- Supporting archetype metadata no longer competes with the title.
+- Major section headings are visually consistent.
+- AI Insights has a clear top-level heading.
+- AI report subsection content follows a consistent visual system.
+- Strengths and weaknesses use mirrored evidence-list layouts.
+- Coaching advice and training priorities use actionable ranked steps.
+- Narrative sections use one consistent narrative-card style.
+- AI report is easier to scan and teaches the player something useful.
+- AI analysis has a polished progress/loading experience.
+- Loading messages show meaningful stages.
+- Results reveal with subtle staggered animation.
+- Reduced-motion accessibility is respected.
+- Existing functionality remains unchanged.
+- No fake backend-dependent features are introduced.
+
+At the end, provide:
+
+- files changed
+- components changed
+- component hierarchy before vs after
+- loading-state implementation
+- animation behavior
+- accessibility handling
+- any remaining backend-dependent UI opportunities that were intentionally NOT implemented
