@@ -1,3 +1,5 @@
+> **Historical only** — deployment switched to a personal AWS account (2026-09-13, see `docs/decisions/AWS_SETUP.md` and D17 in `docs/deliverables/ARCHITECTURE.md`). Kept here for reference; no longer the active target.
+
 Learner Lab
 Environment Overview
 Environment Navigation

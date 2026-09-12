@@ -10,7 +10,7 @@ High-level plan mapping the approved architecture (see `PROJECT_CONTEXT.md`) to 
 | 9 | ~~Gemini AI Insights (Feature 3)~~ — done, code complete, not yet live-run |
 | 9 | ~~Solution Architecture Document / Project Report prose~~ — drafted |
 | 9 | ~~DynamoDB (Analysis History) + S3 (match cache) code~~ — written, not compiled/deployed |
-| current/next | AWS setup (Elastic Beanstalk, API Gateway, Lambda, Athena; deploy/verify DynamoDB+S3) — needs Learner Lab access, owned by the user |
+| current/next | AWS setup (Elastic Beanstalk, API Gateway, Lambda, Athena; deploy/verify DynamoDB+S3) — needs AWS console access, owned by the user |
 | final | Demo prep, mock demo, technical Q&A rehearsal |
 
 Documentation deliverables (Solution Architecture Document, Project Report) are tracked here like any other task — they're worth 11.5/40 rubric points and should be drafted incrementally as each component is built, not written from scratch at the end.
@@ -21,7 +21,7 @@ Documentation deliverables (Solution Architecture Document, Project Report) are 
 
 ## Current Goal
 
-Everything that doesn't need live AWS access is now done. The remaining work is entirely on the AWS Learner Lab track, which only the user can do (region/credentials/console access).
+Everything that doesn't need live AWS access is now done. The remaining work is entirely on the AWS console track, which only the user can do (credentials/console access).
 
 ---
 
@@ -44,7 +44,7 @@ Everything that doesn't need live AWS access is now done. The remaining work is 
 - Homepage layout pass: wider (`xl`) container with a real top bar, standalone search bar section, grouped Player Overview identity block, an explicit 3-column Recent Matches preview grid (was leaving dead space), and a click-to-reveal list for older matches (was a wall of meaningless "Match N" pills) — backed by a new `MatchDto.createdAt` field and backend-side map-code/game-mode-code → display-label translation (`MatchMapper`) so the frontend never sees raw PUBG codes like `Baltic_Main`.
 - `docs/deliverables/SOLUTION_ARCHITECTURE_DOCUMENT.md` and `docs/deliverables/PROJECT_REPORT.md` drafted.
 - Repo cleanup: removed dead scaffolding (empty index files, unused assets), synced stale frontend docs with backend's maintained copies, restored `CLAUDE.md` in both repos to real ongoing instructions (had drifted into completed one-off task tickets).
-- Decided to deploy via the RMIT-provided AWS Academy Learner Lab, not a personal AWS account.
+- Decided to deploy via the RMIT-provided AWS Academy Learner Lab, not a personal AWS account. **Superseded (2026-09-13)**: switched to a personal AWS account (Free Tier + $100 promotional credit) — the Lab's session-expiring credentials and no-custom-IAM-role restriction became too much friction this close to deadline. See D17 in `docs/deliverables/ARCHITECTURE.md` and `docs/decisions/AWS_SETUP.md`.
 - **First real run against live AWS + a real Gemini timeout** (from user-provided runtime logs): confirmed the S3 cache-aside soft-fail (D12) works exactly as designed against real infrastructure — every S3 call failed with an expired/invalid Learner Lab session token, and every one fell back to the PUBG API cleanly with no user-visible error, just a server-side `WARN` log. Separately, a real Gemini read timeout during response-body extraction surfaced a genuine bug: it threw a plain `RestClientException` that escaped both `PubgApiClient`'s and `GeminiApiClient`'s catch clause (which only caught the narrower `HttpStatusCodeException`/`ResourceAccessException` subtypes), reaching the servlet container as an uncaught 500. Fixed by widening both clients' fallback catch to `RestClientException` itself.
 - UI polish pass on the homepage: retryable (not dead-end) failed-match/season-stats states, `Skeleton`-shaped loading instead of spinners, a consistent resting-border convention across all cards/rows, and mobile-responsive breakpoints for the stat-tile grid and selected-match header.
 - Match list went through two more redesigns after real 429s persisted (background auto-load queue, then pagination) before the actual root cause was identified: PUBG's 10 req/min limit is a **shared, app-wide** budget (one API key), which no amount of frontend-side pacing can correctly enforce on its own (two tabs/users each pacing "safely" can still collectively exceed it). Fixed properly backend-side: `PubgRateLimiter` (new, `client/pubg`) makes every `PubgApiClient` call block until a slot is free in a shared sliding 60s window, instead of racing PUBG's own 429. The frontend's match list is now simple pagination (`PAGE_SIZE` per page, capped at `MAX_MATCHES_DISPLAYED` total) — a UX choice, not a rate-limit workaround anymore.
@@ -57,12 +57,12 @@ Re-verifying the ObjectMapper fix with another `mvn test` run — fixed by inspe
 
 ---
 
-## Next (all user-owned — needs Learner Lab access)
+## Next (all user-owned — needs AWS console access)
 
-Step-by-step, click-by-click instructions for all Learner Lab/credentials steps below: **`docs/decisions/LEARNER_LAB_SETUP.md`**.
+Step-by-step, click-by-click instructions for all credentials/console steps below: **`docs/decisions/AWS_SETUP.md`**.
 
 1. Re-run `mvn test` to confirm the ObjectMapper fix resolves all 8 previously-failing tests.
-2. Create the DynamoDB table (`pubg-insight-analysis-history` by default, partition key `playerId`, sort key `matchId`) and S3 bucket (`pubg-insight-match-cache` by default, must be globally-unique — see setup guide) — one-time Console setup, allowed under the rubric. **In progress**: Learner Lab credentials confirmed working (real run against live AWS now fails with `NoSuchBucketException`, not a credentials error) — the bucket itself just hasn't been created yet.
+2. Create the DynamoDB table (`pubg-insight-analysis-history` by default, partition key `playerId`, sort key `matchId`) and S3 bucket (`pubg-insight-match-cache` by default, must be globally-unique — see setup guide) — one-time Console setup, allowed under the rubric. **In progress**: personal-account IAM user + access key confirmed working — table/bucket creation not yet done.
 3. Verify DynamoDB/S3 actually work against real AWS (search a player, view a match, save analysis history, confirm a second lookup of the same match is a cache hit).
 4. Deploy to Elastic Beanstalk, wire up API Gateway + Lambda, set up Athena — all still fully unbuilt.
 5. Build Feature 5 (Analytics Dashboard) once Athena has real historical data to query.
@@ -71,4 +71,4 @@ Step-by-step, click-by-click instructions for all Learner Lab/credentials steps 
 
 ## Blockers
 
-None on the non-AWS track — it's finished. Everything remaining is blocked on the user's own Learner Lab session/credentials.
+None on the non-AWS track — it's finished. Everything remaining is blocked on the user's own AWS console access.

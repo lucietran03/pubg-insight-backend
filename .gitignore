@@ -2,3 +2,5 @@
 .env
 application-local.yml
 target/
+*_accessKeys.csv
+.claude/
