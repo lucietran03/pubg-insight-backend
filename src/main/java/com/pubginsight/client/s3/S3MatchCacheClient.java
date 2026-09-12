@@ -13,10 +13,10 @@ import java.util.Optional;
 // Thin wrapper around S3Client for caching completed PUBG match responses, keyed by
 // matchId (match data is immutable once a match ends and is not player-specific, so one
 // cached object correctly serves every player who ever looks up that match - see
-// docs/ARCHITECTURE.md section 8 for the rate-limit problem this solves).
+// docs/deliverables/ARCHITECTURE.md section 8 for the rate-limit problem this solves).
 //
 // This class only knows S3's semantics (object exists / doesn't / call failed) - like
-// PubgApiClient (see D2 in docs/ARCHITECTURE.md), it never throws a feature-specific
+// PubgApiClient (see D2 in docs/deliverables/ARCHITECTURE.md), it never throws a feature-specific
 // exception. It is MatchService's job to decide what a cache failure means for the
 // match-analytics feature (answer: nothing - see the soft-fail comment there).
 @Component

@@ -4,6 +4,8 @@ import com.pubginsight.client.gemini.dto.GeminiContent;
 import com.pubginsight.client.gemini.dto.GeminiGenerateContentRequest;
 import com.pubginsight.client.gemini.dto.GeminiGenerateContentResponse;
 import com.pubginsight.client.gemini.dto.GeminiPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -16,6 +18,8 @@ import java.util.List;
 
 @Component
 public class GeminiApiClient {
+
+    private static final Logger log = LoggerFactory.getLogger(GeminiApiClient.class);
 
     private static final int CONNECT_TIMEOUT_MILLIS = 3000;
     // Generation takes longer than a simple PUBG lookup, so this gets a longer read timeout.
@@ -67,9 +71,15 @@ public class GeminiApiClient {
         }
     }
 
-    // Gemini's Retry-After (when present) is the delay-seconds form, not an HTTP-date -
-    // parse defensively and simply omit it if it's not a plain integer.
+    // Gemini puts the actually-useful diagnostic info (WHICH quota was exceeded - per
+    // model, per minute vs per day - and its own suggested retry delay) inside the
+    // response BODY (a google.rpc.QuotaFailure / RetryInfo structure), not the HTTP
+    // Retry-After header Gemini doesn't reliably set. Logging the raw body here is the
+    // only way to tell a transient per-minute limit apart from an exhausted per-day one
+    // after the fact - `retryAfterSeconds=null` alone (the previous behavior) couldn't.
     private GeminiRateLimitException toRateLimitException(HttpClientErrorException.TooManyRequests e) {
+        log.warn("Gemini rate limit response body: {}", e.getResponseBodyAsString());
+
         HttpHeaders headers = e.getResponseHeaders();
         String retryAfterHeader = headers != null ? headers.getFirst(HttpHeaders.RETRY_AFTER) : null;
 

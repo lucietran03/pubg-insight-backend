@@ -13,7 +13,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 // is scoped to the s3.* keys only).
 //
 // No explicit credentials provider is configured: on the Learner Lab / EC2-backed Elastic
-// Beanstalk environment (see docs/ARCHITECTURE.md D8), the SDK's default credentials
+// Beanstalk environment (see docs/deliverables/ARCHITECTURE.md D8), the SDK's default credentials
 // provider chain resolves the LabRole's credentials automatically. Building the client here
 // does not make a network call, so this bean is safe to construct even when no AWS
 // credentials are present (e.g. in tests) - failures only surface when a real S3 call is

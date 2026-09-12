@@ -12,7 +12,7 @@ import java.util.List;
 
 // Orchestrates Match + Insight features to gather what's already been computed, stamps a
 // creation timestamp, then persists the result - the same "compose existing services"
-// pattern InsightService itself uses for player/match (see docs/ARCHITECTURE.md D10).
+// pattern InsightService itself uses for player/match (see docs/deliverables/ARCHITECTURE.md D10).
 //
 // Note: generateInsights() internally re-fetches match stats via MatchService itself, so
 // calling both matchService.getMatchStatsForPlayer(...) and

@@ -66,7 +66,7 @@ public class MatchService {
 
     // Cache-aside read: a completed PUBG match is immutable, so a cache hit here means
     // zero PUBG API calls for this lookup - the whole point given PUBG's 10 req/min
-    // free-tier limit (see docs/ARCHITECTURE.md section 8). A null return (cache miss OR
+    // free-tier limit (see docs/deliverables/ARCHITECTURE.md section 8). A null return (cache miss OR
     // cache failure) simply means "go ask PUBG" - the two cases are handled identically by
     // the caller because a broken cache must be invisible to the feature, never a hard
     // error. That's why S3CacheException is caught here rather than left to propagate.
