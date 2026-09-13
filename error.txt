@@ -1,4 +1,40 @@
-/opt/homebrew/opt/java/libexec/openjdk.jdk/Contents/Home/bin/java -XX:TieredStopAtLevel=1 -Dspring.output.ansi.enabled=always -Dcom.sun.management.jmxremote -Dspring.jmx.enabled=true -Dspring.liveBeansView.mbeanDomain -Dspring.application.admin.enabled=true -Dmanagement.endpoints.jmx.exposure.include=* -javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=52031 -Dfile.encoding=UTF-8 -Dsun.stdout.encoding=UTF-8 -Dsun.stderr.encoding=UTF-8 -classpath /Users/lucietran/Documents/GitHub/pubg-insight-backend/target/classes:/Users/lucietran/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.21.4/jackson-databind-2.21.4.jar:/Users/lucietran/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.21.4/jackson-core-2.21.4.jar:/Users/lucietran/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.21/jackson-annotations-2.21.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/dynamodb-enhanced/2.28.29/dynamodb-enhanced-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/aws-core/2.28.29/aws-core-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/retries/2.28.29/retries-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/eventstream/eventstream/1.0.1/eventstream-1.0.1.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/json-utils/2.28.29/json-utils-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/third-party-jackson-core/2.28.29/third-party-jackson-core-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/http-client-spi/2.28.29/http-client-spi-2.28.29.jar:/Users/lucietran/.m2/repository/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/sdk-core/2.28.29/sdk-core-2.28.29.jar:/Users/lucietran/.m2/repository/org/slf4j/slf4j-api/2.0.18/slf4j-api-2.0.18.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/auth/2.28.29/auth-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/http-auth-aws-eventstream/2.28.29/http-auth-aws-eventstream-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/regions/2.28.29/regions-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/dynamodb/2.28.29/dynamodb-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/aws-json-protocol/2.28.29/aws-json-protocol-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/annotations/2.28.29/annotations-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/utils/2.28.29/utils-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/s3/2.28.29/s3-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/aws-xml-protocol/2.28.29/aws-xml-protocol-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/aws-query-protocol/2.28.29/aws-query-protocol-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/protocol-core/2.28.29/protocol-core-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/arns/2.28.29/arns-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/profiles/2.28.29/profiles-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/crt-core/2.28.29/crt-core-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/http-auth/2.28.29/http-auth-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/identity-spi/2.28.29/identity-spi-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/http-auth-spi/2.28.29/http-auth-spi-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/http-auth-aws/2.28.29/http-auth-aws-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/checksums/2.28.29/checksums-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/checksums-spi/2.28.29/checksums-spi-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/retries-spi/2.28.29/retries-spi-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/metrics-spi/2.28.29/metrics-spi-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/endpoints-spi/2.28.29/endpoints-spi-2.28.29.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/apache-client/2.28.29/apache-client-2.28.29.jar:/Users/lucietran/.m2/repository/org/apache/httpcomponents/httpclient/4.5.13/httpclient-4.5.13.jar:/Users/lucietran/.m2/repository/commons-logging/commons-logging/1.3.6/commons-logging-1.3.6.jar:/Users/lucietran/.m2/repository/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar:/Users/lucietran/.m2/repository/commons-codec/commons-codec/1.21.0/commons-codec-1.21.0.jar:/Users/lucietran/.m2/repository/software/amazon/awssdk/netty-nio-client/2.28.29/netty-nio-client-2.28.29.jar:/Users/lucietran/.m2/repository/io/netty/netty-codec-http/4.2.15.Final/netty-codec-http-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-codec-base/4.2.15.Final/netty-codec-base-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-codec-compression/4.2.15.Final/netty-codec-compression-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-codec-http2/4.2.15.Final/netty-codec-http2-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-codec/4.2.15.Final/netty-codec-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-codec-protobuf/4.2.15.Final/netty-codec-protobuf-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-codec-marshalling/4.2.15.Final/netty-codec-marshalling-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-transport/4.2.15.Final/netty-transport-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-common/4.2.15.Final/netty-common-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-buffer/4.2.15.Final/netty-buffer-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-handler/4.2.15.Final/netty-handler-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-transport-native-unix-common/4.2.15.Final/netty-transport-native-unix-common-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-transport-classes-epoll/4.2.15.Final/netty-transport-classes-epoll-4.2.15.Final.jar:/Users/lucietran/.m2/repository/io/netty/netty-resolver/4.2.15.Final/netty-resolver-4.2.15.Final.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-starter-validation/4.1.0/spring-boot-starter-validation-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-starter/4.1.0/spring-boot-starter-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-starter-logging/4.1.0/spring-boot-starter-logging-4.1.0.jar:/Users/lucietran/.m2/repository/ch/qos/logback/logback-classic/1.5.34/logback-classic-1.5.34.jar:/Users/lucietran/.m2/repository/ch/qos/logback/logback-core/1.5.34/logback-core-1.5.34.jar:/Users/lucietran/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.25.4/log4j-to-slf4j-2.25.4.jar:/Users/lucietran/.m2/repository/org/apache/logging/log4j/log4j-api/2.25.4/log4j-api-2.25.4.jar:/Users/lucietran/.m2/repository/org/slf4j/jul-to-slf4j/2.0.18/jul-to-slf4j-2.0.18.jar:/Users/lucietran/.m2/repository/jakarta/annotation/jakarta.annotation-api/3.0.0/jakarta.annotation-api-3.0.0.jar:/Users/lucietran/.m2/repository/org/yaml/snakeyaml/2.6/snakeyaml-2.6.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-validation/4.1.0/spring-boot-validation-4.1.0.jar:/Users/lucietran/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/11.0.22/tomcat-embed-el-11.0.22.jar:/Users/lucietran/.m2/repository/org/hibernate/validator/hibernate-validator/9.1.0.Final/hibernate-validator-9.1.0.Final.jar:/Users/lucietran/.m2/repository/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar:/Users/lucietran/.m2/repository/org/jboss/logging/jboss-logging/3.6.3.Final/jboss-logging-3.6.3.Final.jar:/Users/lucietran/.m2/repository/com/fasterxml/classmate/1.7.3/classmate-1.7.3.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-starter-webmvc/4.1.0/spring-boot-starter-webmvc-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-starter-jackson/4.1.0/spring-boot-starter-jackson-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-jackson/4.1.0/spring-boot-jackson-4.1.0.jar:/Users/lucietran/.m2/repository/tools/jackson/core/jackson-databind/3.1.4/jackson-databind-3.1.4.jar:/Users/lucietran/.m2/repository/tools/jackson/core/jackson-core/3.1.4/jackson-core-3.1.4.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/4.1.0/spring-boot-starter-tomcat-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat-runtime/4.1.0/spring-boot-starter-tomcat-runtime-4.1.0.jar:/Users/lucietran/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/11.0.22/tomcat-embed-core-11.0.22.jar:/Users/lucietran/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/11.0.22/tomcat-embed-websocket-11.0.22.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-tomcat/4.1.0/spring-boot-tomcat-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-http-converter/4.1.0/spring-boot-http-converter-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/spring-web/7.0.8/spring-web-7.0.8.jar:/Users/lucietran/.m2/repository/org/springframework/spring-beans/7.0.8/spring-beans-7.0.8.jar:/Users/lucietran/.m2/repository/io/micrometer/micrometer-observation/1.17.0/micrometer-observation-1.17.0.jar:/Users/lucietran/.m2/repository/io/micrometer/micrometer-commons/1.17.0/micrometer-commons-1.17.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-webmvc/4.1.0/spring-boot-webmvc-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-servlet/4.1.0/spring-boot-servlet-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/spring-webmvc/7.0.8/spring-webmvc-7.0.8.jar:/Users/lucietran/.m2/repository/org/springframework/spring-aop/7.0.8/spring-aop-7.0.8.jar:/Users/lucietran/.m2/repository/org/springframework/spring-expression/7.0.8/spring-expression-7.0.8.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-devtools/4.1.0/spring-boot-devtools-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot/4.1.0/spring-boot-4.1.0.jar:/Users/lucietran/.m2/repository/org/springframework/spring-core/7.0.8/spring-core-7.0.8.jar:/Users/lucietran/.m2/repository/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar:/Users/lucietran/.m2/repository/org/springframework/spring-context/7.0.8/spring-context-7.0.8.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/4.1.0/spring-boot-autoconfigure-4.1.0.jar:/Users/lucietran/.m2/repository/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar:/Users/lucietran/.m2/repository/org/springframework/boot/spring-boot-web-server/4.1.0/spring-boot-web-server-4.1.0.jar com.pubginsight.PubgInsightBackendApplication
+lucietran@macbook pubg-insight-backend % mvn test
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::staticFieldBase has been called by com.google.inject.internal.aop.HiddenClassDefiner (file:/opt/homebrew/Cellar/maven/3.9.11/libexec/lib/guice-5.1.0-classes.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.inject.internal.aop.HiddenClassDefiner
+WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------< com.pubginsight:pubg-insight-backend >----------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ pubg-insight-backend ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ pubg-insight-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ pubg-insight-backend ---
+[INFO] skip non existing resourceDirectory /Users/lucietran/Documents/GitHub/pubg-insight-backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ pubg-insight-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ pubg-insight-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.pubginsight.match.MatchControllerIntegrationTest
+02:55:52.683 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pubginsight.match.MatchControllerIntegrationTest]: MatchControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02:55:52.737 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.match.MatchControllerIntegrationTest
+02:55:52.765 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pubginsight.match.MatchControllerIntegrationTest]: MatchControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02:55:52.767 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.match.MatchControllerIntegrationTest
+02:55:52.792 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -9,496 +45,639 @@
 
  :: Spring Boot ::                (v4.1.0)
 
-2026-09-14T01:32:01.327+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] c.p.PubgInsightBackendApplication        : Starting PubgInsightBackendApplication using Java 25.0.1 with PID 20256 (/Users/lucietran/Documents/GitHub/pubg-insight-backend/target/classes started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
-2026-09-14T01:32:01.328+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] c.p.PubgInsightBackendApplication        : The following 1 profile is active: "local"
-2026-09-14T01:32:01.347+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2026-09-14T01:32:01.347+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2026-09-14T01:32:01.679+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
-2026-09-14T01:32:01.684+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-09-14T01:32:01.684+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.22]
-2026-09-14T01:32:01.694+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 347 ms
-2026-09-14T01:32:02.130+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
-2026-09-14T01:32:02.132+07:00  INFO 20256 --- [pubg-insight-backend] [  restartedMain] c.p.PubgInsightBackendApplication        : Started PubgInsightBackendApplication in 0.959 seconds (process running for 1.242)
-2026-09-14T01:32:08.597+07:00  INFO 20256 --- [pubg-insight-backend] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-09-14T01:32:08.597+07:00  INFO 20256 --- [pubg-insight-backend] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-09-14T01:32:08.598+07:00  INFO 20256 --- [pubg-insight-backend] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2026-09-14T01:32:25.639+07:00  WARN 20256 --- [pubg-insight-backend] [nio-8080-exec-8] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '00f82fa2-8a62-4d40-b0f6-996e1c5b21b0' - returning empty weapon breakdown
+2026-09-14T02:55:52.901+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : Starting MatchControllerIntegrationTest using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T02:55:52.902+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : The following 1 profile is active: "local"
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/lucietran/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.10/byte-buddy-agent-1.18.10.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-09-14T02:55:53.905+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-14T02:55:53.905+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-14T02:55:53.906+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-09-14T02:55:53.917+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : Started MatchControllerIntegrationTest in 1.128 seconds (process running for 1.562)
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/23/06/898d8da8-aefe-11f1-bc64-ded3016f408b-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/players/account.1/matches/match-1
+       Parameters = {}
+          Headers = []
+             Body = null
+    Session Attrs = {}
 
-2026-09-14T01:32:26.684+07:00  WARN 20256 --- [pubg-insight-backend] [nio-8080-exec-6] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '00f82fa2-8a62-4d40-b0f6-996e1c5b21b0' - returning empty weapon breakdown
+Handler:
+             Type = com.pubginsight.match.MatchController
+           Method = com.pubginsight.match.MatchController#getMatchStats(String, String)
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/23/06/898d8da8-aefe-11f1-bc64-ded3016f408b-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+Async:
+    Async started = false
+     Async result = null
 
-2026-09-14T01:32:55.154+07:00  WARN 20256 --- [pubg-insight-backend] [nio-8080-exec-2] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '6c89c101-ae47-465b-8801-ce7da2aaef11' - returning empty weapon breakdown
+Resolved Exception:
+             Type = com.pubginsight.match.MatchNotFoundException
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/22/36/635b19b2-aefa-11f1-8790-8e12a5a6bcff-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
 
-2026-09-14T01:32:56.214+07:00  WARN 20256 --- [pubg-insight-backend] [nio-8080-exec-3] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '6c89c101-ae47-465b-8801-ce7da2aaef11' - returning empty weapon breakdown
+FlashMap:
+       Attributes = null
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/22/36/635b19b2-aefa-11f1-8790-8e12a5a6bcff-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+MockHttpServletResponse:
+           Status = 404
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"error":"Player 'account.1' not found in match 'match-1'"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+[ERROR] Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 3.068 s <<< FAILURE! -- in com.pubginsight.match.MatchControllerIntegrationTest
+[ERROR] com.pubginsight.match.MatchControllerIntegrationTest.getMatchStatsReturns200WithComputedHeadshotRate -- Time elapsed: 0.318 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at com.pubginsight.match.MatchControllerIntegrationTest.getMatchStatsReturns200WithComputedHeadshotRate(MatchControllerIntegrationTest.java:47)
 
-2026-09-14T01:40:31.946+07:00  WARN 20256 --- [pubg-insight-backend] [io-8080-exec-10] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '00f82fa2-8a62-4d40-b0f6-996e1c5b21b0' - returning empty weapon breakdown
+[INFO] Running com.pubginsight.match.MatchServiceTest
+2026-09-14T02:55:55.729+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.match.MatchService       : S3 match cache read failed for match 'match-1', falling back to PUBG API
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/23/06/898d8da8-aefe-11f1-bc64-ded3016f408b-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+com.pubginsight.client.s3.S3CacheException: bucket not reachable
+        at com.pubginsight.client.s3.S3MatchCacheClient.getCachedMatchJson(S3MatchCacheClient.java:46) ~[classes/:na]
+        at com.pubginsight.match.MatchService.fetchFromCache(MatchService.java:75) ~[classes/:na]
+        at com.pubginsight.match.MatchService.getMatchStatsForPlayer(MatchService.java:42) ~[classes/:na]
+        at com.pubginsight.match.MatchServiceTest.fallsThroughToPubgWhenCacheReadFails(MatchServiceTest.java:118) ~[test-classes/:na]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$2(InterceptingLauncher.java:57) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:56) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.apache.maven.surefire.api.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:125) ~[surefire-api-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithCancellationToken(LauncherAdapter.java:68) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:54) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
+Caused by: java.lang.RuntimeException: boom
+        at com.pubginsight.match.MatchServiceTest.fallsThroughToPubgWhenCacheReadFails(MatchServiceTest.java:113) ~[test-classes/:na]
+        ... 81 common frames omitted
 
-2026-09-14T01:40:32.111+07:00  WARN 20256 --- [pubg-insight-backend] [nio-8080-exec-1] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '2d421f4f-4004-49c7-bd0b-17948f792f85' - returning empty weapon breakdown
+2026-09-14T02:55:55.775+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.match.MatchService       : S3 match cache write failed for match 'match-1' - continuing without caching
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/21/59/36e5b656-aef5-11f1-9427-aa562222835b-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+com.pubginsight.client.s3.S3CacheException: bucket not reachable
+        at com.pubginsight.client.s3.S3MatchCacheClient.cacheMatchJson(S3MatchCacheClient.java:62) ~[classes/:na]
+        at com.pubginsight.match.MatchService.cacheIfPresent(MatchService.java:99) ~[classes/:na]
+        at com.pubginsight.match.MatchService.getMatchStatsForPlayer(MatchService.java:46) ~[classes/:na]
+        at com.pubginsight.match.MatchServiceTest.fallsThroughSilentlyWhenCacheWriteFails(MatchServiceTest.java:135) ~[test-classes/:na]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$2(InterceptingLauncher.java:57) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:56) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.apache.maven.surefire.api.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:125) ~[surefire-api-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithCancellationToken(LauncherAdapter.java:68) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:54) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
+Caused by: java.lang.RuntimeException: boom
+        at com.pubginsight.match.MatchServiceTest.fallsThroughSilentlyWhenCacheWriteFails(MatchServiceTest.java:131) ~[test-classes/:na]
+        ... 81 common frames omitted
 
-2026-09-14T01:40:33.016+07:00  WARN 20256 --- [pubg-insight-backend] [nio-8080-exec-6] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '00f82fa2-8a62-4d40-b0f6-996e1c5b21b0' - returning empty weapon breakdown
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.089 s -- in com.pubginsight.match.MatchServiceTest
+[INFO] Running com.pubginsight.match.MatchMapperTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in com.pubginsight.match.MatchMapperTest
+[INFO] Running com.pubginsight.insight.InsightServiceTest
+2026-09-14T02:55:55.832+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.insight.InsightService   : Gemini unavailable for player 'account.1' match 'match-2' - returning offline fallback insight
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/23/06/898d8da8-aefe-11f1-bc64-ded3016f408b-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+com.pubginsight.client.gemini.GeminiApiException: Gemini exhausted
+        at com.pubginsight.client.gemini.GeminiApiClient.generateText(GeminiApiClient.java:58) ~[classes/:na]
+        at com.pubginsight.insight.InsightService.generateInsights(InsightService.java:62) ~[classes/:na]
+        at com.pubginsight.insight.InsightServiceTest.fallsBackToOfflineInsightWhenGeminiIsUnavailableAndDoesNotCacheIt(InsightServiceTest.java:164) ~[test-classes/:na]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$2(InterceptingLauncher.java:57) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:56) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.apache.maven.surefire.api.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:125) ~[surefire-api-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithCancellationToken(LauncherAdapter.java:68) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:54) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
 
-2026-09-14T01:40:33.099+07:00  WARN 20256 --- [pubg-insight-backend] [nio-8080-exec-5] c.p.match.WeaponBreakdownService         : Telemetry fetch/parse failed for match '2d421f4f-4004-49c7-bd0b-17948f792f85' - returning empty weapon breakdown
+2026-09-14T02:55:55.833+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.insight.InsightService   : Gemini unavailable for player 'account.1' match 'match-2' - returning offline fallback insight
 
-com.pubginsight.client.telemetry.TelemetryFetchException: Failed to parse telemetry from 'https://telemetry-cdn.pubg.com/bluehole-pubg/steam/2026/09/12/21/59/36e5b656-aef5-11f1-9427-aa562222835b-telemetry.json'
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:91) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownService.getWeaponBreakdown(WeaponBreakdownService.java:61) ~[classes/:na]
-	at com.pubginsight.match.WeaponBreakdownController.getWeaponBreakdown(WeaponBreakdownController.java:27) ~[classes/:na]
-	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
-	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.8.jar:7.0.8]
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.22.jar:6.1]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:128) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53) ~[tomcat-embed-websocket-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.8.jar:7.0.8]
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:107) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1272) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1801) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:946) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
-	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
-Caused by: com.fasterxml.jackson.core.JsonParseException: Illegal character ((CTRL-CHAR, code 31)): only regular white space (\r, \n, \t) is allowed between tokens
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 2]
-	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2599) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2625) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.base.ParserMinimalBase._throwInvalidSpace(ParserMinimalBase.java:794) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser._skipWSOrEnd(UTF8StreamJsonParser.java:3178) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextToken(UTF8StreamJsonParser.java:716) ~[jackson-core-2.21.4.jar:2.21.4]
-	at com.pubginsight.client.telemetry.TelemetryClient.tallyKillsByWeapon(TelemetryClient.java:100) ~[classes/:na]
-	at com.pubginsight.client.telemetry.TelemetryClient.fetchWeaponKillsForPlayer(TelemetryClient.java:88) ~[classes/:na]
-	... 45 common frames omitted
+com.pubginsight.client.gemini.GeminiApiException: Gemini exhausted
+        at com.pubginsight.client.gemini.GeminiApiClient.generateText(GeminiApiClient.java:58) ~[classes/:na]
+        at com.pubginsight.insight.InsightService.generateInsights(InsightService.java:62) ~[classes/:na]
+        at com.pubginsight.insight.InsightServiceTest.fallsBackToOfflineInsightWhenGeminiIsUnavailableAndDoesNotCacheIt(InsightServiceTest.java:165) ~[test-classes/:na]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502) ~[junit-platform-commons-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70) ~[junit-jupiter-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58) ~[junit-platform-engine-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$2(InterceptingLauncher.java:57) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:56) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58) ~[junit-platform-launcher-6.0.3.jar:6.0.3]
+        at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+        at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+        at org.apache.maven.surefire.api.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:125) ~[surefire-api-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithCancellationToken(LauncherAdapter.java:68) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:54) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136) ~[surefire-junit-platform-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
+        at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
 
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.062 s -- in com.pubginsight.insight.InsightServiceTest
+[INFO] Running com.pubginsight.insight.InsightControllerIntegrationTest
+2026-09-14T02:55:55.849+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.insight.InsightControllerIntegrationTest]: InsightControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:55.854+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.insight.InsightControllerIntegrationTest
+2026-09-14T02:55:55.854+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.insight.InsightControllerIntegrationTest]: InsightControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:55.855+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.insight.InsightControllerIntegrationTest
+2026-09-14T02:55:55.857+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.0)
+
+2026-09-14T02:55:55.867+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : Starting InsightControllerIntegrationTest using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T02:55:55.867+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : The following 1 profile is active: "local"
+2026-09-14T02:55:55.959+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-14T02:55:55.959+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-14T02:55:55.959+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-09-14T02:55:55.962+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : Started InsightControllerIntegrationTest in 0.105 seconds (process running for 3.608)
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/players/account.1/matches/match-1/insights
+       Parameters = {}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = com.pubginsight.insight.InsightController
+           Method = com.pubginsight.insight.InsightController#getInsights(String, String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = com.pubginsight.match.MatchNotFoundException
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 404
+    Error message = null
+          Headers = [Vary:"Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers", Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"error":"Player 'account.1' not found in match 'match-1'"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 1.111 s <<< FAILURE! -- in com.pubginsight.insight.InsightControllerIntegrationTest
+[ERROR] com.pubginsight.insight.InsightControllerIntegrationTest.getInsightsReturns200WithParsedSections -- Time elapsed: 0.995 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<404>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$0(StatusResultMatchers.java:600)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:212)
+        at com.pubginsight.insight.InsightControllerIntegrationTest.getInsightsReturns200WithParsedSections(InsightControllerIntegrationTest.java:70)
+
+[INFO] Running com.pubginsight.PubgInsightBackendApplicationTests
+2026-09-14T02:55:56.961+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.PubgInsightBackendApplicationTests]: PubgInsightBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:56.965+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.PubgInsightBackendApplicationTests
+2026-09-14T02:55:56.966+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.PubgInsightBackendApplicationTests]: PubgInsightBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:56.966+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.PubgInsightBackendApplicationTests
+2026-09-14T02:55:56.968+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.0)
+
+2026-09-14T02:55:56.980+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : Starting PubgInsightBackendApplicationTests using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T02:55:56.980+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : The following 1 profile is active: "local"
+2026-09-14T02:55:57.065+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : Started PubgInsightBackendApplicationTests in 0.097 seconds (process running for 4.711)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.107 s -- in com.pubginsight.PubgInsightBackendApplicationTests
+[INFO] Running com.pubginsight.history.HistoryControllerIntegrationTest
+2026-09-14T02:55:57.068+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.history.HistoryControllerIntegrationTest]: HistoryControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:57.071+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.history.HistoryControllerIntegrationTest
+2026-09-14T02:55:57.072+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.history.HistoryControllerIntegrationTest]: HistoryControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:57.072+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.history.HistoryControllerIntegrationTest
+2026-09-14T02:55:57.074+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.0)
+
+2026-09-14T02:55:57.080+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : Starting HistoryControllerIntegrationTest using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T02:55:57.081+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : The following 1 profile is active: "local"
+2026-09-14T02:55:57.168+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-14T02:55:57.168+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-14T02:55:57.168+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-09-14T02:55:57.170+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : Started HistoryControllerIntegrationTest in 0.096 seconds (process running for 4.816)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.131 s -- in com.pubginsight.history.HistoryControllerIntegrationTest
+[INFO] Running com.pubginsight.history.HistoryServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.pubginsight.history.HistoryServiceTest
+[INFO] Running com.pubginsight.history.AnalysisHistoryMapperTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.pubginsight.history.AnalysisHistoryMapperTest
+[INFO] Running com.pubginsight.client.gemini.GeminiApiClientTest
+2026-09-14T02:55:57.218+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-a' failed (GeminiRateLimitException), trying next model
+2026-09-14T02:55:57.219+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-a' failed (GeminiRateLimitException), trying next model
+2026-09-14T02:55:57.219+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-b' failed (GeminiApiException), trying next model
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.pubginsight.client.gemini.GeminiApiClientTest
+[INFO] Running com.pubginsight.client.pubg.PubgRateLimiterTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.pubginsight.client.pubg.PubgRateLimiterTest
+[INFO] Running com.pubginsight.player.PlayerMapperTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.pubginsight.player.PlayerMapperTest
+[INFO] Running com.pubginsight.player.PlayerControllerIntegrationTest
+2026-09-14T02:55:57.225+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.player.PlayerControllerIntegrationTest]: PlayerControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:57.228+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.player.PlayerControllerIntegrationTest
+2026-09-14T02:55:57.228+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.player.PlayerControllerIntegrationTest]: PlayerControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T02:55:57.229+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.player.PlayerControllerIntegrationTest
+2026-09-14T02:55:57.237+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.c.exception.GlobalExceptionHandler   : PUBG API rate limit reached (retryAfterSeconds=30)
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.pubginsight.player.PlayerControllerIntegrationTest
+[INFO] Running com.pubginsight.player.PlayerServiceTest
+[ERROR] Tests run: 5, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.029 s <<< FAILURE! -- in com.pubginsight.player.PlayerServiceTest
+[ERROR] com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable -- Time elapsed: 0.009 s <<< ERROR!
+org.mockito.exceptions.misusing.PotentialStubbingProblem: 
+
+Strict stubbing argument mismatch. Please check:
+ - this invocation of 'computeSeasonComparison' method:
+    playerMapper.computeSeasonComparison(
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]
+);
+    -> at com.pubginsight.player.PlayerService.tryComputePreviousSeasonComparison(PlayerService.java:59)
+ - has following stubbing(s) with different arguments:
+    1. playerMapper.computeSeasonComparison(
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.2, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.4, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]
+); stubbed with: [Returns: SeasonComparison[winRateDeltaPct=100.0, avgDamageDeltaPct=0.0, killDeathRatioDeltaPct=0.0, headshotRateDeltaPct=-20.0, top10RateDeltaPct=0.0]]
+      -> at com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable(PlayerServiceTest.java:77)
+Typically, stubbing argument mismatch indicates user mistake when writing tests.
+Mockito fails early so that you can debug potential problem easily.
+However, there are legit scenarios when this exception generates false negative signal:
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
+  - stubbed method is intentionally invoked with different arguments by code under test
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
+For more information see javadoc for PotentialStubbingProblem class.
+        at com.pubginsight.player.PlayerMapper.computeSeasonComparison(PlayerMapper.java:108)
+        at com.pubginsight.player.PlayerService.tryComputePreviousSeasonComparison(PlayerService.java:59)
+        at com.pubginsight.player.PlayerService.getSeasonStats(PlayerService.java:39)
+        at com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable(PlayerServiceTest.java:79)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   InsightControllerIntegrationTest.getInsightsReturns200WithParsedSections:70 Status expected:<200> but was:<404>
+[ERROR]   MatchControllerIntegrationTest.getMatchStatsReturns200WithComputedHeadshotRate:47 Status expected:<200> but was:<404>
+[ERROR] Errors: 
+[ERROR]   PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable:79 » PotentialStubbingProblem 
+Strict stubbing argument mismatch. Please check:                                                                                                                                     
+ - this invocation of 'computeSeasonComparison' method:                                                                                                                              
+    playerMapper.computeSeasonComparison(                                                                                                                                            
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],                         
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]                          
+);                                                                                                                                                                                   
+    -> at com.pubginsight.player.PlayerService.tryComputePreviousSeasonComparison(PlayerService.java:59)                                                                             
+ - has following stubbing(s) with different arguments:                                                                                                                               
+    1. playerMapper.computeSeasonComparison(                                                                                                                                         
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.2, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.4, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],                         
+    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]                          
+); stubbed with: [Returns: SeasonComparison[winRateDeltaPct=100.0, avgDamageDeltaPct=0.0, killDeathRatioDeltaPct=0.0, headshotRateDeltaPct=-20.0, top10RateDeltaPct=0.0]]            
+      -> at com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable(PlayerServiceTest.java:77)                                     
+Typically, stubbing argument mismatch indicates user mistake when writing tests.                                                                                                     
+Mockito fails early so that you can debug potential problem easily.                                                                                                                  
+However, there are legit scenarios when this exception generates false negative signal:                                                                                              
+  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API                                                                                            
+    Please use 'will().given()' or 'doReturn().when()' API for stubbing.                                                                                                             
+  - stubbed method is intentionally invoked with different arguments by code under test                                                                                              
+    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).                                                                                                    
+For more information see javadoc for PotentialStubbingProblem class.                                                                                                                 
+[INFO] 
+[ERROR] Tests run: 51, Failures: 2, Errors: 1, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.864 s
+[INFO] Finished at: 2026-09-14T02:55:57+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project pubg-insight-backend: There are test failures.
+[ERROR] 
+[ERROR] See /Users/lucietran/Documents/GitHub/pubg-insight-backend/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+lucietran@macbook pubg-insight-backend % 
