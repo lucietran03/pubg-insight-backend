@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pubginsight.client.telemetry.dto.PlayerBodyHitEvent;
 import com.pubginsight.client.telemetry.dto.PlayerCombatEvents;
 import com.pubginsight.client.telemetry.dto.PlayerKillEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -51,6 +53,7 @@ import java.util.zip.GZIPInputStream;
 @Component
 public class TelemetryClient {
 
+    private static final Logger log = LoggerFactory.getLogger(TelemetryClient.class);
     private static final String LOG_PLAYER_KILL_EVENT_TYPE = "LogPlayerKill";
     // LogPlayerTakeDamage covers every hit landed across the match (not just the killing
     // blow), and carries a "damageReason" field with a specific hit-location value
@@ -139,6 +142,13 @@ public class TelemetryClient {
         List<PlayerBodyHitEvent> bodyHits = new ArrayList<>();
         JsonFactory jsonFactory = objectMapper.getFactory();
 
+        // Diagnostic-only bookkeeping (see the post-loop check below): if this match really has
+        // LogPlayerKill events but none matched playerAccountId, sampling a few real
+        // killer.accountId values actually seen is what tells us whether this is an accountId
+        // format mismatch, not a guess.
+        int totalKillEvents = 0;
+        List<String> sampleKillerAccountIds = new ArrayList<>();
+
         try (JsonParser parser = jsonFactory.createParser(telemetryJson)) {
             if (parser.nextToken() != JsonToken.START_ARRAY) {
                 throw new IOException("Telemetry payload is not a JSON array");
@@ -151,10 +161,27 @@ public class TelemetryClient {
                 JsonNode event = objectMapper.readTree(parser);
                 String eventType = event.path("_T").asText(null);
 
-                if (LOG_PLAYER_KILL_EVENT_TYPE.equals(eventType) && isKillByPlayer(event, playerAccountId)) {
-                    String weaponId = extractDamageCauserId(event);
-                    if (weaponId != null && !weaponId.isBlank()) {
-                        kills.add(new PlayerKillEvent(weaponId, weaponNameResolver.resolve(weaponId), extractDistanceMeters(event)));
+                if (LOG_PLAYER_KILL_EVENT_TYPE.equals(eventType)) {
+                    totalKillEvents++;
+                    String eventKillerAccountId = event.path("killer").path("accountId").asText(null);
+                    if (sampleKillerAccountIds.size() < 5 && eventKillerAccountId != null) {
+                        sampleKillerAccountIds.add(eventKillerAccountId);
+                    }
+
+                    if (playerAccountId.equals(eventKillerAccountId)) {
+                        String weaponId = extractDamageCauserId(event);
+                        if (weaponId != null && !weaponId.isBlank()) {
+                            kills.add(new PlayerKillEvent(weaponId, weaponNameResolver.resolve(weaponId), extractDistanceMeters(event)));
+                        } else {
+                            // Diagnostic only: a real kill matched by accountId but neither known
+                            // weapon-id field path resolved anything - most likely PUBG's
+                            // telemetry schema has moved the field again. Logging the event's own
+                            // top-level (and killerDamageInfo's, if present) field names, not
+                            // assumed guesses, is what actually tells us where the data lives now.
+                            log.warn("LogPlayerKill matched player '{}' but no weapon id field resolved - "
+                                            + "top-level fields: {}, killerDamageInfo fields: {}",
+                                    playerAccountId, fieldNamesOf(event), fieldNamesOf(event.path("killerDamageInfo")));
+                        }
                     }
                 } else if (LOG_PLAYER_TAKE_DAMAGE_EVENT_TYPE.equals(eventType) && isDamageDealtByPlayer(event, playerAccountId)) {
                     String damageReason = event.path("damageReason").asText(null);
@@ -165,12 +192,23 @@ public class TelemetryClient {
             }
         }
 
+        if (kills.isEmpty() && totalKillEvents > 0) {
+            // Diagnostic only: this match has real kill events, but not one had a killer
+            // accountId equal to playerAccountId - comparing the queried id against real ids
+            // actually present in this telemetry file is what tells us if this is an id-format
+            // mismatch (e.g. one side has a "account." prefix the other doesn't).
+            log.warn("Match has {} LogPlayerKill event(s) but none matched playerAccountId='{}' - "
+                    + "sample killer.accountId values actually seen: {}",
+                    totalKillEvents, playerAccountId, sampleKillerAccountIds);
+        }
+
         return new PlayerCombatEvents(kills, bodyHits);
     }
 
-    private static boolean isKillByPlayer(JsonNode event, String killerAccountId) {
-        String eventKillerAccountId = event.path("killer").path("accountId").asText(null);
-        return killerAccountId.equals(eventKillerAccountId);
+    private static List<String> fieldNamesOf(JsonNode node) {
+        List<String> names = new ArrayList<>();
+        node.fieldNames().forEachRemaining(names::add);
+        return names;
     }
 
     // "attacker" (not "victim") is who DEALT this damage - matches the pubgjava
