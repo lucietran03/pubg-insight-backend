@@ -21,7 +21,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 // Fetches and parses a single match's telemetry file (a flat JSON array of typed gameplay
@@ -54,7 +56,13 @@ import java.util.zip.GZIPInputStream;
 public class TelemetryClient {
 
     private static final Logger log = LoggerFactory.getLogger(TelemetryClient.class);
+    // PUBG has periodically replaced telemetry event types with a "V2" successor while keeping
+    // the schema otherwise compatible (same field names) - "LogPlayerKillV2" is a real,
+    // documented example of this pattern, not a guess. Accept both so this doesn't silently
+    // return zero kills again the next time PUBG finishes migrating older matches off the V1
+    // event name.
     private static final String LOG_PLAYER_KILL_EVENT_TYPE = "LogPlayerKill";
+    private static final String LOG_PLAYER_KILL_V2_EVENT_TYPE = "LogPlayerKillV2";
     // LogPlayerTakeDamage covers every hit landed across the match (not just the killing
     // blow), and carries a "damageReason" field with a specific hit-location value
     // ("HeadShot", "TorsoShot", "ArmShot", "LegShot", "PelvisShot") alongside the generic
@@ -142,12 +150,15 @@ public class TelemetryClient {
         List<PlayerBodyHitEvent> bodyHits = new ArrayList<>();
         JsonFactory jsonFactory = objectMapper.getFactory();
 
-        // Diagnostic-only bookkeeping (see the post-loop check below): if this match really has
-        // LogPlayerKill events but none matched playerAccountId, sampling a few real
+        // Diagnostic-only bookkeeping (see the post-loop checks below): if this match really has
+        // LogPlayerKill(V2) events but none matched playerAccountId, sampling a few real
         // killer.accountId values actually seen is what tells us whether this is an accountId
-        // format mismatch, not a guess.
+        // format mismatch. If there are NO kill events of either known type name at all, the
+        // distinct _T values actually present tell us what PUBG renamed the event to this time,
+        // instead of guessing blind.
         int totalKillEvents = 0;
         List<String> sampleKillerAccountIds = new ArrayList<>();
+        Set<String> distinctEventTypesSeen = new LinkedHashSet<>();
 
         try (JsonParser parser = jsonFactory.createParser(telemetryJson)) {
             if (parser.nextToken() != JsonToken.START_ARRAY) {
@@ -160,8 +171,11 @@ public class TelemetryClient {
                 // materialized at once.
                 JsonNode event = objectMapper.readTree(parser);
                 String eventType = event.path("_T").asText(null);
+                if (distinctEventTypesSeen.size() < 40) {
+                    distinctEventTypesSeen.add(eventType);
+                }
 
-                if (LOG_PLAYER_KILL_EVENT_TYPE.equals(eventType)) {
+                if (LOG_PLAYER_KILL_EVENT_TYPE.equals(eventType) || LOG_PLAYER_KILL_V2_EVENT_TYPE.equals(eventType)) {
                     totalKillEvents++;
                     String eventKillerAccountId = event.path("killer").path("accountId").asText(null);
                     if (sampleKillerAccountIds.size() < 5 && eventKillerAccountId != null) {
@@ -178,9 +192,9 @@ public class TelemetryClient {
                             // telemetry schema has moved the field again. Logging the event's own
                             // top-level (and killerDamageInfo's, if present) field names, not
                             // assumed guesses, is what actually tells us where the data lives now.
-                            log.warn("LogPlayerKill matched player '{}' but no weapon id field resolved - "
+                            log.warn("{} matched player '{}' but no weapon id field resolved - "
                                             + "top-level fields: {}, killerDamageInfo fields: {}",
-                                    playerAccountId, fieldNamesOf(event), fieldNamesOf(event.path("killerDamageInfo")));
+                                    eventType, playerAccountId, fieldNamesOf(event), fieldNamesOf(event.path("killerDamageInfo")));
                         }
                     }
                 } else if (LOG_PLAYER_TAKE_DAMAGE_EVENT_TYPE.equals(eventType) && isDamageDealtByPlayer(event, playerAccountId)) {
@@ -197,9 +211,17 @@ public class TelemetryClient {
             // accountId equal to playerAccountId - comparing the queried id against real ids
             // actually present in this telemetry file is what tells us if this is an id-format
             // mismatch (e.g. one side has a "account." prefix the other doesn't).
-            log.warn("Match has {} LogPlayerKill event(s) but none matched playerAccountId='{}' - "
+            log.warn("Match has {} LogPlayerKill(V2) event(s) but none matched playerAccountId='{}' - "
                     + "sample killer.accountId values actually seen: {}",
                     totalKillEvents, playerAccountId, sampleKillerAccountIds);
+        } else if (totalKillEvents == 0) {
+            // Diagnostic only: this match has NO event named "LogPlayerKill" or "LogPlayerKillV2"
+            // at all - if the match summary API (a completely different PUBG endpoint) reports
+            // real kills for this player, PUBG has likely renamed the kill event again. The
+            // distinct _T values actually present in this file are the real evidence for
+            // whatever the current name is, instead of guessing another version suffix blind.
+            log.warn("No LogPlayerKill/LogPlayerKillV2 events found in this match's telemetry at all - "
+                    + "distinct event types actually present: {}", distinctEventTypesSeen);
         }
 
         return new PlayerCombatEvents(kills, bodyHits);
