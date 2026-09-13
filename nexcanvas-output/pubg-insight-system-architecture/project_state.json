@@ -4,101 +4,101 @@
   "projectRoot": ".",
   "status": "failed",
   "currentStage": "diagram-qa",
-  "updatedAt": "2026-09-13T07:39:07Z",
+  "updatedAt": "2026-09-13T18:41:26Z",
   "stages": {
     "plan": {
       "status": "complete",
-      "attempts": 16,
-      "inputHash": "01a0dd9b6843be27a2992502e66de26f2c7d932362f5370f93955525a11ff14c",
+      "attempts": 18,
+      "inputHash": "7dfe3ddcd9489235172fa9bb23c089bd6c50e0a6cea1e431489ae73728c0a8f8",
       "inputs": {
-        "diagram_model.json": "2426b5781bc5c6b16c60501137e84c001b57b15250034fc962e78074b015058c",
+        "diagram_model.json": "e94333913fa54f7574dfaaa6f8d78aae8b6fa64d6f5befb6df527ab28096a9a4",
         "@pipelineVersion": "99f980892d5dcda14eb45933dd2ffcefadc1ca26aeef90025d3b733318b3fcc5"
       },
       "dependencies": {},
-      "startedAt": "2026-09-13T07:39:07Z",
+      "startedAt": "2026-09-13T18:41:26Z",
       "outputs": {
         "reports/layout_brainstorm.json": {
-          "sha256": "0a0d87387e82699c06c9de02d0cdb0745885219f42495a97d89f46e0cbeecddf",
-          "bytes": 2513
+          "sha256": "cf1a500929b66e9e94422df0c7d976c70fe4c3f5e757e38a0c57445b8cfb9f48",
+          "bytes": 2330
         }
       },
-      "outputHash": "0343dcb20e1a641b7a5512822a38651c922e017820fd68c87e7d35fb32474398",
+      "outputHash": "614f55d9709a2c6bc9fd90e043deb61beae48ce75c18708dbbdb572e44fee9b6",
       "result": {
         "ok": true,
         "winner": null
       },
-      "completedAt": "2026-09-13T07:39:07Z"
+      "completedAt": "2026-09-13T18:41:26Z"
     },
     "build": {
       "status": "complete",
-      "attempts": 16,
-      "inputHash": "5e4719676e9ca938557c9fa355cd3baaca40fbc5c56eb65b98687eb785ebcb4c",
+      "attempts": 18,
+      "inputHash": "643e2e8dd2f0c6fe5deb6f56595e1b406ae793eda8cd9c6442a9e88e7facf928",
       "inputs": {
-        "diagram_model.json": "2426b5781bc5c6b16c60501137e84c001b57b15250034fc962e78074b015058c",
+        "diagram_model.json": "e94333913fa54f7574dfaaa6f8d78aae8b6fa64d6f5befb6df527ab28096a9a4",
         "@pipelineVersion": "99f980892d5dcda14eb45933dd2ffcefadc1ca26aeef90025d3b733318b3fcc5",
         "@effectiveAssets": "ee0aeb46bd7bcf78d7f0739e60bf0b06e33fd7aec2dd377f3f97cc13ec269db3"
       },
       "dependencies": {
-        "plan": "0343dcb20e1a641b7a5512822a38651c922e017820fd68c87e7d35fb32474398"
+        "plan": "614f55d9709a2c6bc9fd90e043deb61beae48ce75c18708dbbdb572e44fee9b6"
       },
-      "startedAt": "2026-09-13T07:39:07Z",
+      "startedAt": "2026-09-13T18:41:26Z",
       "outputs": {
         "artifacts/diagram.drawio": {
-          "sha256": "e124a27e8fc3ff8795a37ca3baa399e7c2b4f6cf7b66129de6d29bc2a7ab61e1",
-          "bytes": 291495
+          "sha256": "0089d4184f10bfc9927ee7e20fae4b720a9199259a50d83d7d071b46af93e459",
+          "bytes": 293211
         },
         "reports/build.json": {
-          "sha256": "8c2b161cc8fcd9b70670ce43652adf8267ce0847adfc36344c19f2b9d4b785b3",
+          "sha256": "da9729880e3de73fac27dc6b33da8801d4afd0dd5b5bd054b36f495c60b1a1b6",
           "bytes": 509
         }
       },
-      "outputHash": "586753bd4d5f76ca90204a2f12e2ebc0d79059af7397192efca4dc4ff456296d",
+      "outputHash": "df574566ba1637cfe88c038460a5ac6564e4696a8535e38b14442beddb73cd6f",
       "result": {
         "ok": true,
-        "nodes": 19,
-        "edges": 24
+        "nodes": 22,
+        "edges": 27
       },
-      "completedAt": "2026-09-13T07:39:07Z"
+      "completedAt": "2026-09-13T18:41:26Z"
     },
     "diagram-qa": {
       "status": "failed",
-      "attempts": 15,
-      "inputHash": "1af1857476b469b735f74a08ecb8dd59436ebd1658c1a41458aab1f6111306fb",
+      "attempts": 17,
+      "inputHash": "40d6a26327c5c0153ab3e74ab7a52aa17a6b428ecc091bc3a3b23fe64cbabb82",
       "inputs": {
-        "source_model.json": "6aaa585139804ce46a6e5863b4753d3b7dda9d54636d4517a1aacea17cb7ba6d",
+        "source_model.json": "77f78a74c7933aee235c00fb682e71498cb3ae5b1065c3bbe59e24115c44608c",
         "diagram_lock.json": "d18a2017372563a45502619e7bd0411d383f94ccaa9fb8f4c7324c3f57e81e33",
-        "diagram_model.json": "2426b5781bc5c6b16c60501137e84c001b57b15250034fc962e78074b015058c",
-        "artifacts/diagram.drawio": "e124a27e8fc3ff8795a37ca3baa399e7c2b4f6cf7b66129de6d29bc2a7ab61e1",
+        "diagram_model.json": "e94333913fa54f7574dfaaa6f8d78aae8b6fa64d6f5befb6df527ab28096a9a4",
+        "artifacts/diagram.drawio": "0089d4184f10bfc9927ee7e20fae4b720a9199259a50d83d7d071b46af93e459",
         "@pipelineVersion": "99f980892d5dcda14eb45933dd2ffcefadc1ca26aeef90025d3b733318b3fcc5",
         "@effectiveAssets": "ee0aeb46bd7bcf78d7f0739e60bf0b06e33fd7aec2dd377f3f97cc13ec269db3",
         "@qaOptions": "24e773c4ff367e8a387aab71f03b2d0cc247b12a10121852d9d3e93aadd0f31f"
       },
       "dependencies": {
-        "build": "586753bd4d5f76ca90204a2f12e2ebc0d79059af7397192efca4dc4ff456296d"
+        "build": "df574566ba1637cfe88c038460a5ac6564e4696a8535e38b14442beddb73cd6f"
       },
-      "startedAt": "2026-09-13T07:39:07Z",
+      "startedAt": "2026-09-13T18:41:26Z",
       "outputs": {
         "reports/diagram_qa.json": {
-          "sha256": "24c41bd5d14bd23d415155043bb4b7b51d497beaa8a4aa281c3c4558aff42ea4",
-          "bytes": 12322
+          "sha256": "d0bcf8a42bbac24352bcffae891bf4a017f0d75acefd6ab81907b55a8ad2f032",
+          "bytes": 11141
         }
       },
-      "outputHash": "cd98f23477cec935c4708a3c399bd14539bf2c33d4820319ce7377b929ef5f96",
+      "outputHash": "392c75c98c6a594727181c00a3bde77a6184dc35693d5da6db17c0a533f087e2",
       "result": {
         "ok": false,
         "counts": {
-          "error": 61,
-          "warning": 11,
+          "error": 50,
+          "warning": 13,
           "info": 0
         },
         "failOnWarning": true
       },
-      "completedAt": "2026-09-13T07:39:07Z"
+      "completedAt": "2026-09-13T18:41:26Z"
     },
     "render": {
       "status": "stale",
       "attempts": 0,
-      "invalidatedAt": "2026-09-13T07:39:07Z",
+      "invalidatedAt": "2026-09-13T18:41:26Z",
       "invalidationReason": "Upstream stage 'diagram-qa' failed."
     },
     "visual-qa": {

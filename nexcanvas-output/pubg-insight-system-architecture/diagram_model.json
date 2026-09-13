@@ -2,7 +2,7 @@
   "schemaVersion": "3.0",
   "metadata": {
     "title": "PUBG Insight — System Context & Component Architecture",
-    "subtitle": "Backend feature-package dependencies, external APIs, and AWS deployment status (live vs. planned)",
+    "subtitle": "Backend feature-package dependencies, external services, and AWS deployment status (live vs. planned)",
     "viewIntent": "architecture",
     "route": {
       "family": "software",
@@ -14,7 +14,8 @@
     "evidenceModel": "source_model.json",
     "assumptions": [
       "The app's own custom code (feature packages, and the client.* wrapper classes) is not a named product with a logo, so it stays generic even though the systems it calls now have real icons.",
-      "Frontend is modeled as a single Container-level node (React Frontend); its internal component structure (PlayerSearch.tsx, MatchList.tsx, etc.) is out of scope for this architecture-level diagram."
+      "Frontend is modeled as a single Container-level node (React Frontend); its internal component structure is out of scope for this architecture-level diagram.",
+      "Simplified this revision: External APIs and AWS-live zones merged into one; the non-runtime 'future hosting' connector from frontend to Elastic Beanstalk was dropped; numbered step badges were removed - all per explicit feedback that the prior pass was still visually cluttered."
     ]
   },
   "semantics": {
@@ -32,7 +33,7 @@
       },
       {
         "id": "backend-features",
-        "label": "Backend — Feature Packages (Spring Boot)",
+        "label": "Backend (Spring Boot) — Feature Packages",
         "kind": "boundary",
         "provenance": [
           {
@@ -43,7 +44,7 @@
       },
       {
         "id": "backend-clients",
-        "label": "Backend — client/ Integrations",
+        "label": "Backend (Spring Boot) — client/ Integrations",
         "kind": "boundary",
         "provenance": [
           {
@@ -54,22 +55,11 @@
       },
       {
         "id": "external-live-group",
-        "label": "External APIs — Live (PUBG & Gemini)",
+        "label": "External Services — Live & Verified",
         "kind": "boundary",
         "provenance": [
           {
             "factId": "fact-pubg-gemini-live",
-            "confidence": "confirmed"
-          }
-        ]
-      },
-      {
-        "id": "aws-live-group",
-        "label": "AWS — Live & Verified",
-        "kind": "boundary",
-        "provenance": [
-          {
-            "factId": "fact-s3-dynamodb-status",
             "confidence": "confirmed"
           }
         ]
@@ -192,6 +182,22 @@
         ]
       },
       {
+        "id": "weapon_breakdown",
+        "label": "weapon breakdown",
+        "kind": "component",
+        "technology": "Service + Controller",
+        "description": "Telemetry-derived kills-per-weapon",
+        "tags": [
+          "new-feature"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-telemetry-feature",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
         "id": "pubg_client",
         "label": "client.pubg",
         "kind": "component",
@@ -248,6 +254,22 @@
         ]
       },
       {
+        "id": "telemetry_client",
+        "label": "client.telemetry",
+        "kind": "component",
+        "technology": "java.net.http.HttpClient",
+        "description": "Unauthenticated, not rate-limited",
+        "tags": [
+          "new-feature"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-telemetry-feature",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
         "id": "pubg_api",
         "label": "PUBG Developer API",
         "kind": "external-service",
@@ -269,6 +291,22 @@
         "provenance": [
           {
             "factId": "fact-pubg-gemini-live",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "telemetry_cdn",
+        "label": "Telemetry CDN",
+        "kind": "external-service",
+        "technology": "Static file host (e.g. telemetry-cdn.playbattlegrounds.com)",
+        "description": "Separate host, unauthenticated, unlimited-rate",
+        "tags": [
+          "new-feature"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-telemetry-feature",
             "confidence": "confirmed"
           }
         ]
@@ -310,7 +348,7 @@
         "label": "AWS Elastic Beanstalk",
         "kind": "service",
         "technology": "Planned",
-        "description": "No infra yet",
+        "description": "Future hosting target — no infra yet",
         "tags": [
           "planned-no-code"
         ],
@@ -437,6 +475,22 @@
         ]
       },
       {
+        "id": "r-fe-weapons",
+        "source": "frontend_app",
+        "target": "weapon_breakdown",
+        "kind": "http-request",
+        "label": "GET /weapons",
+        "tags": [
+          "new-feature"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-telemetry-feature",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
         "id": "r-player-pubgclient",
         "source": "player",
         "target": "pubg_client",
@@ -471,6 +525,38 @@
         "provenance": [
           {
             "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-weaponbreakdown-pubgclient",
+        "source": "weapon_breakdown",
+        "target": "pubg_client",
+        "kind": "dependency",
+        "label": "raw match JSON",
+        "tags": [
+          "new-feature"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-telemetry-feature",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-weaponbreakdown-telemetryclient",
+        "source": "weapon_breakdown",
+        "target": "telemetry_client",
+        "kind": "dependency",
+        "label": "fetch kills",
+        "tags": [
+          "new-feature"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-telemetry-feature",
             "confidence": "confirmed"
           }
         ]
@@ -558,7 +644,7 @@
         "source": "pubg_client",
         "target": "pubg_api",
         "kind": "http-integration",
-        "label": "Bearer token",
+        "label": "Bearer token, rate-limited",
         "provenance": [
           {
             "factId": "fact-pubg-gemini-live",
@@ -610,14 +696,18 @@
         ]
       },
       {
-        "id": "r-fe-eb",
-        "source": "frontend_app",
-        "target": "eb",
-        "kind": "planned",
-        "label": "future hosting",
+        "id": "r-telemetryclient-telemetrycdn",
+        "source": "telemetry_client",
+        "target": "telemetry_cdn",
+        "kind": "unauthenticated-fetch",
+        "label": "GET telemetry — no auth, no rate limit",
+        "annotation": "Deliberately bypasses PubgApiClient/PubgRateLimiter",
+        "tags": [
+          "new-feature"
+        ],
         "provenance": [
           {
-            "factId": "fact-planned-aws",
+            "factId": "fact-telemetry-feature",
             "confidence": "confirmed"
           }
         ]
@@ -696,8 +786,8 @@
     "showTitle": false,
     "direction": "LR",
     "canvas": {
-      "width": 4200,
-      "height": 2700,
+      "width": 4400,
+      "height": 2800,
       "background": "#FFFFFF"
     },
     "legend": [
@@ -712,6 +802,10 @@
       {
         "kind": "data",
         "label": "Live external call (backend to PUBG / Gemini / AWS SDK)"
+      },
+      {
+        "kind": "unauthenticated-fetch",
+        "label": "New: unauthenticated, not-rate-limited CDN fetch (telemetry)"
       },
       {
         "kind": "optional",
@@ -740,14 +834,9 @@
         "order": 4
       },
       {
-        "semanticId": "aws-live-group",
-        "presentation": "phase-column",
-        "order": 5
-      },
-      {
         "semanticId": "aws-planned-group",
         "presentation": "phase-column",
-        "order": 6
+        "order": 5
       }
     ],
     "entities": [
@@ -816,6 +905,15 @@
         }
       },
       {
+        "semanticId": "weapon_breakdown",
+        "boundary": "backend-features",
+        "presentation": "service-tile",
+        "importance": "secondary",
+        "layout": {
+          "order": 6
+        }
+      },
+      {
         "semanticId": "pubg_client",
         "boundary": "backend-clients",
         "presentation": "service-tile",
@@ -852,6 +950,15 @@
         }
       },
       {
+        "semanticId": "telemetry_client",
+        "boundary": "backend-clients",
+        "presentation": "service-tile",
+        "importance": "secondary",
+        "layout": {
+          "order": 5
+        }
+      },
+      {
         "semanticId": "pubg_api",
         "boundary": "external-live-group",
         "presentation": "service-icon",
@@ -872,23 +979,32 @@
         }
       },
       {
+        "semanticId": "telemetry_cdn",
+        "boundary": "external-live-group",
+        "presentation": "service-tile",
+        "importance": "secondary",
+        "layout": {
+          "order": 3
+        }
+      },
+      {
         "semanticId": "s3",
-        "boundary": "aws-live-group",
+        "boundary": "external-live-group",
         "presentation": "service-icon",
         "assetRef": "aws-s3",
         "importance": "primary",
         "layout": {
-          "order": 1
+          "order": 4
         }
       },
       {
         "semanticId": "dynamodb",
-        "boundary": "aws-live-group",
+        "boundary": "external-live-group",
         "presentation": "service-icon",
         "assetRef": "aws-dynamodb",
         "importance": "primary",
         "layout": {
-          "order": 2
+          "order": 5
         }
       },
       {
@@ -937,7 +1053,6 @@
         "semanticId": "r-user-fe",
         "lineClass": "control",
         "labelMode": "callout",
-        "step": 1,
         "layout": {
           "order": 1,
           "sourcePort": [
@@ -947,8 +1062,7 @@
           "targetPort": [
             0.0,
             0.5
-          ],
-          "badgeT": 0.12
+          ]
         }
       },
       {
@@ -959,7 +1073,7 @@
           "order": 2,
           "sourcePort": [
             1.0,
-            0.12
+            0.08
           ],
           "targetPort": [
             0.0,
@@ -970,100 +1084,105 @@
       {
         "semanticId": "r-fe-player",
         "lineClass": "control",
-        "labelMode": "callout",
-        "step": 2,
+        "labelMode": "offset",
         "layout": {
           "order": 3,
           "sourcePort": [
             1.0,
-            0.32
+            0.26
           ],
           "targetPort": [
             0.0,
             0.3
-          ],
-          "badgeT": 0.12
+          ]
         }
       },
       {
         "semanticId": "r-fe-match",
         "lineClass": "control",
-        "labelMode": "callout",
-        "step": 5,
+        "labelMode": "offset",
         "layout": {
           "order": 4,
           "sourcePort": [
             1.0,
-            0.52
+            0.44
           ],
           "targetPort": [
             0.0,
             0.25
-          ],
-          "badgeT": 0.12
+          ]
         }
       },
       {
         "semanticId": "r-fe-insight",
         "lineClass": "control",
-        "labelMode": "callout",
-        "step": 9,
+        "labelMode": "offset",
         "layout": {
           "order": 5,
           "sourcePort": [
             1.0,
-            0.72
+            0.62
           ],
           "targetPort": [
             0.0,
             0.2
+          ]
+        }
+      },
+      {
+        "semanticId": "r-fe-weapons",
+        "lineClass": "control",
+        "labelMode": "offset",
+        "layout": {
+          "order": 6,
+          "sourcePort": [
+            1.0,
+            0.8
           ],
-          "badgeT": 0.12
+          "targetPort": [
+            0.0,
+            0.5
+          ]
         }
       },
       {
         "semanticId": "r-player-pubgclient",
         "lineClass": "dependency",
-        "labelMode": "callout",
-        "step": 3,
+        "labelMode": "offset",
         "layout": {
-          "order": 6,
+          "order": 7,
           "sourcePort": [
             1.0,
             0.5
           ],
           "targetPort": [
             0.0,
-            0.3
-          ],
-          "badgeT": 0.12
+            0.2
+          ]
         }
       },
       {
         "semanticId": "r-match-pubgclient",
         "lineClass": "dependency",
-        "labelMode": "callout",
-        "step": 6,
+        "labelMode": "offset",
         "layout": {
-          "order": 7,
+          "order": 8,
           "sourcePort": [
             1.0,
             0.3
           ],
           "targetPort": [
             0.0,
-            0.7
-          ],
-          "badgeT": 0.12
+            0.45
+          ]
         }
       },
       {
         "semanticId": "r-match-s3client",
         "lineClass": "dependency",
-        "labelMode": "callout",
-        "step": 7,
+        "labelMode": "offset",
         "layout": {
-          "order": 8,
+          "order": 9,
           "sourcePort": [
             1.0,
             0.7
@@ -1071,16 +1190,48 @@
           "targetPort": [
             0.0,
             0.5
+          ]
+        }
+      },
+      {
+        "semanticId": "r-weaponbreakdown-pubgclient",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "layout": {
+          "order": 10,
+          "sourcePort": [
+            1.0,
+            0.3
           ],
-          "badgeT": 0.12
+          "targetPort": [
+            0.0,
+            0.8
+          ]
+        }
+      },
+      {
+        "semanticId": "r-weaponbreakdown-telemetryclient",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "layout": {
+          "order": 11,
+          "sourcePort": [
+            1.0,
+            0.7
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
         }
       },
       {
         "semanticId": "r-insight-player",
         "lineClass": "dependency",
         "labelMode": "offset",
+        "laneId": "insight-back-top",
         "layout": {
-          "order": 9,
+          "order": 12,
           "sourcePort": [
             0.3,
             0.0
@@ -1089,80 +1240,27 @@
             0.3,
             0.0
           ]
-        },
-        "laneId": "insight-back-top"
+        }
       },
       {
         "semanticId": "r-insight-match",
         "lineClass": "dependency",
         "labelMode": "offset",
-        "layout": {
-          "order": 10,
-          "sourcePort": [
-            0.6,
-            0.0
-          ],
-          "targetPort": [
-            0.5,
-            0.0
-          ]
-        },
-        "laneId": "insight-back-top2"
-      },
-      {
-        "semanticId": "r-insight-geminiclient",
-        "lineClass": "dependency",
-        "labelMode": "callout",
-        "step": 10,
-        "layout": {
-          "order": 11,
-          "sourcePort": [
-            1.0,
-            0.5
-          ],
-          "targetPort": [
-            0.0,
-            0.5
-          ],
-          "badgeT": 0.12
-        }
-      },
-      {
-        "semanticId": "r-history-match",
-        "lineClass": "dependency",
-        "labelMode": "offset",
-        "layout": {
-          "order": 12,
-          "sourcePort": [
-            0.3,
-            1.0
-          ],
-          "targetPort": [
-            0.5,
-            1.0
-          ]
-        },
-        "laneId": "history-back-bottom"
-      },
-      {
-        "semanticId": "r-history-insight",
-        "lineClass": "dependency",
-        "labelMode": "offset",
+        "laneId": "insight-back-top2",
         "layout": {
           "order": 13,
           "sourcePort": [
             0.6,
-            1.0
+            0.0
           ],
           "targetPort": [
-            0.7,
-            1.0
+            0.5,
+            0.0
           ]
-        },
-        "laneId": "history-back-bottom2"
+        }
       },
       {
-        "semanticId": "r-history-ddbclient",
+        "semanticId": "r-insight-geminiclient",
         "lineClass": "dependency",
         "labelMode": "offset",
         "layout": {
@@ -1178,46 +1276,43 @@
         }
       },
       {
-        "semanticId": "r-pubgclient-pubgapi",
-        "lineClass": "data",
-        "labelMode": "callout",
-        "step": 4,
+        "semanticId": "r-history-match",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "laneId": "history-back-bottom",
         "layout": {
           "order": 15,
           "sourcePort": [
-            1.0,
-            0.5
+            0.3,
+            1.0
           ],
           "targetPort": [
-            0.0,
-            0.3
-          ],
-          "badgeT": 0.12
+            0.5,
+            1.0
+          ]
         }
       },
       {
-        "semanticId": "r-geminiclient-geminiapi",
-        "lineClass": "data",
-        "labelMode": "callout",
-        "step": 11,
+        "semanticId": "r-history-insight",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "laneId": "history-back-bottom2",
         "layout": {
           "order": 16,
           "sourcePort": [
-            1.0,
-            0.5
+            0.6,
+            1.0
           ],
           "targetPort": [
-            0.0,
-            0.3
-          ],
-          "badgeT": 0.12
+            0.7,
+            1.0
+          ]
         }
       },
       {
-        "semanticId": "r-s3client-s3",
-        "lineClass": "data",
-        "labelMode": "callout",
-        "step": 8,
+        "semanticId": "r-history-ddbclient",
+        "lineClass": "dependency",
+        "labelMode": "offset",
         "layout": {
           "order": 17,
           "sourcePort": [
@@ -1226,13 +1321,12 @@
           ],
           "targetPort": [
             0.0,
-            0.3
-          ],
-          "badgeT": 0.12
+            0.5
+          ]
         }
       },
       {
-        "semanticId": "r-ddbclient-ddb",
+        "semanticId": "r-pubgclient-pubgapi",
         "lineClass": "data",
         "labelMode": "offset",
         "layout": {
@@ -1243,33 +1337,80 @@
           ],
           "targetPort": [
             0.0,
-            0.5
+            0.15
           ]
         }
       },
       {
-        "semanticId": "r-fe-eb",
-        "lineClass": "optional",
+        "semanticId": "r-geminiclient-geminiapi",
+        "lineClass": "data",
         "labelMode": "offset",
         "layout": {
           "order": 19,
           "sourcePort": [
-            0.5,
-            1.0
+            1.0,
+            0.5
           ],
           "targetPort": [
-            0.5,
-            1.0
+            0.0,
+            0.15
           ]
-        },
-        "laneId": "fe-eb-bottom"
+        }
+      },
+      {
+        "semanticId": "r-s3client-s3",
+        "lineClass": "data",
+        "labelMode": "offset",
+        "layout": {
+          "order": 20,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.15
+          ]
+        }
+      },
+      {
+        "semanticId": "r-ddbclient-ddb",
+        "lineClass": "data",
+        "labelMode": "offset",
+        "layout": {
+          "order": 21,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.15
+          ]
+        }
+      },
+      {
+        "semanticId": "r-telemetryclient-telemetrycdn",
+        "lineClass": "response",
+        "labelMode": "offset",
+        "layout": {
+          "order": 22,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
+        }
       },
       {
         "semanticId": "r-eb-apigw",
         "lineClass": "optional",
         "labelMode": "offset",
         "layout": {
-          "order": 20,
+          "order": 23,
           "sourcePort": [
             1.0,
             0.5
@@ -1285,7 +1426,7 @@
         "lineClass": "optional",
         "labelMode": "offset",
         "layout": {
-          "order": 21,
+          "order": 24,
           "sourcePort": [
             1.0,
             0.5
@@ -1300,8 +1441,9 @@
         "semanticId": "r-lambda-pubgapi",
         "lineClass": "optional",
         "labelMode": "offset",
+        "laneId": "lambda-back-1",
         "layout": {
-          "order": 22,
+          "order": 25,
           "sourcePort": [
             0.3,
             1.0
@@ -1310,15 +1452,15 @@
             0.5,
             1.0
           ]
-        },
-        "laneId": "lambda-back-1"
+        }
       },
       {
         "semanticId": "r-lambda-geminiapi",
         "lineClass": "optional",
         "labelMode": "offset",
+        "laneId": "lambda-back-2",
         "layout": {
-          "order": 23,
+          "order": 26,
           "sourcePort": [
             0.6,
             1.0
@@ -1327,15 +1469,14 @@
             0.5,
             1.0
           ]
-        },
-        "laneId": "lambda-back-2"
+        }
       },
       {
         "semanticId": "r-s3-athena",
         "lineClass": "optional",
         "labelMode": "offset",
         "layout": {
-          "order": 24,
+          "order": 27,
           "sourcePort": [
             1.0,
             0.5
