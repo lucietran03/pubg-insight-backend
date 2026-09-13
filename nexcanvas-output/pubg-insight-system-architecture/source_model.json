@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "2.0",
+  "status": "confirmed",
+  "sources": [
+    {
+      "id": "repo-backend",
+      "type": "repository",
+      "location": ".",
+      "snapshot": "9d1cff740f4c3f3c20ae49e3ea3495e56faaf861",
+      "repository": {
+        "remote": "git@github.com-lucietran03:lucietran03/pubg-insight-backend.git",
+        "revision": "9d1cff740f4c3f3c20ae49e3ea3495e56faaf861",
+        "dirty": true,
+        "capturedAt": "2026-09-12T20:58:14Z"
+      }
+    },
+    {
+      "id": "repo-frontend",
+      "type": "document",
+      "location": "/Users/trand27/Documents/GitHub/pubg-insight-frontend (sibling repo, inspected as reference material only, not Git-verified against this project's --repo-root)",
+      "snapshot": "src/components, src/services, src/api, src/types inspected directly at commit 6d3d4ad501239c68c2c68aaf1176e0b25b800aeb"
+    },
+    {
+      "id": "doc-architecture",
+      "type": "document",
+      "location": "docs/deliverables/ARCHITECTURE.md",
+      "snapshot": "read in full: System Context, Component View, 6 sequence diagrams, Data Mapping, Error Handling, 17 design decisions, Not-Yet-Built section"
+    },
+    {
+      "id": "doc-aws-setup",
+      "type": "document",
+      "location": "docs/decisions/AWS_SETUP.md",
+      "snapshot": "read in full: personal-account IAM setup, S3 bucket + DynamoDB table one-time console creation steps, Elastic Beanstalk later-phase steps"
+    },
+    {
+      "id": "doc-project-context",
+      "type": "document",
+      "location": "docs/decisions/PROJECT_CONTEXT.md",
+      "snapshot": "read AWS Environment / AWS Services sections (lines 272-431) and verification status section (lines 412-433)"
+    },
+    {
+      "id": "doc-task",
+      "type": "document",
+      "location": "docs/decisions/TASK.md",
+      "snapshot": "re-read 2026-09-13 after a docs correction: line 65 now reads 'Create the DynamoDB table and S3 bucket - done and verified' with live curl confirmation of cache-aside speedup and a real DynamoDB round-trip"
+    },
+    {
+      "id": "aws-icon-archive",
+      "type": "document",
+      "location": "/Users/trand27/.claude/jobs/e76b47eb/tmp/aws-icons.zip (official AWS Architecture Service Icons package, verified valid via unzip -l)",
+      "snapshot": "extracted 2026-09-13: Arch_Amazon-Simple-Storage-Service_64.svg, Arch_Amazon-DynamoDB_64.svg, Arch_AWS-Elastic-Beanstalk_64.svg, Arch_Amazon-API-Gateway_32.svg, Arch_AWS-Lambda_32.svg, Arch_Amazon-Athena_64.svg (real files, not the __MACOSX/._ AppleDouble resource-fork duplicates the archive also contains)"
+    },
+    {
+      "id": "simple-icons-cdn",
+      "type": "url",
+      "location": "https://cdn.jsdelivr.net/npm/simple-icons@11.15.0/icons/",
+      "snapshot": "fetched 2026-09-13: springboot.svg, googlegemini.svg, pubg.svg (each confirmed real via <title> tag inspection before sync)"
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact-package-structure",
+      "claim": "Backend source under src/main/java/com/pubginsight/ contains feature packages player/, match/, insight/, history/, health/, common/ (config+exception) and client/ with subpackages pubg/, gemini/, s3/, dynamodb/.",
+      "evidence": ["repo-backend"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-controller-endpoints",
+      "claim": "PlayerController exposes GET /api/players/{name} and GET /api/players/{playerId}/season-stats; MatchController exposes GET /api/players/{playerId}/matches/{matchId}; InsightController exposes GET /api/players/{playerId}/matches/{matchId}/insights; HistoryController exposes POST and GET .../matches/{matchId}/history; HealthController exposes GET /health.",
+      "evidence": ["repo-backend"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-frontend-calls",
+      "claim": "Frontend services call exactly: GET /health (App.tsx), GET /api/players/{name} and GET /api/players/{playerId}/season-stats (playerService/seasonStatsService), GET /api/players/{playerId}/matches/{matchId} (matchService), GET .../insights (insightService). No frontend service currently calls the /history endpoint - HistoryController exists in the backend but is not yet wired to any UI.",
+      "evidence": ["repo-frontend"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-single-call-surface",
+      "claim": "The frontend has exactly one external call surface: src/api/axios.ts, a shared axios instance with baseURL = VITE_API_BASE_URL. It never calls PUBG/Gemini/AWS directly.",
+      "evidence": ["doc-architecture", "repo-frontend"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-component-deps",
+      "claim": "Compile-time dependencies: player -> client.pubg; match -> client.pubg; match -> client.s3; insight -> player, insight -> match, insight -> client.gemini; history -> match, history -> insight, history -> client.dynamodb. common.exception depends on (catches exceptions from) player, match, client.pubg, client.gemini, client.dynamodb - the reverse of a typical dependency direction, a deliberate design choice (D1) so feature packages stay independent of each other.",
+      "evidence": ["doc-architecture"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-pubg-gemini-live",
+      "claim": "PUBG Developer API and Google Gemini API are both live external integrations: PubgApiClient (rate-limited via PubgRateLimiter, sliding 60s window, blocking) and GeminiApiClient are implemented, called over real HTTPS with Bearer token / API key respectively, and verified working end-to-end against real data (Feature 1 Player Search and Feature 2 Match Analytics verified live per PROJECT_CONTEXT.md; Feature 3 AI Insights code complete).",
+      "evidence": ["doc-architecture", "doc-project-context", "repo-backend"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-s3-dynamodb-status",
+      "claim": "CORRECTED 2026-09-13: client.s3 (S3MatchCacheClient, cache-aside for match JSON, soft-fail on error per D12) and client.dynamodb (AnalysisHistoryRepository, analysis-history persistence, hard-fail/502 on error per D12) are now DEPLOYED AND VERIFIED against the real personal AWS account. PROJECT_CONTEXT.md's Current Status section states: 'DynamoDB table (pubg-insight-analysis-history) and S3 bucket (pubg-insight-match-cache) created on the personal AWS account and verified working end-to-end against real AWS' - confirmed via a real GET .../matches/{id} called twice showing a visible speedup on the second call with no S3Exception warnings (cache-aside working), and a real POST .../matches/{id}/history followed by GET .../history round-tripping a real item through DynamoDB. TASK.md line 65 was updated to match: 'Create the DynamoDB table and S3 bucket - done and verified'. This supersedes an earlier reading of these same docs (pre-correction) that had said bucket/table creation was still pending - that was based on a stale doc snapshot.",
+      "evidence": ["doc-task", "doc-project-context"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-planned-aws",
+      "claim": "Elastic Beanstalk, API Gateway, Lambda, and Athena have no application code and no created infrastructure at all yet - purely planned/approved in the architecture (approved AWS service list in PROJECT_CONTEXT.md, worth the maximum 25 rubric points for criterion 3 if all six services are automated), not built.",
+      "evidence": ["doc-architecture", "doc-project-context", "doc-task"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-rate-limiting",
+      "claim": "PUBG rate limiting is enforced backend-side by PubgRateLimiter (D16): a single shared component tracks a sliding 60s window of call timestamps and blocks the calling thread until a slot is free, protecting the app's one shared PUBG API key budget (10 req/min) regardless of which frontend tab/request triggered the call.",
+      "evidence": ["doc-architecture"],
+      "confidence": "confirmed"
+    },
+    {
+      "id": "fact-real-icons",
+      "claim": "Real, official-source icons were resolved and synced into this project's asset manifest for: Amazon S3, Amazon DynamoDB, AWS Elastic Beanstalk, Amazon API Gateway, AWS Lambda, and Amazon Athena (extracted directly from the official AWS Architecture Service Icons ZIP, bypassing a bug in nexcanvas's own --provider aws-official --source-archive filename-discovery step that could pick a __MACOSX/._ AppleDouble junk duplicate over the real SVG when both share a near-identical normalized filename); React (from Simple Icons); Spring Boot and Google Gemini and PUBG (from Simple Icons, fetched live from the jsdelivr CDN and each verified via its embedded <title> tag before syncing). All are recorded as 'Synced' (React additionally reached 'Embedded' in a prior build) in assets/asset_manifest.json.",
+      "evidence": ["aws-icon-archive", "simple-icons-cdn"],
+      "confidence": "confirmed"
+    }
+  ],
+  "assumptions": [
+    "The app's own custom code (feature packages health/player/match/insight/history, and the client.pubg/client.gemini/client.s3/client.dynamodb wrapper classes) is not a named product with a logo, so these remain generic labeled glyphs even though the systems they call now have real icons.",
+    "The diagram models frontend as a single Container-level node (React Frontend) rather than breaking out individual components (PlayerSearch.tsx, MatchList.tsx, etc.) - the requested viewIntent is system/component architecture for the backend; frontend internal component structure is out of scope for this diagram."
+  ],
+  "exclusions": [
+    "Frontend's newer V2-redesign components observed in the sibling repo (PerformanceRadar.tsx, PlayerIdentityCard.tsx, DeltaIndicator.tsx, PerformanceBreakdown.tsx, AiInsights.tsx, RevealOnMount.tsx, StatTile.tsx, SectionTitle.tsx) are not individually modeled - they are all still served through the same single axios call surface and same backend controllers documented above, so they don't change the architecture-level picture this diagram shows.",
+    "Sequence-level detail (request/response steps within a single feature call) is intentionally excluded - already fully documented as Mermaid sequence diagrams in docs/deliverables/ARCHITECTURE.md; this diagram's viewIntent is architecture (system context + component view), not sequence."
+  ]
+}

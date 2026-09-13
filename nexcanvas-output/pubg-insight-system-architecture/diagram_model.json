@@ -1,0 +1,1351 @@
+{
+  "schemaVersion": "3.0",
+  "metadata": {
+    "title": "PUBG Insight — System Context & Component Architecture",
+    "subtitle": "Backend feature-package dependencies, external APIs, and AWS deployment status (live vs. planned)",
+    "viewIntent": "architecture",
+    "route": {
+      "family": "software",
+      "profile": "c4-container"
+    },
+    "audience": "technical / academic assignment reviewers",
+    "deliveryTarget": "engineering-doc",
+    "language": "en",
+    "evidenceModel": "source_model.json",
+    "assumptions": [
+      "The app's own custom code (feature packages, and the client.* wrapper classes) is not a named product with a logo, so it stays generic even though the systems it calls now have real icons.",
+      "Frontend is modeled as a single Container-level node (React Frontend); its internal component structure (PlayerSearch.tsx, MatchList.tsx, etc.) is out of scope for this architecture-level diagram."
+    ]
+  },
+  "semantics": {
+    "groups": [
+      {
+        "id": "frontend-group",
+        "label": "Frontend",
+        "kind": "boundary",
+        "provenance": [
+          {
+            "factId": "fact-single-call-surface",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "backend-features",
+        "label": "Backend — Feature Packages (Spring Boot)",
+        "kind": "boundary",
+        "provenance": [
+          {
+            "factId": "fact-package-structure",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "backend-clients",
+        "label": "Backend — client/ Integrations",
+        "kind": "boundary",
+        "provenance": [
+          {
+            "factId": "fact-package-structure",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "external-live-group",
+        "label": "External APIs — Live (PUBG & Gemini)",
+        "kind": "boundary",
+        "provenance": [
+          {
+            "factId": "fact-pubg-gemini-live",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "aws-live-group",
+        "label": "AWS — Live & Verified",
+        "kind": "boundary",
+        "provenance": [
+          {
+            "factId": "fact-s3-dynamodb-status",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "aws-planned-group",
+        "label": "AWS — Planned / Not Deployed",
+        "kind": "boundary",
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      }
+    ],
+    "entities": [
+      {
+        "id": "user",
+        "label": "User",
+        "kind": "actor",
+        "description": "Player, in browser",
+        "provenance": []
+      },
+      {
+        "id": "frontend_app",
+        "label": "React Frontend",
+        "kind": "container",
+        "technology": "React / TS / Vite",
+        "description": "Single axios call surface",
+        "provenance": [
+          {
+            "factId": "fact-single-call-surface",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "health",
+        "label": "health",
+        "kind": "component",
+        "technology": "Spring MVC",
+        "description": "GET /health",
+        "provenance": [
+          {
+            "factId": "fact-controller-endpoints",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "player",
+        "label": "player",
+        "kind": "component",
+        "technology": "Service + Controller",
+        "description": "Player search, season stats",
+        "provenance": [
+          {
+            "factId": "fact-controller-endpoints",
+            "confidence": "confirmed"
+          },
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "match",
+        "label": "match",
+        "kind": "component",
+        "technology": "Service + Controller",
+        "description": "Match analytics",
+        "provenance": [
+          {
+            "factId": "fact-controller-endpoints",
+            "confidence": "confirmed"
+          },
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "insight",
+        "label": "insight",
+        "kind": "component",
+        "technology": "Service + Controller",
+        "description": "Gemini AI insights",
+        "provenance": [
+          {
+            "factId": "fact-controller-endpoints",
+            "confidence": "confirmed"
+          },
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "history",
+        "label": "history",
+        "kind": "component",
+        "technology": "Service + Controller",
+        "description": "Analysis history (no UI yet)",
+        "tags": [
+          "not-wired-to-ui"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-frontend-calls",
+            "confidence": "confirmed"
+          },
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "pubg_client",
+        "label": "client.pubg",
+        "kind": "component",
+        "technology": "Spring RestClient",
+        "description": "Rate-limited PUBG client",
+        "provenance": [
+          {
+            "factId": "fact-rate-limiting",
+            "confidence": "confirmed"
+          },
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "gemini_client",
+        "label": "client.gemini",
+        "kind": "component",
+        "technology": "Spring RestClient",
+        "description": "Gemini API client",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "s3_client",
+        "label": "client.s3",
+        "kind": "component",
+        "technology": "AWS SDK v2",
+        "description": "Match cache (soft-fail)",
+        "provenance": [
+          {
+            "factId": "fact-s3-dynamodb-status",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "dynamodb_client",
+        "label": "client.dynamodb",
+        "kind": "component",
+        "technology": "AWS SDK v2",
+        "description": "History repository",
+        "provenance": [
+          {
+            "factId": "fact-s3-dynamodb-status",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "pubg_api",
+        "label": "PUBG Developer API",
+        "kind": "external-service",
+        "technology": "REST / JSON:API",
+        "description": "Live, rate-limited 10/min",
+        "provenance": [
+          {
+            "factId": "fact-pubg-gemini-live",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "gemini_api",
+        "label": "Google Gemini API",
+        "kind": "external-service",
+        "technology": "REST",
+        "description": "Live, aggregated data only",
+        "provenance": [
+          {
+            "factId": "fact-pubg-gemini-live",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "label": "Amazon S3",
+        "kind": "datastore",
+        "technology": "pubg-insight-match-cache",
+        "description": "Match cache — live, verified",
+        "tags": [
+          "deployed"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-s3-dynamodb-status",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "dynamodb",
+        "label": "Amazon DynamoDB",
+        "kind": "datastore",
+        "technology": "pubg-insight-analysis-history",
+        "description": "History — live, verified",
+        "tags": [
+          "deployed"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-s3-dynamodb-status",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "eb",
+        "label": "AWS Elastic Beanstalk",
+        "kind": "service",
+        "technology": "Planned",
+        "description": "No infra yet",
+        "tags": [
+          "planned-no-code"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "apigw",
+        "label": "Amazon API Gateway",
+        "kind": "service",
+        "technology": "Planned",
+        "description": "No infra yet",
+        "tags": [
+          "planned-no-code"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "lambda",
+        "label": "AWS Lambda",
+        "kind": "service",
+        "technology": "Planned",
+        "description": "No code yet",
+        "tags": [
+          "planned-no-code"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "athena",
+        "label": "Amazon Athena",
+        "kind": "service",
+        "technology": "Planned",
+        "description": "No infra yet",
+        "tags": [
+          "planned-no-code"
+        ],
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "id": "r-user-fe",
+        "source": "user",
+        "target": "frontend_app",
+        "kind": "browse",
+        "label": "HTTPS",
+        "provenance": [
+          {
+            "factId": "fact-single-call-surface",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-fe-health",
+        "source": "frontend_app",
+        "target": "health",
+        "kind": "http-request",
+        "label": "GET /health",
+        "provenance": [
+          {
+            "factId": "fact-frontend-calls",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-fe-player",
+        "source": "frontend_app",
+        "target": "player",
+        "kind": "http-request",
+        "label": "GET /players",
+        "provenance": [
+          {
+            "factId": "fact-frontend-calls",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-fe-match",
+        "source": "frontend_app",
+        "target": "match",
+        "kind": "http-request",
+        "label": "GET /matches",
+        "provenance": [
+          {
+            "factId": "fact-frontend-calls",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-fe-insight",
+        "source": "frontend_app",
+        "target": "insight",
+        "kind": "http-request",
+        "label": "GET /insights",
+        "provenance": [
+          {
+            "factId": "fact-frontend-calls",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-player-pubgclient",
+        "source": "player",
+        "target": "pubg_client",
+        "kind": "dependency",
+        "label": "find player/season",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-match-pubgclient",
+        "source": "match",
+        "target": "pubg_client",
+        "kind": "dependency",
+        "label": "find match",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-match-s3client",
+        "source": "match",
+        "target": "s3_client",
+        "kind": "dependency",
+        "label": "cache get/put",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-insight-player",
+        "source": "insight",
+        "target": "player",
+        "kind": "dependency",
+        "label": "season stats",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-insight-match",
+        "source": "insight",
+        "target": "match",
+        "kind": "dependency",
+        "label": "match stats",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-insight-geminiclient",
+        "source": "insight",
+        "target": "gemini_client",
+        "kind": "dependency",
+        "label": "generate text",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-history-match",
+        "source": "history",
+        "target": "match",
+        "kind": "dependency",
+        "label": "match stats",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-history-insight",
+        "source": "history",
+        "target": "insight",
+        "kind": "dependency",
+        "label": "generate insight",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-history-ddbclient",
+        "source": "history",
+        "target": "dynamodb_client",
+        "kind": "dependency",
+        "label": "save item",
+        "provenance": [
+          {
+            "factId": "fact-component-deps",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-pubgclient-pubgapi",
+        "source": "pubg_client",
+        "target": "pubg_api",
+        "kind": "http-integration",
+        "label": "Bearer token",
+        "provenance": [
+          {
+            "factId": "fact-pubg-gemini-live",
+            "confidence": "confirmed"
+          },
+          {
+            "factId": "fact-rate-limiting",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-geminiclient-geminiapi",
+        "source": "gemini_client",
+        "target": "gemini_api",
+        "kind": "http-integration",
+        "label": "API key",
+        "provenance": [
+          {
+            "factId": "fact-pubg-gemini-live",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-s3client-s3",
+        "source": "s3_client",
+        "target": "s3",
+        "kind": "aws-sdk-call",
+        "label": "GetObject/PutObject",
+        "provenance": [
+          {
+            "factId": "fact-s3-dynamodb-status",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-ddbclient-ddb",
+        "source": "dynamodb_client",
+        "target": "dynamodb",
+        "kind": "aws-sdk-call",
+        "label": "PutItem/Query",
+        "provenance": [
+          {
+            "factId": "fact-s3-dynamodb-status",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-fe-eb",
+        "source": "frontend_app",
+        "target": "eb",
+        "kind": "planned",
+        "label": "future hosting",
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-eb-apigw",
+        "source": "eb",
+        "target": "apigw",
+        "kind": "planned",
+        "label": "planned",
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-apigw-lambda",
+        "source": "apigw",
+        "target": "lambda",
+        "kind": "planned",
+        "label": "planned",
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-lambda-pubgapi",
+        "source": "lambda",
+        "target": "pubg_api",
+        "kind": "planned",
+        "label": "planned",
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-lambda-geminiapi",
+        "source": "lambda",
+        "target": "gemini_api",
+        "kind": "planned",
+        "label": "planned",
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      },
+      {
+        "id": "r-s3-athena",
+        "source": "s3",
+        "target": "athena",
+        "kind": "planned",
+        "label": "planned",
+        "provenance": [
+          {
+            "factId": "fact-planned-aws",
+            "confidence": "confirmed"
+          }
+        ]
+      }
+    ]
+  },
+  "presentation": {
+    "theme": "cloud-reference",
+    "visualArchetype": "provider-neutral-reference",
+    "layoutStrategy": "phase-columns",
+    "showTitle": false,
+    "direction": "LR",
+    "canvas": {
+      "width": 4200,
+      "height": 2700,
+      "background": "#FFFFFF"
+    },
+    "legend": [
+      {
+        "kind": "control",
+        "label": "Live HTTP request (frontend to backend)"
+      },
+      {
+        "kind": "dependency",
+        "label": "Backend compile-time dependency (feature/client composition)"
+      },
+      {
+        "kind": "data",
+        "label": "Live external call (backend to PUBG / Gemini / AWS SDK)"
+      },
+      {
+        "kind": "optional",
+        "label": "Planned only — not yet built/deployed"
+      }
+    ],
+    "groups": [
+      {
+        "semanticId": "frontend-group",
+        "presentation": "phase-column",
+        "order": 1
+      },
+      {
+        "semanticId": "backend-features",
+        "presentation": "phase-column",
+        "order": 2
+      },
+      {
+        "semanticId": "backend-clients",
+        "presentation": "phase-column",
+        "order": 3
+      },
+      {
+        "semanticId": "external-live-group",
+        "presentation": "phase-column",
+        "order": 4
+      },
+      {
+        "semanticId": "aws-live-group",
+        "presentation": "phase-column",
+        "order": 5
+      },
+      {
+        "semanticId": "aws-planned-group",
+        "presentation": "phase-column",
+        "order": 6
+      }
+    ],
+    "entities": [
+      {
+        "semanticId": "user",
+        "boundary": "frontend-group",
+        "presentation": "compact-glyph",
+        "importance": "primary",
+        "layout": {
+          "order": 0
+        }
+      },
+      {
+        "semanticId": "frontend_app",
+        "boundary": "frontend-group",
+        "presentation": "service-icon",
+        "assetRef": "react",
+        "importance": "primary",
+        "layout": {
+          "order": 1
+        }
+      },
+      {
+        "semanticId": "health",
+        "boundary": "backend-features",
+        "presentation": "service-tile",
+        "importance": "secondary",
+        "layout": {
+          "order": 1
+        }
+      },
+      {
+        "semanticId": "player",
+        "boundary": "backend-features",
+        "presentation": "service-tile",
+        "importance": "primary",
+        "layout": {
+          "order": 2
+        }
+      },
+      {
+        "semanticId": "match",
+        "boundary": "backend-features",
+        "presentation": "service-tile",
+        "importance": "primary",
+        "layout": {
+          "order": 3
+        }
+      },
+      {
+        "semanticId": "insight",
+        "boundary": "backend-features",
+        "presentation": "service-tile",
+        "importance": "primary",
+        "layout": {
+          "order": 4
+        }
+      },
+      {
+        "semanticId": "history",
+        "boundary": "backend-features",
+        "presentation": "service-tile",
+        "importance": "secondary",
+        "layout": {
+          "order": 5
+        }
+      },
+      {
+        "semanticId": "pubg_client",
+        "boundary": "backend-clients",
+        "presentation": "service-tile",
+        "importance": "primary",
+        "layout": {
+          "order": 1
+        }
+      },
+      {
+        "semanticId": "gemini_client",
+        "boundary": "backend-clients",
+        "presentation": "service-tile",
+        "importance": "primary",
+        "layout": {
+          "order": 2
+        }
+      },
+      {
+        "semanticId": "s3_client",
+        "boundary": "backend-clients",
+        "presentation": "service-tile",
+        "importance": "secondary",
+        "layout": {
+          "order": 3
+        }
+      },
+      {
+        "semanticId": "dynamodb_client",
+        "boundary": "backend-clients",
+        "presentation": "service-tile",
+        "importance": "secondary",
+        "layout": {
+          "order": 4
+        }
+      },
+      {
+        "semanticId": "pubg_api",
+        "boundary": "external-live-group",
+        "presentation": "service-icon",
+        "assetRef": "pubg",
+        "importance": "primary",
+        "layout": {
+          "order": 1
+        }
+      },
+      {
+        "semanticId": "gemini_api",
+        "boundary": "external-live-group",
+        "presentation": "service-icon",
+        "assetRef": "googlegemini",
+        "importance": "primary",
+        "layout": {
+          "order": 2
+        }
+      },
+      {
+        "semanticId": "s3",
+        "boundary": "aws-live-group",
+        "presentation": "service-icon",
+        "assetRef": "aws-s3",
+        "importance": "primary",
+        "layout": {
+          "order": 1
+        }
+      },
+      {
+        "semanticId": "dynamodb",
+        "boundary": "aws-live-group",
+        "presentation": "service-icon",
+        "assetRef": "aws-dynamodb",
+        "importance": "primary",
+        "layout": {
+          "order": 2
+        }
+      },
+      {
+        "semanticId": "eb",
+        "boundary": "aws-planned-group",
+        "presentation": "service-icon",
+        "assetRef": "aws-elastic-beanstalk",
+        "importance": "support",
+        "layout": {
+          "order": 1
+        }
+      },
+      {
+        "semanticId": "apigw",
+        "boundary": "aws-planned-group",
+        "presentation": "service-icon",
+        "assetRef": "aws-api-gateway",
+        "importance": "support",
+        "layout": {
+          "order": 2
+        }
+      },
+      {
+        "semanticId": "lambda",
+        "boundary": "aws-planned-group",
+        "presentation": "service-icon",
+        "assetRef": "aws-lambda",
+        "importance": "support",
+        "layout": {
+          "order": 3
+        }
+      },
+      {
+        "semanticId": "athena",
+        "boundary": "aws-planned-group",
+        "presentation": "service-icon",
+        "assetRef": "aws-athena",
+        "importance": "support",
+        "layout": {
+          "order": 4
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "semanticId": "r-user-fe",
+        "lineClass": "control",
+        "labelMode": "callout",
+        "step": 1,
+        "layout": {
+          "order": 1,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-fe-health",
+        "lineClass": "control",
+        "labelMode": "offset",
+        "layout": {
+          "order": 2,
+          "sourcePort": [
+            1.0,
+            0.12
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
+        }
+      },
+      {
+        "semanticId": "r-fe-player",
+        "lineClass": "control",
+        "labelMode": "callout",
+        "step": 2,
+        "layout": {
+          "order": 3,
+          "sourcePort": [
+            1.0,
+            0.32
+          ],
+          "targetPort": [
+            0.0,
+            0.3
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-fe-match",
+        "lineClass": "control",
+        "labelMode": "callout",
+        "step": 5,
+        "layout": {
+          "order": 4,
+          "sourcePort": [
+            1.0,
+            0.52
+          ],
+          "targetPort": [
+            0.0,
+            0.25
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-fe-insight",
+        "lineClass": "control",
+        "labelMode": "callout",
+        "step": 9,
+        "layout": {
+          "order": 5,
+          "sourcePort": [
+            1.0,
+            0.72
+          ],
+          "targetPort": [
+            0.0,
+            0.2
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-player-pubgclient",
+        "lineClass": "dependency",
+        "labelMode": "callout",
+        "step": 3,
+        "layout": {
+          "order": 6,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.3
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-match-pubgclient",
+        "lineClass": "dependency",
+        "labelMode": "callout",
+        "step": 6,
+        "layout": {
+          "order": 7,
+          "sourcePort": [
+            1.0,
+            0.3
+          ],
+          "targetPort": [
+            0.0,
+            0.7
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-match-s3client",
+        "lineClass": "dependency",
+        "labelMode": "callout",
+        "step": 7,
+        "layout": {
+          "order": 8,
+          "sourcePort": [
+            1.0,
+            0.7
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-insight-player",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "layout": {
+          "order": 9,
+          "sourcePort": [
+            0.3,
+            0.0
+          ],
+          "targetPort": [
+            0.3,
+            0.0
+          ]
+        },
+        "laneId": "insight-back-top"
+      },
+      {
+        "semanticId": "r-insight-match",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "layout": {
+          "order": 10,
+          "sourcePort": [
+            0.6,
+            0.0
+          ],
+          "targetPort": [
+            0.5,
+            0.0
+          ]
+        },
+        "laneId": "insight-back-top2"
+      },
+      {
+        "semanticId": "r-insight-geminiclient",
+        "lineClass": "dependency",
+        "labelMode": "callout",
+        "step": 10,
+        "layout": {
+          "order": 11,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-history-match",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "layout": {
+          "order": 12,
+          "sourcePort": [
+            0.3,
+            1.0
+          ],
+          "targetPort": [
+            0.5,
+            1.0
+          ]
+        },
+        "laneId": "history-back-bottom"
+      },
+      {
+        "semanticId": "r-history-insight",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "layout": {
+          "order": 13,
+          "sourcePort": [
+            0.6,
+            1.0
+          ],
+          "targetPort": [
+            0.7,
+            1.0
+          ]
+        },
+        "laneId": "history-back-bottom2"
+      },
+      {
+        "semanticId": "r-history-ddbclient",
+        "lineClass": "dependency",
+        "labelMode": "offset",
+        "layout": {
+          "order": 14,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
+        }
+      },
+      {
+        "semanticId": "r-pubgclient-pubgapi",
+        "lineClass": "data",
+        "labelMode": "callout",
+        "step": 4,
+        "layout": {
+          "order": 15,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.3
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-geminiclient-geminiapi",
+        "lineClass": "data",
+        "labelMode": "callout",
+        "step": 11,
+        "layout": {
+          "order": 16,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.3
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-s3client-s3",
+        "lineClass": "data",
+        "labelMode": "callout",
+        "step": 8,
+        "layout": {
+          "order": 17,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.3
+          ],
+          "badgeT": 0.12
+        }
+      },
+      {
+        "semanticId": "r-ddbclient-ddb",
+        "lineClass": "data",
+        "labelMode": "offset",
+        "layout": {
+          "order": 18,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
+        }
+      },
+      {
+        "semanticId": "r-fe-eb",
+        "lineClass": "optional",
+        "labelMode": "offset",
+        "layout": {
+          "order": 19,
+          "sourcePort": [
+            0.5,
+            1.0
+          ],
+          "targetPort": [
+            0.5,
+            1.0
+          ]
+        },
+        "laneId": "fe-eb-bottom"
+      },
+      {
+        "semanticId": "r-eb-apigw",
+        "lineClass": "optional",
+        "labelMode": "offset",
+        "layout": {
+          "order": 20,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
+        }
+      },
+      {
+        "semanticId": "r-apigw-lambda",
+        "lineClass": "optional",
+        "labelMode": "offset",
+        "layout": {
+          "order": 21,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
+        }
+      },
+      {
+        "semanticId": "r-lambda-pubgapi",
+        "lineClass": "optional",
+        "labelMode": "offset",
+        "layout": {
+          "order": 22,
+          "sourcePort": [
+            0.3,
+            1.0
+          ],
+          "targetPort": [
+            0.5,
+            1.0
+          ]
+        },
+        "laneId": "lambda-back-1"
+      },
+      {
+        "semanticId": "r-lambda-geminiapi",
+        "lineClass": "optional",
+        "labelMode": "offset",
+        "layout": {
+          "order": 23,
+          "sourcePort": [
+            0.6,
+            1.0
+          ],
+          "targetPort": [
+            0.5,
+            1.0
+          ]
+        },
+        "laneId": "lambda-back-2"
+      },
+      {
+        "semanticId": "r-s3-athena",
+        "lineClass": "optional",
+        "labelMode": "offset",
+        "layout": {
+          "order": 24,
+          "sourcePort": [
+            1.0,
+            0.5
+          ],
+          "targetPort": [
+            0.0,
+            0.5
+          ]
+        }
+      }
+    ]
+  }
+}

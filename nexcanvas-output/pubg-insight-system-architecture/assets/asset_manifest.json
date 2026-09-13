@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "2.0",
+  "catalogVersion": "2026.08",
+  "updatedAt": "2026-09-13T06:34:55Z",
+  "assets": [
+    {
+      "key": "aws",
+      "requested": "aws",
+      "state": "Synced",
+      "provider": "simple-icons",
+      "version": "11.15.0",
+      "sourceUrl": "https://cdn.jsdelivr.net/npm/simple-icons@11.15.0/icons/amazonaws.svg",
+      "localPath": "assets/icons/simple-icons/amazonaws.svg",
+      "sha256": "79224fcf1ee0030e1ee8974ffb928af867b226f30f2e5817608897aafb45a14e",
+      "license": "CC0-1.0; brand and product marks remain subject to their owners' trademark policies.",
+      "trademarkNotice": "Use the mark only for the product it represents; do not redraw, distort, or substitute a neighboring brand.",
+      "message": "",
+      "updatedAt": "2026-09-12T20:49:46Z"
+    },
+    {
+      "key": "react",
+      "requested": "react",
+      "state": "Embedded",
+      "provider": "simple-icons",
+      "version": "16.21.0",
+      "sourceUrl": "https://cdn.jsdelivr.net/npm/simple-icons@16.21.0/icons/react.svg",
+      "localPath": "assets/icons/simple-icons/react.svg",
+      "sha256": "ab9136a1a4a8be72ac6743e1bdd1912d878bd68d57787ea7a6c6838e3b23c01c",
+      "license": "CC0-1.0; brand and product marks remain subject to their owners' trademark policies.",
+      "trademarkNotice": "Use the mark only for the product it represents; do not redraw, distort, or substitute a neighboring brand.",
+      "message": "",
+      "updatedAt": "2026-09-12T20:56:43Z"
+    },
+    {
+      "key": "aws-s3",
+      "requested": "Amazon S3",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/awss3.svg",
+      "sha256": "b92c5101cc6565dd12df37655802279f8fba0c719279f62f93106d26750b36c6",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    },
+    {
+      "key": "aws-dynamodb",
+      "requested": "Amazon DynamoDB",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/awsdynamodb.svg",
+      "sha256": "ed169f049cc24c954cfbe3d14695d5b022558c45e5605936a565d1347c14b664",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    },
+    {
+      "key": "aws-elastic-beanstalk",
+      "requested": "AWS Elastic Beanstalk",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/awselasticbeanstalk.svg",
+      "sha256": "591b7339580b86718ecc72e455fc738b750340d2b14c12b0a7f11704d6debce7",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    },
+    {
+      "key": "aws-api-gateway",
+      "requested": "Amazon API Gateway",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/awsapigateway.svg",
+      "sha256": "22bc78b5ef6c7f228c419c7579d9278cf577296492b89940de850385b35e7b8f",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    },
+    {
+      "key": "aws-lambda",
+      "requested": "AWS Lambda",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/awslambda.svg",
+      "sha256": "33832e1ca5cb5a14762b0fb9bc8e0913c0596ec5c54b745b3b0b20e3a6a61a4f",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    },
+    {
+      "key": "aws-athena",
+      "requested": "Amazon Athena",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/awsathena.svg",
+      "sha256": "03844d38ca3ed4fdcd102d9e654c35aa091c1f11b4c04fa4eb76dab864d6deba",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    },
+    {
+      "key": "springboot",
+      "requested": "Spring Boot",
+      "state": "Synced",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/springboot.svg",
+      "sha256": "1b4bb8d7522fa0742a9fc40685b3efe3e089c5d07e4d3eebf4b4dbb28f827ad3",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:02:52Z"
+    },
+    {
+      "key": "googlegemini",
+      "requested": "Google Gemini",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/googlegemini.svg",
+      "sha256": "a6228d8846040401e941a39ed17459785e8324dbb7b870ce84233c9b3e9863a0",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    },
+    {
+      "key": "pubg",
+      "requested": "PUBG",
+      "state": "Embedded",
+      "provider": "user",
+      "sourceUrl": "",
+      "localPath": "assets/icons/custom/pubg.svg",
+      "sha256": "90162e4cd938b98445965968631ca80005d052c84de208ce728f40cad9e42cc7",
+      "license": "User supplied; usage rights must be confirmed by the user.",
+      "message": "",
+      "updatedAt": "2026-09-13T06:34:55Z"
+    }
+  ]
+}

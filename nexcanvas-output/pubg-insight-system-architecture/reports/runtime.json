@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "2.0",
+  "checkedAt": "2026-09-12T20:45:24Z",
+  "tier": "portable",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "python": "3.9.6",
+  "node": "v20.19.4",
+  "drawio": null,
+  "skillRoot": "/Users/trand27/Documents/GitHub/pubg-insight-backend/.claude/skills/nexcanvas-drawio",
+  "capabilities": {
+    "authorNativeDrawio": true,
+    "validateContracts": true,
+    "structuralQa": true,
+    "layoutBuiltIn": true,
+    "layoutElk": true,
+    "renderCli": false,
+    "openBrowser": true,
+    "imageGeneration": false
+  },
+  "limitations": [
+    "Draw.io Desktop CLI not found; rendered visual QA cannot be completed."
+  ]
+}

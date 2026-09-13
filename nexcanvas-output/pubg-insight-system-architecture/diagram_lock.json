@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "2.0",
+  "status": "draft",
+  "viewIntent": "architecture",
+  "route": {
+    "family": "software",
+    "profile": "c4-container"
+  },
+  "theme": "technical-editorial",
+  "visualArchetype": "technical-editorial",
+  "canvas": {
+    "width": 1600,
+    "height": 900
+  },
+  "sourceHash": "1d9403995053d69b63b72be1c5f4ab911a5bbc87a92ebaf92d169f0645fbd232",
+  "decisions": {
+    "audience": "technical / academic assignment reviewers",
+    "viewIntent": "architecture",
+    "deliveryTarget": "engineering-doc",
+    "notation": "c4",
+    "layout": "nested",
+    "visualArchetype": "technical-editorial",
+    "assetPolicy": "verified-exact-or-generic"
+  }
+}

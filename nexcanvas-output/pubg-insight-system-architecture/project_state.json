@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0",
+  "pipelineVersion": "0.5.0",
+  "projectRoot": ".",
+  "status": "failed",
+  "currentStage": "diagram-qa",
+  "updatedAt": "2026-09-13T07:39:07Z",
+  "stages": {
+    "plan": {
+      "status": "complete",
+      "attempts": 16,
+      "inputHash": "01a0dd9b6843be27a2992502e66de26f2c7d932362f5370f93955525a11ff14c",
+      "inputs": {
+        "diagram_model.json": "2426b5781bc5c6b16c60501137e84c001b57b15250034fc962e78074b015058c",
+        "@pipelineVersion": "99f980892d5dcda14eb45933dd2ffcefadc1ca26aeef90025d3b733318b3fcc5"
+      },
+      "dependencies": {},
+      "startedAt": "2026-09-13T07:39:07Z",
+      "outputs": {
+        "reports/layout_brainstorm.json": {
+          "sha256": "0a0d87387e82699c06c9de02d0cdb0745885219f42495a97d89f46e0cbeecddf",
+          "bytes": 2513
+        }
+      },
+      "outputHash": "0343dcb20e1a641b7a5512822a38651c922e017820fd68c87e7d35fb32474398",
+      "result": {
+        "ok": true,
+        "winner": null
+      },
+      "completedAt": "2026-09-13T07:39:07Z"
+    },
+    "build": {
+      "status": "complete",
+      "attempts": 16,
+      "inputHash": "5e4719676e9ca938557c9fa355cd3baaca40fbc5c56eb65b98687eb785ebcb4c",
+      "inputs": {
+        "diagram_model.json": "2426b5781bc5c6b16c60501137e84c001b57b15250034fc962e78074b015058c",
+        "@pipelineVersion": "99f980892d5dcda14eb45933dd2ffcefadc1ca26aeef90025d3b733318b3fcc5",
+        "@effectiveAssets": "ee0aeb46bd7bcf78d7f0739e60bf0b06e33fd7aec2dd377f3f97cc13ec269db3"
+      },
+      "dependencies": {
+        "plan": "0343dcb20e1a641b7a5512822a38651c922e017820fd68c87e7d35fb32474398"
+      },
+      "startedAt": "2026-09-13T07:39:07Z",
+      "outputs": {
+        "artifacts/diagram.drawio": {
+          "sha256": "e124a27e8fc3ff8795a37ca3baa399e7c2b4f6cf7b66129de6d29bc2a7ab61e1",
+          "bytes": 291495
+        },
+        "reports/build.json": {
+          "sha256": "8c2b161cc8fcd9b70670ce43652adf8267ce0847adfc36344c19f2b9d4b785b3",
+          "bytes": 509
+        }
+      },
+      "outputHash": "586753bd4d5f76ca90204a2f12e2ebc0d79059af7397192efca4dc4ff456296d",
+      "result": {
+        "ok": true,
+        "nodes": 19,
+        "edges": 24
+      },
+      "completedAt": "2026-09-13T07:39:07Z"
+    },
+    "diagram-qa": {
+      "status": "failed",
+      "attempts": 15,
+      "inputHash": "1af1857476b469b735f74a08ecb8dd59436ebd1658c1a41458aab1f6111306fb",
+      "inputs": {
+        "source_model.json": "6aaa585139804ce46a6e5863b4753d3b7dda9d54636d4517a1aacea17cb7ba6d",
+        "diagram_lock.json": "d18a2017372563a45502619e7bd0411d383f94ccaa9fb8f4c7324c3f57e81e33",
+        "diagram_model.json": "2426b5781bc5c6b16c60501137e84c001b57b15250034fc962e78074b015058c",
+        "artifacts/diagram.drawio": "e124a27e8fc3ff8795a37ca3baa399e7c2b4f6cf7b66129de6d29bc2a7ab61e1",
+        "@pipelineVersion": "99f980892d5dcda14eb45933dd2ffcefadc1ca26aeef90025d3b733318b3fcc5",
+        "@effectiveAssets": "ee0aeb46bd7bcf78d7f0739e60bf0b06e33fd7aec2dd377f3f97cc13ec269db3",
+        "@qaOptions": "24e773c4ff367e8a387aab71f03b2d0cc247b12a10121852d9d3e93aadd0f31f"
+      },
+      "dependencies": {
+        "build": "586753bd4d5f76ca90204a2f12e2ebc0d79059af7397192efca4dc4ff456296d"
+      },
+      "startedAt": "2026-09-13T07:39:07Z",
+      "outputs": {
+        "reports/diagram_qa.json": {
+          "sha256": "24c41bd5d14bd23d415155043bb4b7b51d497beaa8a4aa281c3c4558aff42ea4",
+          "bytes": 12322
+        }
+      },
+      "outputHash": "cd98f23477cec935c4708a3c399bd14539bf2c33d4820319ce7377b929ef5f96",
+      "result": {
+        "ok": false,
+        "counts": {
+          "error": 61,
+          "warning": 11,
+          "info": 0
+        },
+        "failOnWarning": true
+      },
+      "completedAt": "2026-09-13T07:39:07Z"
+    },
+    "render": {
+      "status": "stale",
+      "attempts": 0,
+      "invalidatedAt": "2026-09-13T07:39:07Z",
+      "invalidationReason": "Upstream stage 'diagram-qa' failed."
+    },
+    "visual-qa": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "postflight": {
+      "status": "pending",
+      "attempts": 0
+    }
+  }
+}

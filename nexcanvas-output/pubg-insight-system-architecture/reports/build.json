@@ -1,0 +1,20 @@
+{
+  "output": "artifacts/diagram.drawio",
+  "route": "software/c4-container",
+  "nodes": 19,
+  "edges": 24,
+  "embeddedAssets": [
+    "aws-api-gateway",
+    "aws-athena",
+    "aws-dynamodb",
+    "aws-elastic-beanstalk",
+    "aws-lambda",
+    "aws-s3",
+    "googlegemini",
+    "pubg",
+    "react"
+  ],
+  "modelHash": "2f80848da761a6c0bf1998b12208d1d9c34a102602d99947df7686c29ac763a6",
+  "modelSchemaVersion": "3.0",
+  "semanticFingerprint": "5e7e0aa70d863a27c966c87f4973999733808d10987fead73350b19e28b03f90"
+}
