@@ -3,6 +3,7 @@ package com.pubginsight.player;
 import com.pubginsight.client.pubg.PubgApiClient;
 import com.pubginsight.client.pubg.dto.PubgPlayerAttributes;
 import com.pubginsight.client.pubg.dto.PubgPlayerData;
+import com.pubginsight.client.pubg.dto.PubgGameModeStats;
 import com.pubginsight.client.pubg.dto.PubgPlayerListResponse;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsAttributes;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsData;
@@ -59,8 +60,17 @@ class PlayerServiceTest {
 
     @Test
     void attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable() {
-        PubgSeasonStatsAttributes currentAttributes = new PubgSeasonStatsAttributes(Map.of());
-        PubgSeasonStatsAttributes previousAttributes = new PubgSeasonStatsAttributes(Map.of());
+        // Distinct map keys are load-bearing here, not decoration: PubgSeasonStatsAttributes
+        // is a record, so two instances both wrapping Map.of() are .equals() to each other -
+        // Mockito's default argument matching is equality-based, so two `when(...)` stubs for
+        // "equal" arguments collide and the later one silently wins for both. That previously
+        // made both toSeasonStatsDto(currentAttributes)/​(previousAttributes) calls resolve to
+        // the same (last-stubbed) return value in production code, a real bug this test
+        // should have caught but didn't until the fixtures were actually distinguishable.
+        PubgSeasonStatsAttributes currentAttributes = new PubgSeasonStatsAttributes(
+                Map.of("current-marker", new PubgGameModeStats(0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0)));
+        PubgSeasonStatsAttributes previousAttributes = new PubgSeasonStatsAttributes(
+                Map.of("previous-marker", new PubgGameModeStats(0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0)));
         SeasonStatsDto currentDto = seasonStats(0.2, 0.4);
         SeasonStatsDto previousDto = seasonStats(0.1, 0.5);
         SeasonComparison comparison = new SeasonComparison(100.0, 0.0, 0.0, -20.0, 0.0);
