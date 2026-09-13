@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -20,6 +21,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 // Fetches and parses a single match's telemetry file (a flat JSON array of typed gameplay
 // events) to build a per-weapon kill tally for one player.
@@ -66,6 +68,7 @@ public class TelemetryClient {
     public List<WeaponKillCount> fetchWeaponKillsForPlayer(String telemetryUrl, String killerAccountId) {
         HttpRequest request = HttpRequest.newBuilder(URI.create(telemetryUrl))
                 .timeout(REQUEST_TIMEOUT)
+                .header("Accept-Encoding", "gzip")
                 .GET()
                 .build();
 
@@ -84,12 +87,37 @@ public class TelemetryClient {
                     "Telemetry fetch returned HTTP " + response.statusCode() + " for '" + telemetryUrl + "'", null);
         }
 
-        try (InputStream body = response.body()) {
+        try (InputStream body = decodeIfGzipped(response)) {
             Map<String, Integer> killsByWeaponId = tallyKillsByWeapon(body, killerAccountId);
             return toSortedWeaponKillCounts(killsByWeaponId);
         } catch (IOException e) {
             throw new TelemetryFetchException("Failed to parse telemetry from '" + telemetryUrl + "'", e);
         }
+    }
+
+    // PUBG's telemetry CDN serves files gzip-compressed - java.net.http.HttpClient does NOT
+    // auto-decompress responses the way a browser or a library like OkHttp would, so the raw
+    // gzip bytes were being fed straight into the JSON parser (real bug: every single fetch
+    // failed with "Illegal character (CTRL-CHAR, code 31)" at line 1, column 2 - 0x1F is
+    // literally the first byte of the gzip magic number 0x1F8B, which is exactly what a JSON
+    // parser sees as "not whitespace, not a valid token start"). Checking Content-Encoding
+    // alone isn't fully reliable in practice, so this also sniffs the first 2 bytes directly
+    // and falls back to that if the header is missing/wrong.
+    private static InputStream decodeIfGzipped(HttpResponse<InputStream> response) throws IOException {
+        InputStream raw = response.body();
+        boolean declaredGzip = response.headers().firstValue("Content-Encoding")
+                .map(value -> value.equalsIgnoreCase("gzip"))
+                .orElse(false);
+
+        PushbackInputStream pushback = new PushbackInputStream(raw, 2);
+        byte[] magic = new byte[2];
+        int bytesRead = pushback.read(magic);
+        if (bytesRead > 0) {
+            pushback.unread(magic, 0, bytesRead);
+        }
+        boolean looksGzipped = bytesRead == 2 && (magic[0] & 0xFF) == 0x1F && (magic[1] & 0xFF) == 0x8B;
+
+        return (declaredGzip || looksGzipped) ? new GZIPInputStream(pushback) : pushback;
     }
 
     private Map<String, Integer> tallyKillsByWeapon(InputStream telemetryJson, String killerAccountId) throws IOException {
