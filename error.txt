@@ -1,40 +1,45 @@
-lucietran@macbook pubg-insight-backend % mvn test
+lucietran@macbook pubg-insight-backend % mvn clean test
 WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
 WARNING: sun.misc.Unsafe::staticFieldBase has been called by com.google.inject.internal.aop.HiddenClassDefiner (file:/opt/homebrew/Cellar/maven/3.9.11/libexec/lib/guice-5.1.0-classes.jar)
 WARNING: Please consider reporting this to the maintainers of class com.google.inject.internal.aop.HiddenClassDefiner
 WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
 [INFO] Scanning for projects...
-[INFO] 
+[INFO]
 [INFO] ----------------< com.pubginsight:pubg-insight-backend >----------------
 [INFO] Building  0.0.1-SNAPSHOT
 [INFO]   from pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
+[INFO]
+[INFO] --- clean:3.5.0:clean (default-clean) @ pubg-insight-backend ---
+[INFO] Deleting /Users/lucietran/Documents/GitHub/pubg-insight-backend/target
+[INFO]
 [INFO] --- resources:3.5.0:resources (default-resources) @ pubg-insight-backend ---
 [INFO] Copying 2 resources from src/main/resources to target/classes
 [INFO] Copying 3 resources from src/main/resources to target/classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.15.0:compile (default-compile) @ pubg-insight-backend ---
-[INFO] Nothing to compile - all classes are up to date.
-[INFO] 
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 79 source files with javac [debug parameters release 21] to target/classes
+[INFO]
 [INFO] --- resources:3.5.0:testResources (default-testResources) @ pubg-insight-backend ---
 [INFO] skip non existing resourceDirectory /Users/lucietran/Documents/GitHub/pubg-insight-backend/src/test/resources
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ pubg-insight-backend ---
-[INFO] Nothing to compile - all classes are up to date.
-[INFO] 
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 14 source files with javac [debug parameters release 21] to target/test-classes
+[INFO]
 [INFO] --- surefire:3.5.6:test (default-test) @ pubg-insight-backend ---
 [INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
+[INFO]
 [INFO] -------------------------------------------------------
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running com.pubginsight.match.MatchControllerIntegrationTest
-02:55:52.683 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pubginsight.match.MatchControllerIntegrationTest]: MatchControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-02:55:52.737 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.match.MatchControllerIntegrationTest
-02:55:52.765 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pubginsight.match.MatchControllerIntegrationTest]: MatchControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-02:55:52.767 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.match.MatchControllerIntegrationTest
-02:55:52.792 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+03:04:27.926 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pubginsight.match.MatchControllerIntegrationTest]: MatchControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+03:04:27.975 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.match.MatchControllerIntegrationTest
+03:04:28.001 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pubginsight.match.MatchControllerIntegrationTest]: MatchControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+03:04:28.002 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.match.MatchControllerIntegrationTest
+03:04:28.026 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -45,18 +50,18 @@ WARNING: sun.misc.Unsafe::staticFieldBase will be removed in a future release
 
  :: Spring Boot ::                (v4.1.0)
 
-2026-09-14T02:55:52.901+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : Starting MatchControllerIntegrationTest using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
-2026-09-14T02:55:52.902+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : The following 1 profile is active: "local"
+2026-09-14T03:04:28.144+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : Starting MatchControllerIntegrationTest using Java 24.0.2 with PID 42368 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T03:04:28.145+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : The following 1 profile is active: "local"
 Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
 WARNING: A Java agent has been loaded dynamically (/Users/lucietran/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.10/byte-buddy-agent-1.18.10.jar)
 WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
 WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
 WARNING: Dynamic loading of agents will be disallowed by default in a future release
-2026-09-14T02:55:53.905+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-09-14T02:55:53.905+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-09-14T02:55:53.906+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
-2026-09-14T02:55:53.917+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : Started MatchControllerIntegrationTest in 1.128 seconds (process running for 1.562)
+2026-09-14T03:04:29.195+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-14T03:04:29.195+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-14T03:04:29.195+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-09-14T03:04:29.207+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.m.MatchControllerIntegrationTest     : Started MatchControllerIntegrationTest in 1.185 seconds (process running for 1.605)
 
 MockHttpServletRequest:
       HTTP Method = GET
@@ -94,8 +99,8 @@ MockHttpServletResponse:
     Forwarded URL = null
    Redirected URL = null
           Cookies = []
-[ERROR] Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 3.068 s <<< FAILURE! -- in com.pubginsight.match.MatchControllerIntegrationTest
-[ERROR] com.pubginsight.match.MatchControllerIntegrationTest.getMatchStatsReturns200WithComputedHeadshotRate -- Time elapsed: 0.318 s <<< FAILURE!
+[ERROR] Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 3.215 s <<< FAILURE! -- in com.pubginsight.match.MatchControllerIntegrationTest
+[ERROR] com.pubginsight.match.MatchControllerIntegrationTest.getMatchStatsReturns200WithComputedHeadshotRate -- Time elapsed: 0.305 s <<< FAILURE!
 java.lang.AssertionError: Status expected:<200> but was:<404>
         at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
         at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
@@ -104,7 +109,7 @@ java.lang.AssertionError: Status expected:<200> but was:<404>
         at com.pubginsight.match.MatchControllerIntegrationTest.getMatchStatsReturns200WithComputedHeadshotRate(MatchControllerIntegrationTest.java:47)
 
 [INFO] Running com.pubginsight.match.MatchServiceTest
-2026-09-14T02:55:55.729+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.match.MatchService       : S3 match cache read failed for match 'match-1', falling back to PUBG API
+2026-09-14T03:04:31.117+07:00  WARN 42368 --- [pubg-insight-backend] [           main] com.pubginsight.match.MatchService       : S3 match cache read failed for match 'match-1', falling back to PUBG API
 
 com.pubginsight.client.s3.S3CacheException: bucket not reachable
         at com.pubginsight.client.s3.S3MatchCacheClient.getCachedMatchJson(S3MatchCacheClient.java:46) ~[classes/:na]
@@ -196,7 +201,7 @@ Caused by: java.lang.RuntimeException: boom
         at com.pubginsight.match.MatchServiceTest.fallsThroughToPubgWhenCacheReadFails(MatchServiceTest.java:113) ~[test-classes/:na]
         ... 81 common frames omitted
 
-2026-09-14T02:55:55.775+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.match.MatchService       : S3 match cache write failed for match 'match-1' - continuing without caching
+2026-09-14T03:04:31.164+07:00  WARN 42368 --- [pubg-insight-backend] [           main] com.pubginsight.match.MatchService       : S3 match cache write failed for match 'match-1' - continuing without caching
 
 com.pubginsight.client.s3.S3CacheException: bucket not reachable
         at com.pubginsight.client.s3.S3MatchCacheClient.cacheMatchJson(S3MatchCacheClient.java:62) ~[classes/:na]
@@ -288,11 +293,11 @@ Caused by: java.lang.RuntimeException: boom
         at com.pubginsight.match.MatchServiceTest.fallsThroughSilentlyWhenCacheWriteFails(MatchServiceTest.java:131) ~[test-classes/:na]
         ... 81 common frames omitted
 
-[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.089 s -- in com.pubginsight.match.MatchServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.088 s -- in com.pubginsight.match.MatchServiceTest
 [INFO] Running com.pubginsight.match.MatchMapperTest
 [INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in com.pubginsight.match.MatchMapperTest
 [INFO] Running com.pubginsight.insight.InsightServiceTest
-2026-09-14T02:55:55.832+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.insight.InsightService   : Gemini unavailable for player 'account.1' match 'match-2' - returning offline fallback insight
+2026-09-14T03:04:31.218+07:00  WARN 42368 --- [pubg-insight-backend] [           main] com.pubginsight.insight.InsightService   : Gemini unavailable for player 'account.1' match 'match-2' - returning offline fallback insight
 
 com.pubginsight.client.gemini.GeminiApiException: Gemini exhausted
         at com.pubginsight.client.gemini.GeminiApiClient.generateText(GeminiApiClient.java:58) ~[classes/:na]
@@ -380,7 +385,7 @@ com.pubginsight.client.gemini.GeminiApiException: Gemini exhausted
         at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
         at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
 
-2026-09-14T02:55:55.833+07:00  WARN 40227 --- [pubg-insight-backend] [           main] com.pubginsight.insight.InsightService   : Gemini unavailable for player 'account.1' match 'match-2' - returning offline fallback insight
+2026-09-14T03:04:31.218+07:00  WARN 42368 --- [pubg-insight-backend] [           main] com.pubginsight.insight.InsightService   : Gemini unavailable for player 'account.1' match 'match-2' - returning offline fallback insight
 
 com.pubginsight.client.gemini.GeminiApiException: Gemini exhausted
         at com.pubginsight.client.gemini.GeminiApiClient.generateText(GeminiApiClient.java:58) ~[classes/:na]
@@ -468,13 +473,13 @@ com.pubginsight.client.gemini.GeminiApiException: Gemini exhausted
         at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.6.jar:3.5.6]
         at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.6.jar:3.5.6]
 
-[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.062 s -- in com.pubginsight.insight.InsightServiceTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.061 s -- in com.pubginsight.insight.InsightServiceTest
 [INFO] Running com.pubginsight.insight.InsightControllerIntegrationTest
-2026-09-14T02:55:55.849+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.insight.InsightControllerIntegrationTest]: InsightControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:55.854+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.insight.InsightControllerIntegrationTest
-2026-09-14T02:55:55.854+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.insight.InsightControllerIntegrationTest]: InsightControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:55.855+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.insight.InsightControllerIntegrationTest
-2026-09-14T02:55:55.857+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+2026-09-14T03:04:31.234+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.insight.InsightControllerIntegrationTest]: InsightControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:31.240+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.insight.InsightControllerIntegrationTest
+2026-09-14T03:04:31.240+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.insight.InsightControllerIntegrationTest]: InsightControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:31.241+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.insight.InsightControllerIntegrationTest
+2026-09-14T03:04:31.244+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -485,12 +490,12 @@ com.pubginsight.client.gemini.GeminiApiException: Gemini exhausted
 
  :: Spring Boot ::                (v4.1.0)
 
-2026-09-14T02:55:55.867+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : Starting InsightControllerIntegrationTest using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
-2026-09-14T02:55:55.867+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : The following 1 profile is active: "local"
-2026-09-14T02:55:55.959+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-09-14T02:55:55.959+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-09-14T02:55:55.959+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-09-14T02:55:55.962+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : Started InsightControllerIntegrationTest in 0.105 seconds (process running for 3.608)
+2026-09-14T03:04:31.253+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : Starting InsightControllerIntegrationTest using Java 24.0.2 with PID 42368 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T03:04:31.253+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : The following 1 profile is active: "local"
+2026-09-14T03:04:31.341+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-14T03:04:31.341+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-14T03:04:31.342+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-09-14T03:04:31.345+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.i.InsightControllerIntegrationTest   : Started InsightControllerIntegrationTest in 0.101 seconds (process running for 3.743)
 
 MockHttpServletRequest:
       HTTP Method = GET
@@ -528,8 +533,8 @@ MockHttpServletResponse:
     Forwarded URL = null
    Redirected URL = null
           Cookies = []
-[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 1.111 s <<< FAILURE! -- in com.pubginsight.insight.InsightControllerIntegrationTest
-[ERROR] com.pubginsight.insight.InsightControllerIntegrationTest.getInsightsReturns200WithParsedSections -- Time elapsed: 0.995 s <<< FAILURE!
+[ERROR] Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.947 s <<< FAILURE! -- in com.pubginsight.insight.InsightControllerIntegrationTest
+[ERROR] com.pubginsight.insight.InsightControllerIntegrationTest.getInsightsReturns200WithParsedSections -- Time elapsed: 0.835 s <<< FAILURE!
 java.lang.AssertionError: Status expected:<200> but was:<404>
         at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:62)
         at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:129)
@@ -538,11 +543,11 @@ java.lang.AssertionError: Status expected:<200> but was:<404>
         at com.pubginsight.insight.InsightControllerIntegrationTest.getInsightsReturns200WithParsedSections(InsightControllerIntegrationTest.java:70)
 
 [INFO] Running com.pubginsight.PubgInsightBackendApplicationTests
-2026-09-14T02:55:56.961+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.PubgInsightBackendApplicationTests]: PubgInsightBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:56.965+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.PubgInsightBackendApplicationTests
-2026-09-14T02:55:56.966+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.PubgInsightBackendApplicationTests]: PubgInsightBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:56.966+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.PubgInsightBackendApplicationTests
-2026-09-14T02:55:56.968+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+2026-09-14T03:04:32.183+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.PubgInsightBackendApplicationTests]: PubgInsightBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:32.187+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.PubgInsightBackendApplicationTests
+2026-09-14T03:04:32.187+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.PubgInsightBackendApplicationTests]: PubgInsightBackendApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:32.188+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.PubgInsightBackendApplicationTests
+2026-09-14T03:04:32.190+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -553,16 +558,16 @@ java.lang.AssertionError: Status expected:<200> but was:<404>
 
  :: Spring Boot ::                (v4.1.0)
 
-2026-09-14T02:55:56.980+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : Starting PubgInsightBackendApplicationTests using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
-2026-09-14T02:55:56.980+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : The following 1 profile is active: "local"
-2026-09-14T02:55:57.065+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : Started PubgInsightBackendApplicationTests in 0.097 seconds (process running for 4.711)
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.107 s -- in com.pubginsight.PubgInsightBackendApplicationTests
+2026-09-14T03:04:32.200+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : Starting PubgInsightBackendApplicationTests using Java 24.0.2 with PID 42368 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T03:04:32.200+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : The following 1 profile is active: "local"
+2026-09-14T03:04:32.280+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.PubgInsightBackendApplicationTests   : Started PubgInsightBackendApplicationTests in 0.091 seconds (process running for 4.678)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.100 s -- in com.pubginsight.PubgInsightBackendApplicationTests
 [INFO] Running com.pubginsight.history.HistoryControllerIntegrationTest
-2026-09-14T02:55:57.068+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.history.HistoryControllerIntegrationTest]: HistoryControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:57.071+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.history.HistoryControllerIntegrationTest
-2026-09-14T02:55:57.072+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.history.HistoryControllerIntegrationTest]: HistoryControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:57.072+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.history.HistoryControllerIntegrationTest
-2026-09-14T02:55:57.074+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
+2026-09-14T03:04:32.283+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.history.HistoryControllerIntegrationTest]: HistoryControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:32.286+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.history.HistoryControllerIntegrationTest
+2026-09-14T03:04:32.286+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.history.HistoryControllerIntegrationTest]: HistoryControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:32.287+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.history.HistoryControllerIntegrationTest
+2026-09-14T03:04:32.288+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.b.d.r.RestartApplicationListener     : Restart disabled due to context in which it is running
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -573,101 +578,49 @@ java.lang.AssertionError: Status expected:<200> but was:<404>
 
  :: Spring Boot ::                (v4.1.0)
 
-2026-09-14T02:55:57.080+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : Starting HistoryControllerIntegrationTest using Java 24.0.2 with PID 40227 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
-2026-09-14T02:55:57.081+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : The following 1 profile is active: "local"
-2026-09-14T02:55:57.168+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-09-14T02:55:57.168+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-09-14T02:55:57.168+07:00  INFO 40227 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
-2026-09-14T02:55:57.170+07:00  INFO 40227 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : Started HistoryControllerIntegrationTest in 0.096 seconds (process running for 4.816)
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.131 s -- in com.pubginsight.history.HistoryControllerIntegrationTest
+2026-09-14T03:04:32.295+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : Starting HistoryControllerIntegrationTest using Java 24.0.2 with PID 42368 (started by lucietran in /Users/lucietran/Documents/GitHub/pubg-insight-backend)
+2026-09-14T03:04:32.295+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : The following 1 profile is active: "local"
+2026-09-14T03:04:32.383+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-09-14T03:04:32.383+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-09-14T03:04:32.383+07:00  INFO 42368 --- [pubg-insight-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-09-14T03:04:32.386+07:00  INFO 42368 --- [pubg-insight-backend] [           main] c.p.h.HistoryControllerIntegrationTest   : Started HistoryControllerIntegrationTest in 0.098 seconds (process running for 4.784)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.135 s -- in com.pubginsight.history.HistoryControllerIntegrationTest
 [INFO] Running com.pubginsight.history.HistoryServiceTest
 [INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.pubginsight.history.HistoryServiceTest
 [INFO] Running com.pubginsight.history.AnalysisHistoryMapperTest
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.pubginsight.history.AnalysisHistoryMapperTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.pubginsight.history.AnalysisHistoryMapperTest
 [INFO] Running com.pubginsight.client.gemini.GeminiApiClientTest
-2026-09-14T02:55:57.218+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-a' failed (GeminiRateLimitException), trying next model
-2026-09-14T02:55:57.219+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-a' failed (GeminiRateLimitException), trying next model
-2026-09-14T02:55:57.219+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-b' failed (GeminiApiException), trying next model
+2026-09-14T03:04:32.438+07:00  WARN 42368 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-a' failed (GeminiRateLimitException), trying next model
+2026-09-14T03:04:32.439+07:00  WARN 42368 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-a' failed (GeminiRateLimitException), trying next model
+2026-09-14T03:04:32.439+07:00  WARN 42368 --- [pubg-insight-backend] [           main] c.p.client.gemini.GeminiApiClient        : Gemini model 'model-b' failed (GeminiApiException), trying next model
 [INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.pubginsight.client.gemini.GeminiApiClientTest
 [INFO] Running com.pubginsight.client.pubg.PubgRateLimiterTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.pubginsight.client.pubg.PubgRateLimiterTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.pubginsight.client.pubg.PubgRateLimiterTest
 [INFO] Running com.pubginsight.player.PlayerMapperTest
 [INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.pubginsight.player.PlayerMapperTest
 [INFO] Running com.pubginsight.player.PlayerControllerIntegrationTest
-2026-09-14T02:55:57.225+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.player.PlayerControllerIntegrationTest]: PlayerControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:57.228+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.player.PlayerControllerIntegrationTest
-2026-09-14T02:55:57.228+07:00  INFO 40227 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.player.PlayerControllerIntegrationTest]: PlayerControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-2026-09-14T02:55:57.229+07:00  INFO 40227 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.player.PlayerControllerIntegrationTest
-2026-09-14T02:55:57.237+07:00  WARN 40227 --- [pubg-insight-backend] [           main] c.p.c.exception.GlobalExceptionHandler   : PUBG API rate limit reached (retryAfterSeconds=30)
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.pubginsight.player.PlayerControllerIntegrationTest
+2026-09-14T03:04:32.446+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.player.PlayerControllerIntegrationTest]: PlayerControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:32.449+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.player.PlayerControllerIntegrationTest
+2026-09-14T03:04:32.450+07:00  INFO 42368 --- [pubg-insight-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.pubginsight.player.PlayerControllerIntegrationTest]: PlayerControllerIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-09-14T03:04:32.450+07:00  INFO 42368 --- [pubg-insight-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.pubginsight.PubgInsightBackendApplication for test class com.pubginsight.player.PlayerControllerIntegrationTest
+2026-09-14T03:04:32.458+07:00  WARN 42368 --- [pubg-insight-backend] [           main] c.p.c.exception.GlobalExceptionHandler   : PUBG API rate limit reached (retryAfterSeconds=30)
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in com.pubginsight.player.PlayerControllerIntegrationTest
 [INFO] Running com.pubginsight.player.PlayerServiceTest
-[ERROR] Tests run: 5, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.029 s <<< FAILURE! -- in com.pubginsight.player.PlayerServiceTest
-[ERROR] com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable -- Time elapsed: 0.009 s <<< ERROR!
-org.mockito.exceptions.misusing.PotentialStubbingProblem: 
-
-Strict stubbing argument mismatch. Please check:
- - this invocation of 'computeSeasonComparison' method:
-    playerMapper.computeSeasonComparison(
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]
-);
-    -> at com.pubginsight.player.PlayerService.tryComputePreviousSeasonComparison(PlayerService.java:59)
- - has following stubbing(s) with different arguments:
-    1. playerMapper.computeSeasonComparison(
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.2, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.4, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]
-); stubbed with: [Returns: SeasonComparison[winRateDeltaPct=100.0, avgDamageDeltaPct=0.0, killDeathRatioDeltaPct=0.0, headshotRateDeltaPct=-20.0, top10RateDeltaPct=0.0]]
-      -> at com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable(PlayerServiceTest.java:77)
-Typically, stubbing argument mismatch indicates user mistake when writing tests.
-Mockito fails early so that you can debug potential problem easily.
-However, there are legit scenarios when this exception generates false negative signal:
-  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API
-    Please use 'will().given()' or 'doReturn().when()' API for stubbing.
-  - stubbed method is intentionally invoked with different arguments by code under test
-    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).
-For more information see javadoc for PotentialStubbingProblem class.
-        at com.pubginsight.player.PlayerMapper.computeSeasonComparison(PlayerMapper.java:108)
-        at com.pubginsight.player.PlayerService.tryComputePreviousSeasonComparison(PlayerService.java:59)
-        at com.pubginsight.player.PlayerService.getSeasonStats(PlayerService.java:39)
-        at com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable(PlayerServiceTest.java:79)
-
-[INFO] 
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in com.pubginsight.player.PlayerServiceTest
+[INFO]
 [INFO] Results:
-[INFO] 
-[ERROR] Failures: 
+[INFO]
+[ERROR] Failures:
 [ERROR]   InsightControllerIntegrationTest.getInsightsReturns200WithParsedSections:70 Status expected:<200> but was:<404>
 [ERROR]   MatchControllerIntegrationTest.getMatchStatsReturns200WithComputedHeadshotRate:47 Status expected:<200> but was:<404>
-[ERROR] Errors: 
-[ERROR]   PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable:79 » PotentialStubbingProblem 
-Strict stubbing argument mismatch. Please check:                                                                                                                                     
- - this invocation of 'computeSeasonComparison' method:                                                                                                                              
-    playerMapper.computeSeasonComparison(                                                                                                                                            
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],                         
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]                          
-);                                                                                                                                                                                   
-    -> at com.pubginsight.player.PlayerService.tryComputePreviousSeasonComparison(PlayerService.java:59)                                                                             
- - has following stubbing(s) with different arguments:                                                                                                                               
-    1. playerMapper.computeSeasonComparison(                                                                                                                                         
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.2, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.4, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null],                         
-    SeasonStatsDto[wins=0, roundsPlayed=0, winRate=0.1, avgDamage=0.0, killDeathRatio=0.0, headshotRate=0.5, top10Rate=0.0, avgSurvivalSeconds=0.0, longestKillMeters=0.0, radar=RadarScores[combat=0.0, survival=0.0, precision=0.0, aggression=0.0, support=0.0, consistency=0.0], archetype=Balanced Operator, previousSeasonComparison=null]                          
-); stubbed with: [Returns: SeasonComparison[winRateDeltaPct=100.0, avgDamageDeltaPct=0.0, killDeathRatioDeltaPct=0.0, headshotRateDeltaPct=-20.0, top10RateDeltaPct=0.0]]            
-      -> at com.pubginsight.player.PlayerServiceTest.attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable(PlayerServiceTest.java:77)                                     
-Typically, stubbing argument mismatch indicates user mistake when writing tests.                                                                                                     
-Mockito fails early so that you can debug potential problem easily.                                                                                                                  
-However, there are legit scenarios when this exception generates false negative signal:                                                                                              
-  - stubbing the same method multiple times using 'given().will()' or 'when().then()' API                                                                                            
-    Please use 'will().given()' or 'doReturn().when()' API for stubbing.                                                                                                             
-  - stubbed method is intentionally invoked with different arguments by code under test                                                                                              
-    Please use default or 'silent' JUnit Rule (equivalent of Strictness.LENIENT).                                                                                                    
-For more information see javadoc for PotentialStubbingProblem class.                                                                                                                 
-[INFO] 
-[ERROR] Tests run: 51, Failures: 2, Errors: 1, Skipped: 0
-[INFO] 
+[INFO]
+[ERROR] Tests run: 51, Failures: 2, Errors: 0, Skipped: 0
+[INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  5.864 s
-[INFO] Finished at: 2026-09-14T02:55:57+07:00
+[INFO] Total time:  6.848 s
+[INFO] Finished at: 2026-09-14T03:04:32+07:00
 [INFO] ------------------------------------------------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.6:test (default-test) on project pubg-insight-backend: There are test failures.
 [ERROR] 
