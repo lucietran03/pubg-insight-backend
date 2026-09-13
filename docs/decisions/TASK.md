@@ -62,10 +62,9 @@ Re-verifying the ObjectMapper fix with another `mvn test` run — fixed by inspe
 Step-by-step, click-by-click instructions for all credentials/console steps below: **`docs/decisions/AWS_SETUP.md`**.
 
 1. Re-run `mvn test` to confirm the ObjectMapper fix resolves all 8 previously-failing tests.
-2. Create the DynamoDB table (`pubg-insight-analysis-history` by default, partition key `playerId`, sort key `matchId`) and S3 bucket (`pubg-insight-match-cache` by default, must be globally-unique — see setup guide) — one-time Console setup, allowed under the rubric. **In progress**: personal-account IAM user + access key confirmed working — table/bucket creation not yet done.
-3. Verify DynamoDB/S3 actually work against real AWS (search a player, view a match, save analysis history, confirm a second lookup of the same match is a cache hit).
-4. Deploy to Elastic Beanstalk, wire up API Gateway + Lambda, set up Athena — all still fully unbuilt.
-5. Build Feature 5 (Analytics Dashboard) once Athena has real historical data to query.
+2. ~~Create the DynamoDB table and S3 bucket~~ — **done and verified**: `pubg-insight-analysis-history` (partition key `playerId`, sort key `matchId`) and `pubg-insight-match-cache` both created on the personal AWS account. Confirmed live via direct `curl` calls: `GET .../matches/{id}` twice showed a real speedup on the second call (S3 cache-aside working, no `S3Exception` warnings in the backend log), and `POST .../matches/{id}/history` followed by `GET .../history` round-tripped a real item through DynamoDB.
+3. Deploy to Elastic Beanstalk, wire up API Gateway + Lambda, set up Athena — all still fully unbuilt.
+4. Build Feature 5 (Analytics Dashboard) once Athena has real historical data to query.
 
 ---
 
