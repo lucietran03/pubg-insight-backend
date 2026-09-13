@@ -5,8 +5,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 // New, additive endpoint - does not touch MatchController or its existing
 // GET /api/players/{playerId}/matches/{matchId} route/shape. A separate controller class
 // mapping into an overlapping URL prefix is fine: Spring dispatches by full path, and
@@ -23,7 +21,7 @@ public class WeaponBreakdownController {
     }
 
     @GetMapping("/weapons")
-    public List<WeaponKillDto> getWeaponBreakdown(@PathVariable String playerId, @PathVariable String matchId) {
+    public MatchCombatBreakdownDto getWeaponBreakdown(@PathVariable String playerId, @PathVariable String matchId) {
         return weaponBreakdownService.getWeaponBreakdown(matchId, playerId);
     }
 }

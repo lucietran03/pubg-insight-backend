@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pubginsight.client.telemetry.dto.WeaponKillCount;
+import com.pubginsight.client.telemetry.dto.PlayerKillEvent;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -17,14 +17,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 // Fetches and parses a single match's telemetry file (a flat JSON array of typed gameplay
-// events) to build a per-weapon kill tally for one player.
+// events) into the raw list of one player's LogPlayerKill events (weapon + distance).
+// match.WeaponBreakdownService derives both the weapon tally and the shot-distance
+// breakdown from this same list - one telemetry pass covers both presentations.
 //
 // Deliberately NOT routed through client.pubg.PubgApiClient/PubgRateLimiter: telemetry files
 // are static assets served from a separate CDN host (the "URL" in the match response's
@@ -65,7 +64,7 @@ public class TelemetryClient {
                 .build();
     }
 
-    public List<WeaponKillCount> fetchWeaponKillsForPlayer(String telemetryUrl, String killerAccountId) {
+    public List<PlayerKillEvent> fetchKillEventsForPlayer(String telemetryUrl, String killerAccountId) {
         HttpRequest request = HttpRequest.newBuilder(URI.create(telemetryUrl))
                 .timeout(REQUEST_TIMEOUT)
                 .header("Accept-Encoding", "gzip")
@@ -88,8 +87,7 @@ public class TelemetryClient {
         }
 
         try (InputStream body = decodeIfGzipped(response)) {
-            Map<String, Integer> killsByWeaponId = tallyKillsByWeapon(body, killerAccountId);
-            return toSortedWeaponKillCounts(killsByWeaponId);
+            return extractKillEvents(body, killerAccountId);
         } catch (IOException e) {
             throw new TelemetryFetchException("Failed to parse telemetry from '" + telemetryUrl + "'", e);
         }
@@ -120,8 +118,8 @@ public class TelemetryClient {
         return (declaredGzip || looksGzipped) ? new GZIPInputStream(pushback) : pushback;
     }
 
-    private Map<String, Integer> tallyKillsByWeapon(InputStream telemetryJson, String killerAccountId) throws IOException {
-        Map<String, Integer> killsByWeaponId = new LinkedHashMap<>();
+    private List<PlayerKillEvent> extractKillEvents(InputStream telemetryJson, String killerAccountId) throws IOException {
+        List<PlayerKillEvent> events = new ArrayList<>();
         JsonFactory jsonFactory = objectMapper.getFactory();
 
         try (JsonParser parser = jsonFactory.createParser(telemetryJson)) {
@@ -143,11 +141,11 @@ public class TelemetryClient {
                     continue;
                 }
 
-                killsByWeaponId.merge(weaponId, 1, Integer::sum);
+                events.add(new PlayerKillEvent(weaponId, weaponNameResolver.resolve(weaponId), extractDistanceMeters(event)));
             }
         }
 
-        return killsByWeaponId;
+        return events;
     }
 
     private static boolean isKillByPlayer(JsonNode event, String killerAccountId) {
@@ -171,13 +169,14 @@ public class TelemetryClient {
         return event.path("killerDamageInfo").path("damageCauserName").asText(null);
     }
 
-    private List<WeaponKillCount> toSortedWeaponKillCounts(Map<String, Integer> killsByWeaponId) {
-        List<WeaponKillCount> result = new ArrayList<>(killsByWeaponId.size());
-        for (Map.Entry<String, Integer> entry : killsByWeaponId.entrySet()) {
-            String weaponId = entry.getKey();
-            result.add(new WeaponKillCount(weaponId, weaponNameResolver.resolve(weaponId), entry.getValue()));
+    // PUBG telemetry reports LogPlayerKill's "distance" in CENTIMETERS, not meters - a known,
+    // easy-to-miss quirk of this schema. Returns null (not 0.0) when the field is genuinely
+    // absent, so a kill with no distance data is never misrepresented as a 0m point-blank kill.
+    private static Double extractDistanceMeters(JsonNode event) {
+        JsonNode distanceNode = event.path("distance");
+        if (!distanceNode.isNumber()) {
+            return null;
         }
-        result.sort(Comparator.comparingInt(WeaponKillCount::kills).reversed());
-        return result;
+        return distanceNode.asDouble() / 100.0;
     }
 }

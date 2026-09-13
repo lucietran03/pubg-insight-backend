@@ -6,11 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pubginsight.client.pubg.PubgApiClient;
 import com.pubginsight.client.telemetry.TelemetryClient;
 import com.pubginsight.client.telemetry.TelemetryFetchException;
+import com.pubginsight.client.telemetry.dto.PlayerKillEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 // New, strictly-additive feature: a telemetry-derived "which weapon got each of this
 // player's kills in this match" breakdown, on top of the existing summary-stats-only match
@@ -45,7 +50,13 @@ public class WeaponBreakdownService {
         this.telemetryClient = telemetryClient;
     }
 
-    public List<WeaponKillDto> getWeaponBreakdown(String matchId, String playerId) {
+    // Distance buckets mirror PUBG's own in-client "shot distance" breakdown ranges (see the
+    // reference screenshots this feature was built from) - upper bound is exclusive except
+    // the last, open-ended bucket.
+    private static final double[] DISTANCE_BUCKET_UPPER_BOUNDS_METERS = {30, 120, 300};
+    private static final String[] DISTANCE_BUCKET_LABELS = {"0-30m", "30-120m", "120-300m", "300m+"};
+
+    public MatchCombatBreakdownDto getWeaponBreakdown(String matchId, String playerId) {
         String rawMatchJson = pubgApiClient.findMatchRawJson(matchId);
         if (rawMatchJson == null) {
             throw new MatchNotFoundException("Match '" + matchId + "' not found");
@@ -54,18 +65,58 @@ public class WeaponBreakdownService {
         String telemetryUrl = extractTelemetryUrl(rawMatchJson, matchId);
         if (telemetryUrl == null) {
             log.warn("No telemetry asset URL found for match '{}' - returning empty weapon breakdown", matchId);
-            return List.of();
+            return MatchCombatBreakdownDto.empty();
         }
 
         try {
-            return telemetryClient.fetchWeaponKillsForPlayer(telemetryUrl, playerId).stream()
-                    .map(count -> new WeaponKillDto(count.weaponName(), count.kills()))
-                    .toList();
+            List<PlayerKillEvent> killEvents = telemetryClient.fetchKillEventsForPlayer(telemetryUrl, playerId);
+            return new MatchCombatBreakdownDto(toWeaponBreakdown(killEvents), toDistanceBuckets(killEvents));
         } catch (TelemetryFetchException e) {
             log.warn("Telemetry fetch/parse failed for match '{}' - returning empty weapon breakdown",
                     matchId, e);
-            return List.of();
+            return MatchCombatBreakdownDto.empty();
         }
+    }
+
+    private static List<WeaponKillDto> toWeaponBreakdown(List<PlayerKillEvent> killEvents) {
+        Map<String, Integer> killsByWeaponName = new LinkedHashMap<>();
+        for (PlayerKillEvent event : killEvents) {
+            killsByWeaponName.merge(event.weaponName(), 1, Integer::sum);
+        }
+
+        List<WeaponKillDto> result = new ArrayList<>(killsByWeaponName.size());
+        killsByWeaponName.forEach((weaponName, kills) -> result.add(new WeaponKillDto(weaponName, kills)));
+        result.sort(Comparator.comparingInt(WeaponKillDto::kills).reversed());
+        return result;
+    }
+
+    // Kills with no distance data (see PlayerKillEvent.distanceMeters) are silently excluded
+    // from the histogram rather than guessed into a bucket - an honest "we don't know" beats a
+    // fabricated data point.
+    private static List<DistanceBucketDto> toDistanceBuckets(List<PlayerKillEvent> killEvents) {
+        int[] counts = new int[DISTANCE_BUCKET_LABELS.length];
+        for (PlayerKillEvent event : killEvents) {
+            Double distance = event.distanceMeters();
+            if (distance == null) {
+                continue;
+            }
+            counts[bucketIndexFor(distance)]++;
+        }
+
+        List<DistanceBucketDto> buckets = new ArrayList<>(DISTANCE_BUCKET_LABELS.length);
+        for (int i = 0; i < DISTANCE_BUCKET_LABELS.length; i++) {
+            buckets.add(new DistanceBucketDto(DISTANCE_BUCKET_LABELS[i], counts[i]));
+        }
+        return buckets;
+    }
+
+    private static int bucketIndexFor(double distanceMeters) {
+        for (int i = 0; i < DISTANCE_BUCKET_UPPER_BOUNDS_METERS.length; i++) {
+            if (distanceMeters < DISTANCE_BUCKET_UPPER_BOUNDS_METERS[i]) {
+                return i;
+            }
+        }
+        return DISTANCE_BUCKET_LABELS.length - 1;
     }
 
     private String extractTelemetryUrl(String rawMatchJson, String matchId) {
