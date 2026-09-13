@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pubginsight.client.pubg.PubgApiClient;
 import com.pubginsight.client.telemetry.TelemetryClient;
 import com.pubginsight.client.telemetry.TelemetryFetchException;
+import com.pubginsight.client.telemetry.dto.PlayerBodyHitEvent;
+import com.pubginsight.client.telemetry.dto.PlayerCombatEvents;
 import com.pubginsight.client.telemetry.dto.PlayerKillEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,22 @@ public class WeaponBreakdownService {
     private static final double[] DISTANCE_BUCKET_UPPER_BOUNDS_METERS = {30, 120, 300};
     private static final String[] DISTANCE_BUCKET_LABELS = {"0-30m", "30-120m", "120-300m", "300m+"};
 
+    // Every real, directional value telemetry's "damageReason" enum can carry, head-to-toe,
+    // mapped to a human label - see TelemetryClient for where/how this field is sourced and
+    // verified. "None" and "NonSpecific" (non-directional damage: bluezone, falls, vehicles,
+    // etc.) are deliberately NOT in this map - there is no body part to honestly attribute
+    // them to, so they are excluded from the breakdown entirely rather than guessed into a
+    // bucket, same principle as excluding kills with no distance data.
+    private static final Map<String, String> BODY_PART_LABELS_BY_DAMAGE_REASON = Map.of(
+            "HeadShot", "Head",
+            "TorsoShot", "Torso",
+            "PelvisShot", "Pelvis",
+            "ArmShot", "Arms",
+            "LegShot", "Legs"
+    );
+    private static final List<String> BODY_PART_DAMAGE_REASON_ORDER =
+            List.of("HeadShot", "TorsoShot", "PelvisShot", "ArmShot", "LegShot");
+
     public MatchCombatBreakdownDto getWeaponBreakdown(String matchId, String playerId) {
         String rawMatchJson = pubgApiClient.findMatchRawJson(matchId);
         if (rawMatchJson == null) {
@@ -69,8 +87,12 @@ public class WeaponBreakdownService {
         }
 
         try {
-            List<PlayerKillEvent> killEvents = telemetryClient.fetchKillEventsForPlayer(telemetryUrl, playerId);
-            return new MatchCombatBreakdownDto(toWeaponBreakdown(killEvents), toDistanceBuckets(killEvents));
+            PlayerCombatEvents combatEvents = telemetryClient.fetchCombatEventsForPlayer(telemetryUrl, playerId);
+            List<PlayerKillEvent> killEvents = combatEvents.kills();
+            return new MatchCombatBreakdownDto(
+                    toWeaponBreakdown(killEvents),
+                    toDistanceBuckets(killEvents),
+                    toBodyPartBreakdown(combatEvents.bodyHits()));
         } catch (TelemetryFetchException e) {
             log.warn("Telemetry fetch/parse failed for match '{}' - returning empty weapon breakdown",
                     matchId, e);
@@ -117,6 +139,28 @@ public class WeaponBreakdownService {
             }
         }
         return DISTANCE_BUCKET_LABELS.length - 1;
+    }
+
+    // Body-hit events with a damageReason not in BODY_PART_LABELS_BY_DAMAGE_REASON (i.e.
+    // "None"/"NonSpecific", or any future reason PUBG adds that this project doesn't yet
+    // recognize) are silently excluded rather than guessed into a bucket - same "we don't
+    // know" honesty as toDistanceBuckets above. Always returns all five labels (even at 0
+    // hits) in head-to-toe order, so the frontend can filter zero-hit rows the same way it
+    // already does for shotDistances.
+    private static List<BodyPartDamageDto> toBodyPartBreakdown(List<PlayerBodyHitEvent> bodyHitEvents) {
+        Map<String, Integer> hitsByReason = new LinkedHashMap<>();
+        for (PlayerBodyHitEvent event : bodyHitEvents) {
+            if (!BODY_PART_LABELS_BY_DAMAGE_REASON.containsKey(event.damageReason())) {
+                continue;
+            }
+            hitsByReason.merge(event.damageReason(), 1, Integer::sum);
+        }
+
+        List<BodyPartDamageDto> result = new ArrayList<>(BODY_PART_DAMAGE_REASON_ORDER.size());
+        for (String reason : BODY_PART_DAMAGE_REASON_ORDER) {
+            result.add(new BodyPartDamageDto(BODY_PART_LABELS_BY_DAMAGE_REASON.get(reason), hitsByReason.getOrDefault(reason, 0)));
+        }
+        return result;
     }
 
     private String extractTelemetryUrl(String rawMatchJson, String matchId) {

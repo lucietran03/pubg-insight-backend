@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pubginsight.client.telemetry.dto.PlayerBodyHitEvent;
+import com.pubginsight.client.telemetry.dto.PlayerCombatEvents;
 import com.pubginsight.client.telemetry.dto.PlayerKillEvent;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +23,11 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 // Fetches and parses a single match's telemetry file (a flat JSON array of typed gameplay
-// events) into the raw list of one player's LogPlayerKill events (weapon + distance).
-// match.WeaponBreakdownService derives both the weapon tally and the shot-distance
-// breakdown from this same list - one telemetry pass covers both presentations.
+// events) into the raw lists of one player's LogPlayerKill events (weapon + distance) and
+// LogPlayerTakeDamage events where that player was the attacker (body-part hit location).
+// match.WeaponBreakdownService derives the weapon tally, shot-distance breakdown, and
+// body-part breakdown all from this same pair of lists - one telemetry pass covers all three
+// presentations.
 //
 // Deliberately NOT routed through client.pubg.PubgApiClient/PubgRateLimiter: telemetry files
 // are static assets served from a separate CDN host (the "URL" in the match response's
@@ -48,6 +52,15 @@ import java.util.zip.GZIPInputStream;
 public class TelemetryClient {
 
     private static final String LOG_PLAYER_KILL_EVENT_TYPE = "LogPlayerKill";
+    // LogPlayerTakeDamage covers every hit landed across the match (not just the killing
+    // blow), and carries a "damageReason" field with a specific hit-location value
+    // ("HeadShot", "TorsoShot", "ArmShot", "LegShot", "PelvisShot") alongside the generic
+    // "None"/"NonSpecific" reasons used for non-directional damage (bluezone, falls,
+    // vehicles, etc). Confirmed against two independent sources: PUBG's own official
+    // dictionary (github.com/pubg/api-assets, enums/telemetry/damageReason.json) and the
+    // community pubgjava client's LogPlayerTakeDamage/DamageReason model classes, which agree
+    // on both the field name and every enum value.
+    private static final String LOG_PLAYER_TAKE_DAMAGE_EVENT_TYPE = "LogPlayerTakeDamage";
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
     // Generous compared to PubgApiClient's 5s read timeout on purpose - telemetry files are
     // orders of magnitude larger than any api.pubg.com JSON response.
@@ -64,7 +77,7 @@ public class TelemetryClient {
                 .build();
     }
 
-    public List<PlayerKillEvent> fetchKillEventsForPlayer(String telemetryUrl, String killerAccountId) {
+    public PlayerCombatEvents fetchCombatEventsForPlayer(String telemetryUrl, String playerAccountId) {
         HttpRequest request = HttpRequest.newBuilder(URI.create(telemetryUrl))
                 .timeout(REQUEST_TIMEOUT)
                 .header("Accept-Encoding", "gzip")
@@ -87,7 +100,7 @@ public class TelemetryClient {
         }
 
         try (InputStream body = decodeIfGzipped(response)) {
-            return extractKillEvents(body, killerAccountId);
+            return extractCombatEvents(body, playerAccountId);
         } catch (IOException e) {
             throw new TelemetryFetchException("Failed to parse telemetry from '" + telemetryUrl + "'", e);
         }
@@ -118,8 +131,12 @@ public class TelemetryClient {
         return (declaredGzip || looksGzipped) ? new GZIPInputStream(pushback) : pushback;
     }
 
-    private List<PlayerKillEvent> extractKillEvents(InputStream telemetryJson, String killerAccountId) throws IOException {
-        List<PlayerKillEvent> events = new ArrayList<>();
+    // Single streamed pass over the telemetry array producing both event lists at once -
+    // deliberately not two separate streaming passes (kills, then body hits), since telemetry
+    // files can run into the tens of MB and each full re-parse would double that cost.
+    private PlayerCombatEvents extractCombatEvents(InputStream telemetryJson, String playerAccountId) throws IOException {
+        List<PlayerKillEvent> kills = new ArrayList<>();
+        List<PlayerBodyHitEvent> bodyHits = new ArrayList<>();
         JsonFactory jsonFactory = objectMapper.getFactory();
 
         try (JsonParser parser = jsonFactory.createParser(telemetryJson)) {
@@ -132,28 +149,39 @@ public class TelemetryClient {
                 // positioned right after it - the rest of the (possibly huge) array is never
                 // materialized at once.
                 JsonNode event = objectMapper.readTree(parser);
-                if (!isKillByPlayer(event, killerAccountId)) {
-                    continue;
-                }
+                String eventType = event.path("_T").asText(null);
 
-                String weaponId = extractDamageCauserId(event);
-                if (weaponId == null || weaponId.isBlank()) {
-                    continue;
+                if (LOG_PLAYER_KILL_EVENT_TYPE.equals(eventType) && isKillByPlayer(event, playerAccountId)) {
+                    String weaponId = extractDamageCauserId(event);
+                    if (weaponId != null && !weaponId.isBlank()) {
+                        kills.add(new PlayerKillEvent(weaponId, weaponNameResolver.resolve(weaponId), extractDistanceMeters(event)));
+                    }
+                } else if (LOG_PLAYER_TAKE_DAMAGE_EVENT_TYPE.equals(eventType) && isDamageDealtByPlayer(event, playerAccountId)) {
+                    String damageReason = event.path("damageReason").asText(null);
+                    if (damageReason != null && !damageReason.isBlank()) {
+                        bodyHits.add(new PlayerBodyHitEvent(damageReason));
+                    }
                 }
-
-                events.add(new PlayerKillEvent(weaponId, weaponNameResolver.resolve(weaponId), extractDistanceMeters(event)));
             }
         }
 
-        return events;
+        return new PlayerCombatEvents(kills, bodyHits);
     }
 
     private static boolean isKillByPlayer(JsonNode event, String killerAccountId) {
-        if (!LOG_PLAYER_KILL_EVENT_TYPE.equals(event.path("_T").asText(null))) {
-            return false;
-        }
         String eventKillerAccountId = event.path("killer").path("accountId").asText(null);
         return killerAccountId.equals(eventKillerAccountId);
+    }
+
+    // "attacker" (not "victim") is who DEALT this damage - matches the pubgjava
+    // LogPlayerTakeDamage model (attacker/victim, both a "Character" object with an
+    // accountId), the same shape as LogPlayerKill's "killer"/"victim". Damage events with no
+    // attacker at all (bluezone, falls, drowning, etc.) safely fall through to "not equal"
+    // here rather than throwing, since JsonNode.path() on a missing field returns a
+    // MissingNode whose .asText(null) is null.
+    private static boolean isDamageDealtByPlayer(JsonNode event, String attackerAccountId) {
+        String eventAttackerAccountId = event.path("attacker").path("accountId").asText(null);
+        return attackerAccountId.equals(eventAttackerAccountId);
     }
 
     // "damageCauserName" is the field name in every telemetry sample this project could find
