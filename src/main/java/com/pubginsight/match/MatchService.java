@@ -25,10 +25,7 @@ public class MatchService {
     private final MatchMapper matchMapper;
     private final S3MatchCacheClient s3MatchCacheClient;
     // Built directly rather than injected: this Spring Boot version auto-configures a
-    // Jackson 3 (tools.jackson.databind.json.JsonMapper) bean by default, not a
-    // com.fasterxml.jackson.databind.ObjectMapper one, so there is no Spring-managed bean
-    // of this exact type to inject. A private, unmanaged instance is enough - none of our
-    // DTOs need any custom module (dates, etc.), so the default configuration is fine.
+    // Jackson 3 JsonMapper bean, not a com.fasterxml.jackson.databind.ObjectMapper one.
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public MatchService(PubgApiClient pubgApiClient, MatchMapper matchMapper,
@@ -64,12 +61,9 @@ public class MatchService {
         return matchMapper.toMatchDto(matchId, response.data().attributes(), stats);
     }
 
-    // Cache-aside read: a completed PUBG match is immutable, so a cache hit here means
-    // zero PUBG API calls for this lookup - the whole point given PUBG's 10 req/min
-    // free-tier limit (see docs/deliverables/ARCHITECTURE.md section 8). A null return (cache miss OR
-    // cache failure) simply means "go ask PUBG" - the two cases are handled identically by
-    // the caller because a broken cache must be invisible to the feature, never a hard
-    // error. That's why S3CacheException is caught here rather than left to propagate.
+    // A completed match is immutable, so a cache hit avoids a PUBG API call entirely -
+    // important given PUBG's 10 req/min free-tier limit. Cache failures are soft-failed
+    // (return null, same as a miss) so a broken cache never breaks the feature.
     private PubgMatchResponse fetchFromCache(String matchId) {
         try {
             Optional<String> cachedJson = s3MatchCacheClient.getCachedMatchJson(matchId);
@@ -86,10 +80,8 @@ public class MatchService {
         }
     }
 
-    // Cache-aside write, only reached on a cache miss (see getMatchStatsForPlayer). A write
-    // failure is soft-failed the same way a read failure is - the match was still fetched
-    // successfully from PUBG, so the feature must not fail just because the result couldn't
-    // be cached for next time.
+    // Write failures are soft-failed too: the match was already fetched successfully,
+    // so a caching error must not fail the request.
     private void cacheIfPresent(String matchId, PubgMatchResponse response) {
         if (response == null) {
             return;

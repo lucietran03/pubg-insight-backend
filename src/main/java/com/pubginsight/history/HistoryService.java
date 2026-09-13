@@ -10,16 +10,9 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 
-// Orchestrates Match + Insight features to gather what's already been computed, stamps a
-// creation timestamp, then persists the result - the same "compose existing services"
-// pattern InsightService itself uses for player/match (see docs/deliverables/ARCHITECTURE.md D10).
-//
-// Note: generateInsights() internally re-fetches match stats via MatchService itself, so
-// calling both matchService.getMatchStatsForPlayer(...) and
-// insightService.generateInsights(...) here does one redundant PUBG match lookup. This is
-// an accepted trade-off for reusing InsightService's existing composition/parsing logic
-// as-is rather than splitting it apart - recordAnalysis is an on-demand, user-triggered
-// action, not a hot path.
+// Re-derives match/insight data via MatchService/InsightService rather than storing it,
+// which means recordAnalysis does one redundant PUBG match lookup (generateInsights fetches
+// it again internally) - an accepted trade-off since this isn't a hot path.
 @Service
 public class HistoryService {
 

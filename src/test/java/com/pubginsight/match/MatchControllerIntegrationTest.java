@@ -7,6 +7,8 @@ import com.pubginsight.client.pubg.dto.PubgMatchData;
 import com.pubginsight.client.pubg.dto.PubgMatchResponse;
 import com.pubginsight.client.pubg.dto.PubgParticipantAttributes;
 import com.pubginsight.client.pubg.dto.PubgParticipantStats;
+import com.pubginsight.client.s3.S3MatchCacheClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -15,7 +17,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,6 +35,18 @@ class MatchControllerIntegrationTest {
 
     @MockitoBean
     private PubgApiClient pubgApiClient;
+
+    // Without this, MatchService's real cache-aside read hits the actual configured AWS
+    // account (now that credentials are set up locally), so a real S3 response - not the
+    // stubbed PubgApiClient - decided these tests' behavior. Forcing a cache miss makes the
+    // PubgApiClient stub authoritative, as intended.
+    @MockitoBean
+    private S3MatchCacheClient s3MatchCacheClient;
+
+    @BeforeEach
+    void forceCacheMiss() {
+        when(s3MatchCacheClient.getCachedMatchJson(anyString())).thenReturn(Optional.empty());
+    }
 
     @Test
     void getMatchStatsReturns200WithComputedHeadshotRate() throws Exception {

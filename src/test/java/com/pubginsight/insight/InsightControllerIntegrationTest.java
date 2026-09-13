@@ -12,6 +12,8 @@ import com.pubginsight.client.pubg.dto.PubgParticipantStats;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsAttributes;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsData;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsResponse;
+import com.pubginsight.client.s3.S3MatchCacheClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -28,9 +31,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// Exercises Controller -> InsightService -> PlayerService/MatchService, wired for real
-// through Spring. Only the two external client boundaries (PUBG, Gemini) are mocked.
-// See PlayerControllerIntegrationTest for the @MockitoBean version caveat.
+// Wires Controller -> InsightService -> PlayerService/MatchService for real through
+// Spring; only the PUBG and Gemini clients are mocked.
 @SpringBootTest
 @AutoConfigureMockMvc
 class InsightControllerIntegrationTest {
@@ -43,6 +45,17 @@ class InsightControllerIntegrationTest {
 
     @MockitoBean
     private GeminiApiClient geminiApiClient;
+
+    // Without this, MatchService's real cache-aside read hits the actual configured AWS
+    // account, so a real S3 response - not the stubbed PubgApiClient - decides this test's
+    // behavior. Forcing a cache miss makes the PubgApiClient stub authoritative.
+    @MockitoBean
+    private S3MatchCacheClient s3MatchCacheClient;
+
+    @BeforeEach
+    void forceCacheMiss() {
+        when(s3MatchCacheClient.getCachedMatchJson(anyString())).thenReturn(Optional.empty());
+    }
 
     @Test
     void getInsightsReturns200WithParsedSections() throws Exception {

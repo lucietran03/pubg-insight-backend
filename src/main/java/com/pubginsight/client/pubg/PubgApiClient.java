@@ -25,14 +25,11 @@ public class PubgApiClient {
     private final String defaultShard;
     private final PubgRateLimiter rateLimiter;
 
-    // The current (and previous) season changes roughly every 2-3 months, so caching both
-    // for the life of the app instance saves 1 PUBG call per season-stats request -
-    // meaningful given the 10 req/min free-tier limit. A restart is enough to pick up a
-    // season change.
+    // Cached for the app's lifetime: seasons change every 2-3 months, so this saves a
+    // PUBG call per season-stats request against the 10 req/min free-tier limit.
     private volatile SeasonIds cachedSeasonIds;
 
-    // previousSeasonId is null when the current season is the account's/shard's very
-    // first season (e.g. a brand-new game) - there is nothing before it to compare against.
+    // previousSeasonId is null when the current season is the account's first season.
     private record SeasonIds(String currentSeasonId, String previousSeasonId) {
     }
 
@@ -63,13 +60,8 @@ public class PubgApiClient {
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
         } catch (RestClientException e) {
-            // Catching RestClientException itself, not just its ResourceAccessException/
-            // HttpStatusCodeException subtypes: a read timeout that happens while Spring is
-            // still reading response headers/body (readWithMessageConverters) surfaces as a
-            // plain RestClientException, not ResourceAccessException - confirmed via a real
-            // uncaught 500 from GeminiApiClient's identical old catch clause in production
-            // logs. PubgApiClient had the same gap, just not yet triggered by its shorter
-            // 5s read timeout.
+            // A read timeout while Spring is still reading the response body surfaces as a
+            // plain RestClientException, not ResourceAccessException, so catch the supertype.
             throw new PubgApiException("PUBG API request failed for player '" + playerName + "'", e);
         }
     }
@@ -90,15 +82,8 @@ public class PubgApiClient {
         }
     }
 
-    // Same endpoint/rate-limit cost as findMatchById(), but returns the raw JSON body instead
-    // of the typed PubgMatchResponse. Added for match.WeaponBreakdownService, which needs the
-    // "asset" resource's attributes.URL (telemetry file location) from the match response's
-    // "included" array - a field PubgIncludedItem/PubgParticipantAttributes intentionally
-    // don't model (see the comment on PubgIncludedItem). Reusing those existing, tested DTOs
-    // as-is (rather than widening their shape) keeps this addition fully isolated from the
-    // already-working match stats flow, at the cost of one extra call against this same
-    // rate-limited budget per match view - see match.WeaponBreakdownService for why that
-    // trade-off was made deliberately.
+    // Returns the raw JSON body because the telemetry asset URL in the response's
+    // "included" array isn't modeled by PubgIncludedItem/PubgParticipantAttributes.
     public String findMatchRawJson(String matchId) {
         rateLimiter.acquire();
         try {
@@ -119,9 +104,7 @@ public class PubgApiClient {
         return loadSeasonIds().currentSeasonId();
     }
 
-    // Returns null when the current season has no season before it (e.g. a brand-new
-    // game/shard with only one season released so far) - callers should treat that as
-    // "no previous season to compare against" rather than an error.
+    // Returns null when the current season has no season before it.
     public String findPreviousSeasonId() {
         return loadSeasonIds().previousSeasonId();
     }
@@ -152,10 +135,8 @@ public class PubgApiClient {
                 throw new PubgApiException("No current PUBG season found", null);
             }
 
-            // PubgSeasonAttributes exposes no numeric/sortable ordering field (just
-            // isCurrentSeason/isOffseason) - PUBG returns the seasons list in chronological
-            // order, so the entry immediately before the current one in the array is "the
-            // previous season". Index 0 (no predecessor) means there is no previous season.
+            // Seasons have no explicit ordering field; PUBG returns them chronologically,
+            // so the entry before the current one in the array is the previous season.
             String currentSeasonId = seasons.get(currentIndex).id();
             String previousSeasonId = currentIndex > 0 ? seasons.get(currentIndex - 1).id() : null;
 

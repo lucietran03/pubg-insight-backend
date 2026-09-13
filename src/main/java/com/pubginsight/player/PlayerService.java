@@ -40,10 +40,8 @@ public class PlayerService {
         return currentSeasonStats.withPreviousSeasonComparison(comparison);
     }
 
-    // Returns null (rather than throwing) whenever a previous season can't be compared
-    // against - no previous season exists yet (brand-new game/shard), or this player has
-    // no recorded stats for it (e.g. their account didn't exist yet last season). Both are
-    // normal, expected states, not error conditions.
+    // Returns null when there's no previous season to compare against - a normal state,
+    // not an error.
     private SeasonComparison tryComputePreviousSeasonComparison(String accountId, SeasonStatsDto currentSeasonStats) {
         String previousSeasonId = pubgApiClient.findPreviousSeasonId();
         if (previousSeasonId == null) {

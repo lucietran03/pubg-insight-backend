@@ -22,17 +22,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// Exercises Controller -> HistoryService -> AnalysisHistoryMapper wired for real through
-// Spring. MatchService/InsightService (the composition boundary) and
-// AnalysisHistoryRepository (the DynamoDB boundary) are mocked, so this never makes a
-// real PUBG/Gemini/AWS call. See PlayerControllerIntegrationTest for the @MockitoBean
-// version caveat.
-//
-// This also implicitly exercises DynamoDbClientConfig's bean creation (every
-// @SpringBootTest in this module now builds a DynamoDbEnhancedClient as part of context
-// startup) - assumed safe without real AWS credentials since building a DynamoDbClient
-// does not itself make a network call; only an actual table operation would. Flag if
-// context startup fails in an environment without any AWS credentials at all.
+// Wires Controller -> HistoryService -> AnalysisHistoryMapper for real through Spring;
+// MatchService/InsightService and AnalysisHistoryRepository are mocked, so no real
+// PUBG/Gemini/AWS call happens. Context startup also builds a real DynamoDbEnhancedClient
+// bean, which is safe without AWS credentials since only an actual table operation would need them.
 @SpringBootTest
 @AutoConfigureMockMvc
 class HistoryControllerIntegrationTest {

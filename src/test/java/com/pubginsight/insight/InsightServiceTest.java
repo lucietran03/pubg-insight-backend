@@ -39,9 +39,6 @@ class InsightServiceTest {
     @InjectMocks
     private InsightService insightService;
 
-    // These tests only care about the insight-generation flow, not the analytics values
-    // themselves (see PlayerMapperTest for those) - fill the new fields with plausible
-    // placeholders rather than repeating them at every call site.
     private static SeasonStatsDto seasonStats(int wins, int roundsPlayed, double winRate) {
         return new SeasonStatsDto(
                 wins, roundsPlayed, winRate,
@@ -97,8 +94,6 @@ class InsightServiceTest {
 
         InsightDto result = insightService.generateInsights("account.1", "match-1");
 
-        // Gemini didn't return the new labels this time - each missing section stays
-        // empty rather than being defaulted to placeholder text.
         assertThat(result.playstyle()).isEmpty();
         assertThat(result.seasonProgress()).isEmpty();
         assertThat(result.riskFactors()).isEmpty();

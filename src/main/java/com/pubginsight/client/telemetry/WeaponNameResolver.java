@@ -12,21 +12,11 @@ import java.util.Collections;
 import java.util.Map;
 
 // Maps PUBG telemetry "damageCauserName" identifiers (e.g. "WeapAK47_C") to human-readable
-// names (e.g. "AKM"), per CLAUDE.md's requirement that every user-facing label be
-// understandable to someone who has never played PUBG.
+// names (e.g. "AKM"), bundled from PUBG's official dictionary at
+// src/main/resources/telemetry/damage-causer-names.json.
 //
-// The mapping is bundled at src/main/resources/telemetry/damage-causer-names.json, copied
-// verbatim from PUBG's own official dictionary
-// (https://github.com/pubg/api-assets/blob/master/dictionaries/telemetry/damageCauserName.json,
-// snapshot taken 2026-09-14) rather than hand-guessed - this is the same file the "official
-// resources for PUBG API developers" repo ships for exactly this purpose, and it already
-// covers non-weapon causers too (vehicles, environmental hazards, AI), which is why the field
-// is named damageCauserName rather than weaponId.
-//
-// PUBG occasionally adds new items whose id won't be in this snapshot yet. Rather than
-// fabricate a "pretty" name for an id we don't actually recognize, resolve() falls back to
-// returning the raw id unchanged - an honest "we don't have a friendly name for this yet"
-// signal instead of invented data.
+// resolve() falls back to the raw id when it isn't in the dictionary yet, rather than
+// fabricating a name.
 @Component
 public class WeaponNameResolver {
 
@@ -52,9 +42,8 @@ public class WeaponNameResolver {
             Map<String, String> dictionary = new ObjectMapper().readValue(in, Map.class);
             return Collections.unmodifiableMap(dictionary);
         } catch (IOException e) {
-            // A missing/corrupt bundled resource must not crash the whole application at
-            // startup (this feature is strictly additive) - fall back to "no mapping known",
-            // which just means resolve() always returns the raw id until this is fixed.
+            // A missing/corrupt bundled resource must not crash startup - fall back to no
+            // mapping, so resolve() just returns raw ids until this is fixed.
             log.error("Failed to load bundled weapon name dictionary from '{}' - " +
                     "weapon breakdown will show raw PUBG item ids instead of friendly names",
                     DICTIONARY_RESOURCE_PATH, e);

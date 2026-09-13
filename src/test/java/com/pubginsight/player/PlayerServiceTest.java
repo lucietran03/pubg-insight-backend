@@ -60,13 +60,9 @@ class PlayerServiceTest {
 
     @Test
     void attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable() {
-        // Distinct map keys are load-bearing here, not decoration: PubgSeasonStatsAttributes
-        // is a record, so two instances both wrapping Map.of() are .equals() to each other -
-        // Mockito's default argument matching is equality-based, so two `when(...)` stubs for
-        // "equal" arguments collide and the later one silently wins for both. That previously
-        // made both toSeasonStatsDto(currentAttributes)/​(previousAttributes) calls resolve to
-        // the same (last-stubbed) return value in production code, a real bug this test
-        // should have caught but didn't until the fixtures were actually distinguishable.
+        // Distinct map keys matter: PubgSeasonStatsAttributes is a record, so two Map.of()
+        // instances are equal, and Mockito's equality-based stub matching would otherwise
+        // collide the current/previous stubs.
         PubgSeasonStatsAttributes currentAttributes = new PubgSeasonStatsAttributes(
                 Map.of("current-marker", new PubgGameModeStats(0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0)));
         PubgSeasonStatsAttributes previousAttributes = new PubgSeasonStatsAttributes(
@@ -107,8 +103,6 @@ class PlayerServiceTest {
         SeasonStatsDto result = playerService.getSeasonStats("account.1");
 
         assertThat(result.previousSeasonComparison()).isNull();
-        // No previous season ID means there's nothing to fetch stats for - only the
-        // current season's findSeasonStats call should have happened.
         verify(pubgApiClient, times(1)).findSeasonStats(anyString(), anyString());
     }
 

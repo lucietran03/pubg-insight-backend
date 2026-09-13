@@ -45,9 +45,7 @@ class MatchServiceTest {
     @InjectMocks
     private MatchService matchService;
 
-    // MatchService builds its own ObjectMapper internally (not Spring-injected - see the
-    // comment on that field for why), so this instance exists only to produce realistic
-    // cached JSON strings for the cache-hit test below, not to be wired into the service.
+    // Only used to produce realistic cached JSON strings for the cache-hit test below.
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test

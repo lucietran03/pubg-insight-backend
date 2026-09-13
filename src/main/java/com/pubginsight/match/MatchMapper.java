@@ -9,9 +9,8 @@ import java.util.Map;
 @Component
 public class MatchMapper {
 
-    // PUBG's API returns internal map codes, not the names players know - not every map
-    // PUBG has ever shipped is listed here, only the ones in current/recent rotation.
-    // Unmapped codes fall through to the raw value rather than disappearing.
+    // PUBG's API returns internal map codes, not display names. Unmapped codes fall
+    // through to the raw value.
     private static final Map<String, String> MAP_NAMES = Map.ofEntries(
             Map.entry("Baltic_Main", "Erangel"),
             Map.entry("Desert_Main", "Miramar"),

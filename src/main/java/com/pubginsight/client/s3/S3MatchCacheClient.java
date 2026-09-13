@@ -10,15 +10,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.util.Optional;
 
-// Thin wrapper around S3Client for caching completed PUBG match responses, keyed by
-// matchId (match data is immutable once a match ends and is not player-specific, so one
-// cached object correctly serves every player who ever looks up that match - see
-// docs/deliverables/ARCHITECTURE.md section 8 for the rate-limit problem this solves).
-//
-// This class only knows S3's semantics (object exists / doesn't / call failed) - like
-// PubgApiClient (see D2 in docs/deliverables/ARCHITECTURE.md), it never throws a feature-specific
-// exception. It is MatchService's job to decide what a cache failure means for the
-// match-analytics feature (answer: nothing - see the soft-fail comment there).
+// Caches completed PUBG match responses, keyed by matchId - match data is immutable once a
+// match ends and isn't player-specific, so one cached object serves every player who looks it up.
 @Component
 public class S3MatchCacheClient {
 
@@ -33,14 +26,8 @@ public class S3MatchCacheClient {
         this.bucketName = properties.cacheBucket();
     }
 
-    // A missing object is a normal, expected outcome (cache miss) - not an error - so it
-    // is reported as an empty Optional rather than an exception.
-    //
-    // Uses getObjectAsBytes() rather than getObject()+manual InputStream reading: it's the
-    // SDK's own convenience method for exactly this "read the whole object into memory"
-    // case (fine here - cached match JSON is small) and returns ResponseBytes<GetObjectResponse>,
-    // whose asUtf8String() does the byte[]->String decoding for us. Same exception surface
-    // (including NoSuchKeyException) as the streaming getObject() call either way.
+    // A missing object is a normal cache miss, not an error, so it's reported as an empty
+    // Optional rather than an exception.
     public Optional<String> getCachedMatchJson(String matchId) {
         try {
             GetObjectRequest request = GetObjectRequest.builder()

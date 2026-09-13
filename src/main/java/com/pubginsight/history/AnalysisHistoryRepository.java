@@ -14,11 +14,8 @@ import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 import java.util.List;
 
-// Thin wrapper around the Enhanced Client's DynamoDbTable<AnalysisHistoryItem> - the only
-// class in this feature that knows it's talking to DynamoDB. Mirrors PubgApiClient's
-// pattern of catching the SDK's own exception types and wrapping them in this module's
-// own exception (AnalysisHistoryException), so callers never need to know about
-// software.amazon.awssdk types.
+// The only class in this feature that knows it's talking to DynamoDB; wraps the SDK's
+// exception types in AnalysisHistoryException so callers don't depend on software.amazon.awssdk.
 @Repository
 public class AnalysisHistoryRepository {
 
@@ -36,8 +33,7 @@ public class AnalysisHistoryRepository {
                     "Failed to save analysis history for player '" + item.getPlayerId()
                             + "', match '" + item.getMatchId() + "'", e);
         } catch (SdkException e) {
-            // Broader fallback for non-service SDK failures (e.g. network issues) that
-            // aren't a DynamoDbException specifically.
+            // Broader fallback for non-service SDK failures (e.g. network issues).
             throw new AnalysisHistoryException(
                     "DynamoDB call failed while saving analysis history for player '" + item.getPlayerId() + "'", e);
         }

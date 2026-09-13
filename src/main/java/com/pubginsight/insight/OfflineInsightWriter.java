@@ -7,11 +7,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-// Network-free, deterministic safety net used only when Gemini is fully unavailable (see
-// InsightService.generateInsights). Deliberately simple threshold checks on numbers
-// PlayerService/MatchService already computed - this is a basic fallback, not a
-// replacement for genuine AI analysis, and its output is always labelled
-// InsightDto.source() = "offline" so it's never mistaken for one.
+// Deterministic fallback used only when Gemini is unavailable; output is always
+// labelled InsightDto.source() = "offline" so it's never mistaken for a real AI result.
 @Component
 public class OfflineInsightWriter {
 
@@ -49,9 +46,7 @@ public class OfflineInsightWriter {
             recommendations.add("practice aim to improve headshot rate");
         }
 
-        // No Gemini call to draw from in offline mode, so the V2 coach sections
-        // (playstyle/seasonProgress/riskFactors/trainingPriorities) are left empty rather
-        // than guessed at - same "never fabricate" rule as the original 4 sections above.
+        // No Gemini call to draw from, so the coach sections are left empty rather than guessed at.
         return new InsightDto(summary, strengths, weaknesses, recommendations,
                 "", "", List.of(), List.of(), "offline");
     }

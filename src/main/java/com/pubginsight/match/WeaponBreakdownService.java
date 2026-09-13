@@ -19,22 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-// New, strictly-additive feature: a telemetry-derived "which weapon got each of this
-// player's kills in this match" breakdown, on top of the existing summary-stats-only match
-// page. Deliberately its own service/controller instead of extending MatchService/MatchDto -
-// see WeaponBreakdownController for the endpoint and match.WeaponKillDto for the response
-// shape.
-//
-// Failure handling is intentionally asymmetric:
-//   - PubgApiException/PubgRateLimitException from PubgApiClient.findMatchRawJson() are left
-//     to propagate to common.exception.GlobalExceptionHandler, same as every other PUBG-backed
-//     endpoint - those are already-understood, already-tested failure modes for "PUBG API is
-//     down/rate-limited", and the frontend already knows how to show them.
-//   - Anything specific to telemetry itself (no asset URL on the match, the telemetry CDN
-//     being slow/unreachable, an unparseable payload) is caught here and turned into an empty
-//     list instead of an error. This is a brand new, optional panel bolted onto an
-//     already-working match page - it must never turn "the match page mostly works" into "the
-//     match page shows an error", per this task's isolation requirement.
+// Telemetry failures (missing asset URL, unreachable CDN, bad payload) are caught and
+// turned into an empty breakdown rather than an error - this panel must never break the
+// match page. PUBG API errors still propagate normally.
 @Service
 public class WeaponBreakdownService {
 
@@ -43,8 +30,7 @@ public class WeaponBreakdownService {
 
     private final PubgApiClient pubgApiClient;
     private final TelemetryClient telemetryClient;
-    // Same rationale as MatchService's own field: this Spring Boot version's auto-configured
-    // Jackson bean is a Jackson 3 JsonMapper, not this classic ObjectMapper type.
+    // Jackson 3 JsonMapper is auto-configured, not this classic ObjectMapper type.
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public WeaponBreakdownService(PubgApiClient pubgApiClient, TelemetryClient telemetryClient) {
@@ -52,18 +38,13 @@ public class WeaponBreakdownService {
         this.telemetryClient = telemetryClient;
     }
 
-    // Distance buckets mirror PUBG's own in-client "shot distance" breakdown ranges (see the
-    // reference screenshots this feature was built from) - upper bound is exclusive except
-    // the last, open-ended bucket.
+    // Mirrors PUBG's own in-client shot-distance breakdown; upper bound exclusive except
+    // the last bucket.
     private static final double[] DISTANCE_BUCKET_UPPER_BOUNDS_METERS = {30, 120, 300};
     private static final String[] DISTANCE_BUCKET_LABELS = {"0-30m", "30-120m", "120-300m", "300m+"};
 
-    // Every real, directional value telemetry's "damageReason" enum can carry, head-to-toe,
-    // mapped to a human label - see TelemetryClient for where/how this field is sourced and
-    // verified. "None" and "NonSpecific" (non-directional damage: bluezone, falls, vehicles,
-    // etc.) are deliberately NOT in this map - there is no body part to honestly attribute
-    // them to, so they are excluded from the breakdown entirely rather than guessed into a
-    // bucket, same principle as excluding kills with no distance data.
+    // "None"/"NonSpecific" (bluezone, falls, vehicles) are excluded - there's no body
+    // part to honestly attribute them to.
     private static final Map<String, String> BODY_PART_LABELS_BY_DAMAGE_REASON = Map.of(
             "HeadShot", "Head",
             "TorsoShot", "Torso",
@@ -112,9 +93,7 @@ public class WeaponBreakdownService {
         return result;
     }
 
-    // Kills with no distance data (see PlayerKillEvent.distanceMeters) are silently excluded
-    // from the histogram rather than guessed into a bucket - an honest "we don't know" beats a
-    // fabricated data point.
+    // Kills with no distance data are excluded rather than guessed into a bucket.
     private static List<DistanceBucketDto> toDistanceBuckets(List<PlayerKillEvent> killEvents) {
         int[] counts = new int[DISTANCE_BUCKET_LABELS.length];
         for (PlayerKillEvent event : killEvents) {
@@ -141,12 +120,7 @@ public class WeaponBreakdownService {
         return DISTANCE_BUCKET_LABELS.length - 1;
     }
 
-    // Body-hit events with a damageReason not in BODY_PART_LABELS_BY_DAMAGE_REASON (i.e.
-    // "None"/"NonSpecific", or any future reason PUBG adds that this project doesn't yet
-    // recognize) are silently excluded rather than guessed into a bucket - same "we don't
-    // know" honesty as toDistanceBuckets above. Always returns all five labels (even at 0
-    // hits) in head-to-toe order, so the frontend can filter zero-hit rows the same way it
-    // already does for shotDistances.
+    // Unrecognized damageReason values are excluded rather than guessed into a bucket.
     private static List<BodyPartDamageDto> toBodyPartBreakdown(List<PlayerBodyHitEvent> bodyHitEvents) {
         Map<String, Integer> hitsByReason = new LinkedHashMap<>();
         for (PlayerBodyHitEvent event : bodyHitEvents) {

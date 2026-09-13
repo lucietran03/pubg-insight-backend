@@ -68,9 +68,7 @@ class GeminiApiClientTest {
             }
         };
 
-        // The exception from the LAST attempted model must propagate as-is (e.g. so a
-        // GeminiRateLimitException's retryAfterSeconds still reaches GlobalExceptionHandler
-        // unchanged), not a synthesized generic failure.
+        // The last attempted model's exception must propagate as-is, not a synthesized one.
         assertThatThrownBy(() -> client.generateText("prompt"))
                 .isSameAs(modelBFailure);
     }

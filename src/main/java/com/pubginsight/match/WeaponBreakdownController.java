@@ -5,11 +5,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// New, additive endpoint - does not touch MatchController or its existing
-// GET /api/players/{playerId}/matches/{matchId} route/shape. A separate controller class
-// mapping into an overlapping URL prefix is fine: Spring dispatches by full path, and
-// "/api/players/{playerId}/matches/{matchId}/weapons" never collides with MatchController's
-// "/api/players/{playerId}/matches/{matchId}".
 @RestController
 @RequestMapping("/api/players/{playerId}/matches/{matchId}")
 public class WeaponBreakdownController {

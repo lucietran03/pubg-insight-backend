@@ -18,9 +18,7 @@ public class HistoryController {
         this.historyService = historyService;
     }
 
-    // No request body: the match stats and AI insight are re-derived server-side from
-    // playerId/matchId (via MatchService/InsightService), the same data the frontend
-    // already fetched to display them - it shouldn't have to re-send it just to save it.
+    // No request body: match stats and the AI insight are re-derived server-side from playerId/matchId.
     @PostMapping("/matches/{matchId}/history")
     public AnalysisHistoryDto recordAnalysis(@PathVariable String playerId, @PathVariable String matchId) {
         return historyService.recordAnalysis(playerId, matchId);

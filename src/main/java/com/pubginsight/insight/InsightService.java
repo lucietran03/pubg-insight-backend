@@ -18,9 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// Orchestrates Player + Match features to gather already-aggregated metrics, then asks
-// Gemini to turn them into a natural-language summary. Gemini never sees raw match
-// telemetry - only the numbers PlayerService/MatchService already computed.
+// Gemini never sees raw match telemetry, only the aggregated metrics from PlayerService/MatchService.
 @Service
 public class InsightService {
 
@@ -32,11 +30,8 @@ public class InsightService {
     private final GeminiApiClient geminiApiClient;
     private final OfflineInsightWriter offlineInsightWriter;
 
-    // A generated insight for a given (player, match) never changes - the underlying
-    // match is immutable and season stats are only prompt context - so a plain in-memory
-    // cache is enough to stop repeat views of the same match from re-billing the paid
-    // Gemini API. Single Spring Boot instance for a course project, not a distributed
-    // system, so this deliberately isn't DynamoDB/Redis; a restart resetting it is fine.
+    // A given (player, match) insight never changes, so an in-memory cache avoids
+    // re-billing the Gemini API on repeat views.
     private final ConcurrentHashMap<String, InsightDto> insightCache = new ConcurrentHashMap<>();
 
     public InsightService(PlayerService playerService, MatchService matchService,
@@ -62,10 +57,7 @@ public class InsightService {
             String rawText = geminiApiClient.generateText(buildPrompt(match, seasonStats));
             insight = parseInsight(rawText);
         } catch (GeminiApiException | GeminiRateLimitException e) {
-            // Every configured Gemini model is exhausted (see GeminiApiClient.generateText).
-            // Fall back to a deterministic, network-free summary instead of a 5xx - but
-            // never cache it here: unlike a genuine Gemini result, an offline fallback
-            // should be retried on the next request in case Gemini has recovered by then.
+            // Not cached, unlike a genuine Gemini result: retry on the next request in case Gemini recovers.
             log.warn("Gemini unavailable for player '{}' match '{}' - returning offline fallback insight",
                     playerId, matchId, e);
             return offlineInsightWriter.write(match, seasonStats);
@@ -131,10 +123,7 @@ public class InsightService {
                 radar.combat(), radar.survival(), radar.precision(), radar.aggression(), radar.support(), radar.consistency());
     }
 
-    // Percentage change of this match's value versus the player's season average for the
-    // same metric. Only ever compares numbers PlayerService/MatchService already computed -
-    // never invents a season average that isn't on SeasonStatsDto. Guards against a zero
-    // season average (e.g. a brand-new player) rather than dividing by zero.
+    // Guards against a zero season average (e.g. a brand-new player) rather than dividing by zero.
     private String describeDeltaVsSeasonAverage(double matchValue, double seasonAverage) {
         if (seasonAverage == 0) {
             return "no season average available yet";
@@ -146,18 +135,12 @@ public class InsightService {
     private InsightDto parseInsight(String rawText) {
         String summary = extractSection(rawText, "SUMMARY");
         if (summary.isEmpty()) {
-            // Gemini didn't follow the requested format - fall back to showing the raw
-            // text as the summary rather than failing the whole request. Still a genuine
-            // Gemini response, so it keeps the "gemini" source. The new sections have
-            // nothing reliable to extract from an unstructured response, so they're left
-            // empty rather than guessed at.
+            // Gemini didn't follow the requested format; fall back to the raw text as the
+            // summary rather than failing the request, still tagged as a genuine "gemini" source.
             return new InsightDto(rawText.trim(), List.of(), List.of(), List.of(),
                     "", "", List.of(), List.of(), GEMINI_SOURCE);
         }
 
-        // Each section below follows the same tolerant rule as SUMMARY/STRENGTHS/etc.:
-        // if Gemini omits a label, extractSection/extractList simply returns "" / List.of()
-        // for it - never a fabricated placeholder.
         return new InsightDto(
                 summary,
                 extractList(rawText, "STRENGTHS"),

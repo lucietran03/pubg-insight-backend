@@ -26,55 +26,26 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-// Fetches and parses a single match's telemetry file (a flat JSON array of typed gameplay
-// events) into the raw lists of one player's LogPlayerKill events (weapon + distance) and
-// LogPlayerTakeDamage events where that player was the attacker (body-part hit location).
-// match.WeaponBreakdownService derives the weapon tally, shot-distance breakdown, and
-// body-part breakdown all from this same pair of lists - one telemetry pass covers all three
-// presentations.
+// Fetches a match's telemetry file and extracts one player's kill events and the
+// damage-dealt events where that player was the attacker.
 //
-// Deliberately NOT routed through client.pubg.PubgApiClient/PubgRateLimiter: telemetry files
-// are static assets served from a separate CDN host (the "URL" in the match response's
-// "asset" resource, e.g. telemetry-cdn.playbattlegrounds.com), not from api.pubg.com, and are
-// fetched unauthenticated - no "Authorization: Bearer <key>" header is sent. This isn't a
-// guess: the community pubgjava client (github.com/mautini/pubgjava) tags every other
-// endpoint's Retrofit method with a custom "@Headers("@: Auth")" marker that its interceptor
-// uses to attach the API key, but its getTelemetry(String url) method carries no such marker
-// - the only endpoint in that whole interface without it. That is real, working, referenced
-// client code treating telemetry as an unauthenticated fetch to an arbitrary URL, distinct
-// from every rate-limited api.pubg.com call. This project's own sandbox could not confirm
-// this by making a live call against a real match (api.pubg.com and the telemetry CDN are
-// both blocked by this environment's outbound proxy, category "Online and Other Games" -
-// confirmed via curl, not assumed), so treat this as strong secondary evidence, not a
-// first-party empirical result - re-verify against a real match on a real dev machine before
-// relying on it for anything beyond this course project's demo.
+// Deliberately NOT routed through client.pubg.PubgApiClient/PubgRateLimiter: telemetry
+// files are served unauthenticated from a separate CDN host, not api.pubg.com, and are not
+// subject to that rate limit.
 //
-// Telemetry files can run into the tens of MB. To avoid loading the whole array into memory,
-// this streams the top-level array token-by-token and only fully materializes (as a JsonNode)
-// the individual objects worth inspecting - memory stays bounded by event size, not file size.
+// Streams the top-level JSON array token-by-token rather than loading it whole, since
+// telemetry files can run into the tens of MB.
 @Component
 public class TelemetryClient {
 
     private static final Logger log = LoggerFactory.getLogger(TelemetryClient.class);
-    // PUBG has periodically replaced telemetry event types with a "V2" successor while keeping
-    // the schema otherwise compatible (same field names) - "LogPlayerKillV2" is a real,
-    // documented example of this pattern, not a guess. Accept both so this doesn't silently
-    // return zero kills again the next time PUBG finishes migrating older matches off the V1
-    // event name.
+    // PUBG has renamed this event to "LogPlayerKillV2" (same schema) in some matches; accept both.
     private static final String LOG_PLAYER_KILL_EVENT_TYPE = "LogPlayerKill";
     private static final String LOG_PLAYER_KILL_V2_EVENT_TYPE = "LogPlayerKillV2";
-    // LogPlayerTakeDamage covers every hit landed across the match (not just the killing
-    // blow), and carries a "damageReason" field with a specific hit-location value
-    // ("HeadShot", "TorsoShot", "ArmShot", "LegShot", "PelvisShot") alongside the generic
-    // "None"/"NonSpecific" reasons used for non-directional damage (bluezone, falls,
-    // vehicles, etc). Confirmed against two independent sources: PUBG's own official
-    // dictionary (github.com/pubg/api-assets, enums/telemetry/damageReason.json) and the
-    // community pubgjava client's LogPlayerTakeDamage/DamageReason model classes, which agree
-    // on both the field name and every enum value.
+    // Covers every hit landed in the match, not just killing blows.
     private static final String LOG_PLAYER_TAKE_DAMAGE_EVENT_TYPE = "LogPlayerTakeDamage";
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
-    // Generous compared to PubgApiClient's 5s read timeout on purpose - telemetry files are
-    // orders of magnitude larger than any api.pubg.com JSON response.
+    // More generous than PubgApiClient's 5s read timeout - telemetry files are much larger.
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(30);
 
     private final WeaponNameResolver weaponNameResolver;
@@ -117,14 +88,8 @@ public class TelemetryClient {
         }
     }
 
-    // PUBG's telemetry CDN serves files gzip-compressed - java.net.http.HttpClient does NOT
-    // auto-decompress responses the way a browser or a library like OkHttp would, so the raw
-    // gzip bytes were being fed straight into the JSON parser (real bug: every single fetch
-    // failed with "Illegal character (CTRL-CHAR, code 31)" at line 1, column 2 - 0x1F is
-    // literally the first byte of the gzip magic number 0x1F8B, which is exactly what a JSON
-    // parser sees as "not whitespace, not a valid token start"). Checking Content-Encoding
-    // alone isn't fully reliable in practice, so this also sniffs the first 2 bytes directly
-    // and falls back to that if the header is missing/wrong.
+    // HttpClient does not auto-decompress gzip responses, unlike a browser - Content-Encoding
+    // alone isn't always reliable either, so this also sniffs the gzip magic bytes as a fallback.
     private static InputStream decodeIfGzipped(HttpResponse<InputStream> response) throws IOException {
         InputStream raw = response.body();
         boolean declaredGzip = response.headers().firstValue("Content-Encoding")
@@ -142,20 +107,15 @@ public class TelemetryClient {
         return (declaredGzip || looksGzipped) ? new GZIPInputStream(pushback) : pushback;
     }
 
-    // Single streamed pass over the telemetry array producing both event lists at once -
-    // deliberately not two separate streaming passes (kills, then body hits), since telemetry
-    // files can run into the tens of MB and each full re-parse would double that cost.
+    // Single streamed pass produces both event lists - two separate passes would double the
+    // parse cost on multi-MB telemetry files.
     private PlayerCombatEvents extractCombatEvents(InputStream telemetryJson, String playerAccountId) throws IOException {
         List<PlayerKillEvent> kills = new ArrayList<>();
         List<PlayerBodyHitEvent> bodyHits = new ArrayList<>();
         JsonFactory jsonFactory = objectMapper.getFactory();
 
-        // Diagnostic-only bookkeeping (see the post-loop checks below): if this match really has
-        // LogPlayerKill(V2) events but none matched playerAccountId, sampling a few real
-        // killer.accountId values actually seen is what tells us whether this is an accountId
-        // format mismatch. If there are NO kill events of either known type name at all, the
-        // distinct _T values actually present tell us what PUBG renamed the event to this time,
-        // instead of guessing blind.
+        // Bookkeeping for the diagnostic warnings below, in case of an accountId mismatch or
+        // a future PUBG event rename.
         int totalKillEvents = 0;
         List<String> sampleKillerAccountIds = new ArrayList<>();
         Set<String> distinctEventTypesSeen = new LinkedHashSet<>();
@@ -166,9 +126,6 @@ public class TelemetryClient {
             }
 
             while (parser.nextToken() == JsonToken.START_OBJECT) {
-                // Reads just this one array element as a tree, then leaves the parser
-                // positioned right after it - the rest of the (possibly huge) array is never
-                // materialized at once.
                 JsonNode event = objectMapper.readTree(parser);
                 String eventType = event.path("_T").asText(null);
                 if (distinctEventTypesSeen.size() < 40) {
@@ -187,11 +144,7 @@ public class TelemetryClient {
                         if (weaponId != null && !weaponId.isBlank()) {
                             kills.add(new PlayerKillEvent(weaponId, weaponNameResolver.resolve(weaponId), extractDistanceMeters(event)));
                         } else {
-                            // Diagnostic only: a real kill matched by accountId but neither known
-                            // weapon-id field path resolved anything - most likely PUBG's
-                            // telemetry schema has moved the field again. Logging the event's own
-                            // top-level (and killerDamageInfo's, if present) field names, not
-                            // assumed guesses, is what actually tells us where the data lives now.
+                            // Logs the event's actual field names to help diagnose a future schema change.
                             log.warn("{} matched player '{}' but no weapon id field resolved - "
                                             + "top-level fields: {}, killerDamageInfo fields: {}",
                                     eventType, playerAccountId, fieldNamesOf(event), fieldNamesOf(event.path("killerDamageInfo")));
@@ -207,19 +160,12 @@ public class TelemetryClient {
         }
 
         if (kills.isEmpty() && totalKillEvents > 0) {
-            // Diagnostic only: this match has real kill events, but not one had a killer
-            // accountId equal to playerAccountId - comparing the queried id against real ids
-            // actually present in this telemetry file is what tells us if this is an id-format
-            // mismatch (e.g. one side has a "account." prefix the other doesn't).
+            // Helps diagnose an accountId format mismatch between this and other PUBG endpoints.
             log.warn("Match has {} LogPlayerKill(V2) event(s) but none matched playerAccountId='{}' - "
                     + "sample killer.accountId values actually seen: {}",
                     totalKillEvents, playerAccountId, sampleKillerAccountIds);
         } else if (totalKillEvents == 0) {
-            // Diagnostic only: this match has NO event named "LogPlayerKill" or "LogPlayerKillV2"
-            // at all - if the match summary API (a completely different PUBG endpoint) reports
-            // real kills for this player, PUBG has likely renamed the kill event again. The
-            // distinct _T values actually present in this file are the real evidence for
-            // whatever the current name is, instead of guessing another version suffix blind.
+            // Helps diagnose a future PUBG kill-event rename.
             log.warn("No LogPlayerKill/LogPlayerKillV2 events found in this match's telemetry at all - "
                     + "distinct event types actually present: {}", distinctEventTypesSeen);
         }
@@ -233,22 +179,14 @@ public class TelemetryClient {
         return names;
     }
 
-    // "attacker" (not "victim") is who DEALT this damage - matches the pubgjava
-    // LogPlayerTakeDamage model (attacker/victim, both a "Character" object with an
-    // accountId), the same shape as LogPlayerKill's "killer"/"victim". Damage events with no
-    // attacker at all (bluezone, falls, drowning, etc.) safely fall through to "not equal"
-    // here rather than throwing, since JsonNode.path() on a missing field returns a
-    // MissingNode whose .asText(null) is null.
+    // Damage events with no attacker (bluezone, falls, etc.) safely resolve to "not equal"
+    // here rather than throwing, since a missing field's .asText(null) is null.
     private static boolean isDamageDealtByPlayer(JsonNode event, String attackerAccountId) {
         String eventAttackerAccountId = event.path("attacker").path("accountId").asText(null);
         return attackerAccountId.equals(eventAttackerAccountId);
     }
 
-    // "damageCauserName" is the field name in every telemetry sample this project could find
-    // documented (including the pubgjava model below), but PUBG's telemetry schema is known to
-    // drift over time - defensively also check a "killerDamageInfo.damageCauserName" nesting
-    // some newer event types use elsewhere in the schema, in case a future match's
-    // LogPlayerKill has moved the field there too.
+    // Some event shapes nest damageCauserName under killerDamageInfo instead of the top level.
     private static String extractDamageCauserId(JsonNode event) {
         String flat = event.path("damageCauserName").asText(null);
         if (flat != null && !flat.isBlank()) {
@@ -257,9 +195,8 @@ public class TelemetryClient {
         return event.path("killerDamageInfo").path("damageCauserName").asText(null);
     }
 
-    // PUBG telemetry reports LogPlayerKill's "distance" in CENTIMETERS, not meters - a known,
-    // easy-to-miss quirk of this schema. Returns null (not 0.0) when the field is genuinely
-    // absent, so a kill with no distance data is never misrepresented as a 0m point-blank kill.
+    // PUBG telemetry reports distance in centimeters, not meters. Returns null (not 0.0) when
+    // the field is absent, so a missing distance isn't misread as a point-blank kill.
     private static Double extractDistanceMeters(JsonNode event) {
         JsonNode distanceNode = event.path("distance");
         if (!distanceNode.isNumber()) {

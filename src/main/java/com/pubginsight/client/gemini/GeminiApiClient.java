@@ -22,7 +22,6 @@ public class GeminiApiClient {
     private static final Logger log = LoggerFactory.getLogger(GeminiApiClient.class);
 
     private static final int CONNECT_TIMEOUT_MILLIS = 3000;
-    // Generation takes longer than a simple PUBG lookup, so this gets a longer read timeout.
     private static final int READ_TIMEOUT_MILLIS = 15000;
 
     private final RestClient restClient;
@@ -42,18 +41,14 @@ public class GeminiApiClient {
         this.apiKey = properties.key();
 
         if (models.isEmpty()) {
-            // Fail fast at startup rather than looping zero times and throwing a null
-            // lastFailure the first time a request comes in.
+            // Fail fast here rather than looping zero times and throwing a null lastFailure below.
             throw new IllegalStateException("gemini.api.models must contain at least one model");
         }
     }
 
-    // Tries each configured model in priority order. Quota/rate-limit failures are
-    // per-model, not per-application, so a busy or exhausted model is a reason to try the
-    // next one rather than give up - the last real failure (not a synthesized one) is
-    // what propagates if every model is down, since GlobalExceptionHandler needs the
-    // actual exception type (e.g. GeminiRateLimitException's retryAfterSeconds) to render
-    // the right status.
+    // Tries each configured model in order, falling back on quota/rate-limit failures since
+    // those are per-model, not per-application. Propagates the last real failure (not a
+    // synthesized one) if every model is down, so its concrete type is preserved.
     public String generateText(String prompt) {
         RuntimeException lastFailure = null;
 
@@ -69,9 +64,7 @@ public class GeminiApiClient {
         throw lastFailure;
     }
 
-    // Extracted as its own method (rather than inlined in the loop above) so a unit test
-    // can override this single seam to exercise the failover logic without a real
-    // RestClient call, API key, or quota.
+    // Package-private so tests can override this seam to exercise failover without a real call.
     String callModel(String model, String prompt) {
         GeminiGenerateContentRequest request = new GeminiGenerateContentRequest(
                 List.of(new GeminiContent(List.of(new GeminiPart(prompt)))));
@@ -92,21 +85,14 @@ public class GeminiApiClient {
         } catch (HttpClientErrorException.TooManyRequests e) {
             throw toRateLimitException(e);
         } catch (RestClientException e) {
-            // Catching RestClientException itself, not just its ResourceAccessException/
-            // HttpStatusCodeException subtypes: a read timeout that happens while Spring is
-            // still reading response headers/body (readWithMessageConverters) surfaces as a
-            // plain RestClientException, not ResourceAccessException - confirmed via a real
-            // uncaught 500 in production logs before this was widened to the common superclass.
+            // Caught as the broad RestClientException, not just its subtypes: a timeout while
+            // Spring is still reading the response body surfaces as a plain RestClientException.
             throw new GeminiApiException("Gemini API request failed for model '" + model + "'", e);
         }
     }
 
-    // Gemini puts the actually-useful diagnostic info (WHICH quota was exceeded - per
-    // model, per minute vs per day - and its own suggested retry delay) inside the
-    // response BODY (a google.rpc.QuotaFailure / RetryInfo structure), not the HTTP
-    // Retry-After header Gemini doesn't reliably set. Logging the raw body here is the
-    // only way to tell a transient per-minute limit apart from an exhausted per-day one
-    // after the fact - `retryAfterSeconds=null` alone (the previous behavior) couldn't.
+    // Gemini's Retry-After header isn't reliably set; the useful quota/retry info is in the
+    // response body instead, so log it for diagnosis.
     private GeminiRateLimitException toRateLimitException(HttpClientErrorException.TooManyRequests e) {
         log.warn("Gemini rate limit response body: {}", e.getResponseBodyAsString());
 

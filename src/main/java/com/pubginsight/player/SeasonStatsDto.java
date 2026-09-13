@@ -17,10 +17,8 @@ public record SeasonStatsDto(
         SeasonComparison previousSeasonComparison
 ) {
 
-    // toSeasonStatsDto() builds a SeasonStatsDto for a single season without knowing
-    // about any other season - PlayerService composes the comparison afterwards (it's the
-    // one that fetches both seasons), then attaches it here rather than threading a second
-    // dto through the mapper's core aggregation method.
+    // Comparison is attached after the fact since a single season has no visibility
+    // into any other season.
     public SeasonStatsDto withPreviousSeasonComparison(SeasonComparison comparison) {
         return new SeasonStatsDto(wins, roundsPlayed, winRate, avgDamage, killDeathRatio, headshotRate,
                 top10Rate, avgSurvivalSeconds, longestKillMeters, radar, archetype, comparison);

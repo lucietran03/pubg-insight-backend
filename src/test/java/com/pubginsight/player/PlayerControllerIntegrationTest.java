@@ -20,13 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// Integration test: exercises the real Controller -> Service -> Mapper wiring through
-// Spring's DI container and a real (simulated) HTTP request. Only the external PUBG
-// boundary (PubgApiClient) is mocked, since we don't want real network calls in a test run.
-//
-// NOTE: written against Spring Boot 4.1.0's test annotations as best known; if
-// @MockitoBean doesn't resolve, this Boot version may still use the older
-// @org.springframework.boot.test.mock.mockito.MockBean instead — swap it if so.
+// Written against Spring Boot 4.1.0's @MockitoBean; if it doesn't resolve, this Boot
+// version may need the older @MockBean instead.
 @SpringBootTest
 @AutoConfigureMockMvc
 class PlayerControllerIntegrationTest {

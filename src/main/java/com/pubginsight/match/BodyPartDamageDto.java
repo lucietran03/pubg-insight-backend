@@ -1,8 +1,6 @@
 package com.pubginsight.match;
 
-// One body-part location and how many of the player's landed hits (as attacker) in this match
-// struck it - e.g. ("Head", 7). Derived from telemetry's "damageReason" enum
-// (see TelemetryClient), which only ever reports one of a small, fixed set of real hit
-// locations - not fabricated from weapon type or any other guesswork.
+// Hit counts per body-part location for this player's landed attacks in a match.
+// Sourced from telemetry's damageReason enum, not inferred from weapon type.
 public record BodyPartDamageDto(String label, int hits) {
 }

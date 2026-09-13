@@ -2,10 +2,8 @@ package com.pubginsight.client.pubg.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-// PUBG's real per-mode season stats payload has dozens of fields; this only lists the
-// ones this app actually derives metrics from (see PlayerMapper/PlayerAnalyticsService).
-// @JsonIgnoreProperties means adding more fields later is always safe/additive - nothing
-// here needs to change if PUBG adds new fields we still don't care about.
+// PUBG's per-mode season stats payload has dozens of fields; only the ones this app
+// actually uses are modeled here.
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record PubgGameModeStats(
         Integer wins,

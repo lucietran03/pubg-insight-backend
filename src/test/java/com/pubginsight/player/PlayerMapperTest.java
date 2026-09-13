@@ -52,9 +52,7 @@ class PlayerMapperTest {
 
     @Test
     void aggregatesSeasonStatsAcrossGameModesAndClassifiesArchetype() {
-        // Sums to: wins=7, rounds=70, kills=75, headshot=25, damage=18000, timeSurvived=33000,
-        // top10s=25, assists=10, revives=5, longestKill=max(120,80)=120 - chosen so precision
-        // (headshot rate 25/75=33%) is clearly the standout axis over the others.
+        // Chosen so precision (headshot rate 25/75=33%) is clearly the standout axis.
         PubgGameModeStats squad = new PubgGameModeStats(
                 5, 50, 45, 60, 10, 20, 15000.0, 25000.0, 900.0, 120.0, 20, 5, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
         PubgGameModeStats solo = new PubgGameModeStats(
@@ -81,8 +79,7 @@ class PlayerMapperTest {
     @Test
     void classifiesFlatProfileAsBalancedOperator() {
         // Every axis lands on exactly 50 against its own ceiling (see PlayerMapper's
-        // scale() constants) - kills/round=1.0, damage/round=250, headshot rate=25%,
-        // survival/round=600s, support/round=0.5, top10 rate=50%.
+        // scale() constants).
         PubgGameModeStats squad = new PubgGameModeStats(
                 10, 100, 90, 100, 30, 25, 25000.0, 60000.0, 1000.0, 100.0, 50, 20, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
         PubgSeasonStatsAttributes attributes = new PubgSeasonStatsAttributes(Map.of("squad", squad));
@@ -115,10 +112,7 @@ class PlayerMapperTest {
 
     @Test
     void toSeasonStatsDtoLeavesPreviousSeasonComparisonNull() {
-        // toSeasonStatsDto() maps a single season in isolation - it has no visibility into
-        // any other season, so previousSeasonComparison always starts null here. It's
-        // PlayerService's job (it's the one holding both seasons) to attach a comparison
-        // via withPreviousSeasonComparison() afterwards.
+        // toSeasonStatsDto() maps a single season in isolation, so this always starts null.
         PubgGameModeStats squad = new PubgGameModeStats(
                 5, 50, 45, 60, 10, 20, 15000.0, 25000.0, 900.0, 120.0, 20, 5, 0, 0, 0, 0, 0.0, 0.0, 0, 0);
         PubgSeasonStatsAttributes attributes = new PubgSeasonStatsAttributes(Map.of("squad", squad));

@@ -5,9 +5,7 @@ import com.pubginsight.insight.InsightDto;
 import com.pubginsight.match.MatchDto;
 import org.springframework.stereotype.Component;
 
-// Pure mapping between the DynamoDB-facing AnalysisHistoryItem and the app-facing
-// AnalysisHistoryDto/(MatchDto + InsightDto) pair. createdAt is passed in rather than
-// generated here (e.g. via Instant.now()) so this class stays a plain, deterministic
+// createdAt is passed in rather than generated here so this stays a pure, deterministic
 // function that's trivial to unit test without mocking the clock.
 @Component
 public class AnalysisHistoryMapper {

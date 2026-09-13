@@ -62,11 +62,8 @@ public class GlobalExceptionHandler {
         return builder.body(Map.of("error", "AI Insights rate limit reached. Please try again later."));
     }
 
-    // No handler for S3CacheException on purpose: MatchService catches and soft-fails it
-    // internally (a broken cache must never break the feature), so it should never reach
-    // here. Unlike the S3 cache, DynamoDB write/read failure in HistoryService IS a real
-    // feature failure (there's nothing to fall back to), so AnalysisHistoryException is
-    // handled explicitly below.
+    // No handler for S3CacheException: MatchService soft-fails it internally. DynamoDB
+    // failures here have no fallback, so they're surfaced as a real error.
     @ExceptionHandler(AnalysisHistoryException.class)
     public ResponseEntity<Map<String, String>> handleAnalysisHistoryException(AnalysisHistoryException e) {
         log.error("DynamoDB analysis history call failed: {}", e.getMessage(), e.getCause());
