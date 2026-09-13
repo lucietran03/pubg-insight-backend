@@ -90,6 +90,31 @@ public class PubgApiClient {
         }
     }
 
+    // Same endpoint/rate-limit cost as findMatchById(), but returns the raw JSON body instead
+    // of the typed PubgMatchResponse. Added for match.WeaponBreakdownService, which needs the
+    // "asset" resource's attributes.URL (telemetry file location) from the match response's
+    // "included" array - a field PubgIncludedItem/PubgParticipantAttributes intentionally
+    // don't model (see the comment on PubgIncludedItem). Reusing those existing, tested DTOs
+    // as-is (rather than widening their shape) keeps this addition fully isolated from the
+    // already-working match stats flow, at the cost of one extra call against this same
+    // rate-limited budget per match view - see match.WeaponBreakdownService for why that
+    // trade-off was made deliberately.
+    public String findMatchRawJson(String matchId) {
+        rateLimiter.acquire();
+        try {
+            return restClient.get()
+                    .uri("/shards/{shard}/matches/{matchId}", defaultShard, matchId)
+                    .retrieve()
+                    .body(String.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            return null;
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw toRateLimitException(e);
+        } catch (RestClientException e) {
+            throw new PubgApiException("PUBG API request failed for match '" + matchId + "' (raw)", e);
+        }
+    }
+
     public String findCurrentSeasonId() {
         return loadSeasonIds().currentSeasonId();
     }
