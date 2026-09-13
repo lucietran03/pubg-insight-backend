@@ -57,7 +57,8 @@ class InsightControllerIntegrationTest {
         when(pubgApiClient.findCurrentSeasonId()).thenReturn("season-current");
         when(pubgApiClient.findSeasonStats("account.1", "season-current"))
                 .thenReturn(new PubgSeasonStatsResponse(new PubgSeasonStatsData("playerSeason", "id",
-                        new PubgSeasonStatsAttributes(Map.of("squad", new PubgGameModeStats(29, 265))))));
+                        new PubgSeasonStatsAttributes(Map.of("squad", new PubgGameModeStats(
+                                29, 265, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0))))));
 
         when(geminiApiClient.generateText(anyString())).thenReturn(
                 "SUMMARY: Great aim this match.\n"
