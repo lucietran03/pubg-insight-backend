@@ -29,3 +29,7 @@ aws:
     analysis-history-table: ${DYNAMODB_ANALYSIS_HISTORY_TABLE:pubg-insight-analysis-history}
   s3:
     cache-bucket: ${S3_CACHE_BUCKET:pubg-insight-match-cache}
+  athena:
+    database: ${ATHENA_DATABASE:pubg_insight}
+    table: ${ATHENA_TABLE:pubg_insight_analytics}
+    output-location: ${ATHENA_OUTPUT_LOCATION:s3://pubg-insight-match-cache/athena-results/}

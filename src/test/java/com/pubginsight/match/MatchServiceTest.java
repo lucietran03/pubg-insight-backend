@@ -8,6 +8,7 @@ import com.pubginsight.client.pubg.dto.PubgMatchData;
 import com.pubginsight.client.pubg.dto.PubgMatchResponse;
 import com.pubginsight.client.pubg.dto.PubgParticipantAttributes;
 import com.pubginsight.client.pubg.dto.PubgParticipantStats;
+import com.pubginsight.client.s3.S3AnalyticsWriter;
 import com.pubginsight.client.s3.S3CacheException;
 import com.pubginsight.client.s3.S3MatchCacheClient;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,9 @@ class MatchServiceTest {
 
     @Mock
     private S3MatchCacheClient s3MatchCacheClient;
+
+    @Mock
+    private S3AnalyticsWriter s3AnalyticsWriter;
 
     @InjectMocks
     private MatchService matchService;

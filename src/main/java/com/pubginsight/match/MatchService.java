@@ -7,6 +7,7 @@ import com.pubginsight.client.pubg.dto.PubgIncludedItem;
 import com.pubginsight.client.pubg.dto.PubgMatchResponse;
 import com.pubginsight.client.pubg.dto.PubgParticipantAttributes;
 import com.pubginsight.client.pubg.dto.PubgParticipantStats;
+import com.pubginsight.client.s3.S3AnalyticsWriter;
 import com.pubginsight.client.s3.S3CacheException;
 import com.pubginsight.client.s3.S3MatchCacheClient;
 import org.slf4j.Logger;
@@ -24,15 +25,17 @@ public class MatchService {
     private final PubgApiClient pubgApiClient;
     private final MatchMapper matchMapper;
     private final S3MatchCacheClient s3MatchCacheClient;
+    private final S3AnalyticsWriter s3AnalyticsWriter;
     // Built directly rather than injected: this Spring Boot version auto-configures a
     // Jackson 3 JsonMapper bean, not a com.fasterxml.jackson.databind.ObjectMapper one.
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public MatchService(PubgApiClient pubgApiClient, MatchMapper matchMapper,
-                         S3MatchCacheClient s3MatchCacheClient) {
+                         S3MatchCacheClient s3MatchCacheClient, S3AnalyticsWriter s3AnalyticsWriter) {
         this.pubgApiClient = pubgApiClient;
         this.matchMapper = matchMapper;
         this.s3MatchCacheClient = s3MatchCacheClient;
+        this.s3AnalyticsWriter = s3AnalyticsWriter;
     }
 
     public MatchDto getMatchStatsForPlayer(String matchId, String playerId) {
@@ -58,7 +61,32 @@ public class MatchService {
                 .orElseThrow(() -> new MatchNotFoundException(
                         "Player '" + playerId + "' not found in match '" + matchId + "'"));
 
-        return matchMapper.toMatchDto(matchId, response.data().attributes(), stats);
+        MatchDto dto = matchMapper.toMatchDto(matchId, response.data().attributes(), stats);
+        writeAnalyticsRecord(playerId, dto);
+        return dto;
+    }
+
+    // Flat, purpose-built feed for Athena - see S3AnalyticsWriter. Best-effort: never allowed
+    // to fail the request that triggered it.
+    private record MatchAnalyticsRecord(
+            String matchId, String playerId, String mapName, String gameMode,
+            int kills, double damageDealt, int winPlace, double headshotRate,
+            double timeSurvivedSeconds, String createdAt) {
+    }
+
+    private void writeAnalyticsRecord(String playerId, MatchDto dto) {
+        try {
+            MatchAnalyticsRecord record = new MatchAnalyticsRecord(
+                    dto.matchId(), playerId, dto.mapName(), dto.gameMode(),
+                    dto.kills(), dto.damageDealt(), dto.winPlace(), dto.headshotRate(),
+                    dto.timeSurvivedSeconds(), dto.createdAt());
+            String json = objectMapper.writeValueAsString(record);
+            s3AnalyticsWriter.writeRecord(dto.matchId(), playerId, json);
+        } catch (S3CacheException e) {
+            log.warn("Analytics write failed for match '{}' - continuing without it", dto.matchId(), e);
+        } catch (JsonProcessingException e) {
+            log.warn("Analytics record for match '{}' could not be serialized - continuing without it", dto.matchId(), e);
+        }
     }
 
     // A completed match is immutable, so a cache hit avoids a PUBG API call entirely -

@@ -12,6 +12,7 @@ import com.pubginsight.client.pubg.dto.PubgParticipantStats;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsAttributes;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsData;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsResponse;
+import com.pubginsight.client.s3.S3AnalyticsWriter;
 import com.pubginsight.client.s3.S3MatchCacheClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,11 +47,13 @@ class InsightControllerIntegrationTest {
     @MockitoBean
     private GeminiApiClient geminiApiClient;
 
-    // Without this, MatchService's real cache-aside read hits the actual configured AWS
-    // account, so a real S3 response - not the stubbed PubgApiClient - decides this test's
-    // behavior. Forcing a cache miss makes the PubgApiClient stub authoritative.
+    // Without this, MatchService's real cache-aside read can hit AWS, letting a real S3
+    // response - not the stubbed PubgApiClient - decide this test's behavior.
     @MockitoBean
     private S3MatchCacheClient s3MatchCacheClient;
+
+    @MockitoBean
+    private S3AnalyticsWriter s3AnalyticsWriter;
 
     @BeforeEach
     void forceCacheMiss() {

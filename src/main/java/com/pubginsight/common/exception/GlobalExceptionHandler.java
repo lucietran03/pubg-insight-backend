@@ -1,5 +1,6 @@
 package com.pubginsight.common.exception;
 
+import com.pubginsight.client.athena.AthenaQueryException;
 import com.pubginsight.client.dynamodb.AnalysisHistoryException;
 import com.pubginsight.client.gemini.GeminiApiException;
 import com.pubginsight.client.gemini.GeminiRateLimitException;
@@ -69,5 +70,12 @@ public class GlobalExceptionHandler {
         log.error("DynamoDB analysis history call failed: {}", e.getMessage(), e.getCause());
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(Map.of("error", "Failed to save or load analysis history. Please try again later."));
+    }
+
+    @ExceptionHandler(AthenaQueryException.class)
+    public ResponseEntity<Map<String, String>> handleAthenaQueryException(AthenaQueryException e) {
+        log.error("Athena population-comparison query failed: {}", e.getMessage(), e.getCause());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", "Failed to compute population comparison. Please try again later."));
     }
 }

@@ -7,6 +7,7 @@ import com.pubginsight.client.pubg.dto.PubgMatchData;
 import com.pubginsight.client.pubg.dto.PubgMatchResponse;
 import com.pubginsight.client.pubg.dto.PubgParticipantAttributes;
 import com.pubginsight.client.pubg.dto.PubgParticipantStats;
+import com.pubginsight.client.s3.S3AnalyticsWriter;
 import com.pubginsight.client.s3.S3MatchCacheClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,12 +37,15 @@ class MatchControllerIntegrationTest {
     @MockitoBean
     private PubgApiClient pubgApiClient;
 
-    // Without this, MatchService's real cache-aside read hits the actual configured AWS
-    // account (now that credentials are set up locally), so a real S3 response - not the
-    // stubbed PubgApiClient - decided these tests' behavior. Forcing a cache miss makes the
-    // PubgApiClient stub authoritative, as intended.
+    // Without this, MatchService's real cache-aside read can hit AWS, letting a real S3
+    // response - not the stubbed PubgApiClient - decide these tests' behavior.
     @MockitoBean
     private S3MatchCacheClient s3MatchCacheClient;
+
+    // Same reason as s3MatchCacheClient above - without this, the analytics write hits the
+    // real S3 bucket during the test run instead of being a no-op.
+    @MockitoBean
+    private S3AnalyticsWriter s3AnalyticsWriter;
 
     @BeforeEach
     void forceCacheMiss() {
