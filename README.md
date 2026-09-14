@@ -90,9 +90,9 @@ A separate, Spring-independent endpoint is served by the Lambda: `GET /share/{pl
 
 ## Getting Started / Local Setup
 
-**Prerequisites:** Java 21, Maven (or use the bundled `./mvnw`), AWS credentials resolvable via the SDK's default credential provider chain (e.g. `~/.aws/credentials`) if you want to exercise the AWS-backed endpoints locally.
+**Prerequisites:** Java 21, Maven (or use the bundled `./mvnw`), an AWS account with credentials resolvable via the SDK's default credential provider chain (e.g. `~/.aws/credentials`) — required for every endpoint except plain player/match/season lookups, since those already touch S3/DynamoDB/Athena.
 
-1. Edit `src/main/resources/application-local.yml` (gitignored — put real secrets directly in it, Spring Boot does not read `.env` files) with your real API keys:
+1. **Create** `src/main/resources/application-local.yml` (this file does not exist in a fresh clone — it's gitignored on purpose, since it holds real secrets) with your own API keys:
 
    ```yaml
    pubg:
@@ -103,7 +103,7 @@ A separate, Spring-independent endpoint is served by the Lambda: `GET /share/{pl
        key: <your Gemini API key>
    ```
 
-   `spring.profiles.active: local` is already the default in `application.yml`, so this file is picked up automatically — no extra flag needed.
+   Get a PUBG API key from https://developer.pubg.com (free, requires a PUBG account). Get a Gemini API key from https://aistudio.google.com/apikey (free tier available). `spring.profiles.active: local` is already the default in `application.yml`, so this file is picked up automatically — no extra flag needed. Spring Boot does **not** read `.env` files (that's a Node/Vite convention), so put the real values directly in this YAML file, not a `.env`.
 
 2. Run:
 
@@ -113,19 +113,75 @@ A separate, Spring-independent endpoint is served by the Lambda: `GET /share/{pl
 
 3. The backend runs on `http://localhost:8080`.
 
+Running locally with no AWS credentials configured still works for basic player/match/season lookups — S3/DynamoDB/Athena calls soft-fail (logged, not thrown) wherever the code treats them as a cache rather than a source of truth (see `docs/deliverables/ARCHITECTURE.md` Design Decision D12). The Athena population-comparison and history endpoints do require real AWS credentials and the resources below to exist.
+
+---
+
+## AWS Resources Required (one-time setup)
+
+Everything below is a **one-time provisioning step** — allowed under the assignment's automation rule, since none of it happens in the live request path (see `docs/deliverables/ARCHITECTURE.md` §7). Once created, every read/write against these resources happens through application code. Region used throughout: `us-east-1`.
+
+| # | Service | Resource | Purpose |
+|---|---|---|---|
+| 1 | S3 | `pubg-insight-match-cache` bucket | raw match cache (`matches/`), Athena feed (`analytics/`), Athena results (`athena-results/`) |
+| 2 | S3 | `pubg-insight-frontend` bucket, static website hosting enabled | serves the built frontend |
+| 3 | DynamoDB | `pubg-insight-analysis-history` table (PK `playerId`, SK `matchId`) | saved analyses |
+| 4 | DynamoDB | `pubg-insight-season-stats-cache` table (PK `playerId`, TTL `expiresAt`) | 1h season-stats cache |
+| 5 | Elastic Beanstalk | application `pubg-insight-backend` + environment (Java/Corretto platform) | hosts this backend |
+| 6 | IAM | `aws-elasticbeanstalk-ec2-role` — `AmazonS3FullAccess`, `AmazonDynamoDBFullAccess`, inline policy for `athena:StartQueryExecution/GetQueryExecution/GetQueryResults` + `glue:GetTable/GetDatabase` scoped to `pubg_insight` | lets the running backend call S3/DynamoDB/Athena |
+| 7 | CloudFront | distribution fronting the S3 frontend bucket (custom HTTP origin, redirect-to-https) | HTTPS + edge caching for the SPA |
+| 8 | CloudFront | distribution fronting the Elastic Beanstalk backend (custom HTTP origin, CachingDisabled + AllViewer policy) | fixes browser mixed-content blocking |
+| 9 | Athena | database `pubg_insight`, external table `pubg_insight_analytics` (manual DDL, `org.openx.data.jsonserde.JsonSerDe`, location `s3://pubg-insight-match-cache/analytics/`) | population-comparison queries |
+| 10 | Lambda | function `pubg-insight-share-analysis` (Node.js 20.x, source `lambda/share-analysis/index.mjs`) | serves the public share page |
+| 11 | IAM | `pubg-insight-share-lambda-role` — `dynamodb:GetItem` on `pubg-insight-analysis-history` only | least-privilege role for the Lambda above |
+| 12 | API Gateway | HTTP API with route `GET /share/{playerId}/{matchId}` → the Lambda above, plus a resource-based Lambda permission for `apigateway.amazonaws.com` | public share URL |
+| 13 | ECR | repository `pubg-insight-season-stats-cache-warmer` | holds the cache-warmer container image |
+| 14 | ECS | cluster `pubg-insight`, Fargate task definition `pubg-insight-season-stats-cache-warmer` (source `season-stats-cache-warmer/`) | scheduled cache-warming job |
+| 15 | IAM | `ecsTaskExecutionRole` (standard `AmazonECSTaskExecutionRolePolicy`), `pubg-insight-season-stats-warmer-task-role` (`dynamodb:Scan` on analysis-history only) | ECS execution + task roles |
+| 16 | EventBridge Scheduler | schedule `pubg-insight-season-stats-cache-warmer`, `rate(6 hours)`, target = the ECS task above | triggers the cache warmer automatically |
+| 17 | IAM | `pubg-insight-scheduler-ecs-role` — `ecs:RunTask` + `iam:PassRole`, scoped to the cluster/task-definition/roles above | lets EventBridge Scheduler start the ECS task |
+
+Full AWS CLI commands used to provision every resource above are preserved in this repository's commit history (each addition landed as its own commit around the corresponding feature — e.g. search commit messages for "Athena", "CloudFront", "ECS Fargate"). There is no single setup script that runs all of them end-to-end; they were created incrementally as each AWS category was added.
+
 ---
 
 ## Deployment
 
-`deploy.sh` builds and deploys the backend to the existing Elastic Beanstalk environment:
+Once the resources above exist, `deploy.sh` (repo root) builds and ships the **backend** to the existing Elastic Beanstalk environment:
 
 ```bash
 ./deploy.sh
 ```
 
-It runs `mvn clean package` (requires real Maven Central network access), uploads the resulting jar to S3, creates a new Elastic Beanstalk application version, and updates the `Pubg-insight-backend-env` environment to that version.
+It runs `mvn clean package` (requires real Maven Central network access) → uploads the resulting jar to the EB-managed S3 bucket → `aws elasticbeanstalk create-application-version` → `aws elasticbeanstalk update-environment` → waits for the environment to report `Ready`/`Green`.
 
-The Lambda (`lambda/share-analysis/`) and the ECS Fargate job (`season-stats-cache-warmer/`) are deployed and scheduled separately — see `docs/deliverables/ARCHITECTURE.md` for details.
+The **frontend** deploys separately (from the `pubg-insight-frontend` repo):
+
+```bash
+npm run build
+aws s3 sync dist/ s3://pubg-insight-frontend/ --delete
+aws cloudfront create-invalidation --distribution-id <frontend-distribution-id> --paths "/*"
+```
+
+The **Lambda** (`lambda/share-analysis/`) redeploys with a plain zip upload — no build step, since it has no npm dependencies (Lambda's Node.js 20.x runtime already bundles the AWS SDK v3 packages it imports):
+
+```bash
+cd lambda/share-analysis
+zip -q function.zip index.mjs
+aws lambda update-function-code --function-name pubg-insight-share-analysis --zip-file fileb://function.zip
+```
+
+The **ECS cache-warmer container** (`season-stats-cache-warmer/`) redeploys by rebuilding and re-pushing its image, then letting the next scheduled run (or a manual `aws ecs run-task`) pick up `:latest`:
+
+```bash
+cd season-stats-cache-warmer
+docker build --platform linux/amd64 -t pubg-insight-season-stats-cache-warmer:latest .
+docker tag pubg-insight-season-stats-cache-warmer:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/pubg-insight-season-stats-cache-warmer:latest
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/pubg-insight-season-stats-cache-warmer:latest
+```
+
+None of these four deploy paths depend on each other — redeploying the backend does not require redeploying the Lambda or the ECS image, and vice versa.
 
 ---
 
