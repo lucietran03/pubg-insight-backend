@@ -85,6 +85,8 @@ export const handler = async (event) => {
   const topStrengths = (item.strengths ?? []).slice(0, 3);
   const topRecommendation = item.recommendations?.[0];
   const survivedMinutes = item.timeSurvivedSeconds != null ? Math.round(item.timeSurvivedSeconds / 60) : null;
+  // Deep-links back into this exact analysis instead of dropping the viewer on the bare homepage.
+  const deepLinkUrl = `${APP_URL}/?playerId=${encodeURIComponent(playerId)}&matchId=${encodeURIComponent(matchId)}`;
 
   const body = `
     <h1>${escapeHtml(item.mapName)} · ${escapeHtml(item.gameMode)}</h1>
@@ -100,7 +102,7 @@ export const handler = async (event) => {
       ? `<div class="section-label">WHAT WENT WELL</div>${topStrengths.map((s) => `<p class="strength">✓ ${escapeHtml(s)}</p>`).join("")}`
       : ""}
     ${topRecommendation ? `<div class="section-label">KEY COACHING ADVICE</div><p class="recommendation">${escapeHtml(topRecommendation)}</p>` : ""}
-    <a class="cta" href="${escapeHtml(APP_URL)}">View full analysis on PUBG Insight</a>
+    <a class="cta" href="${escapeHtml(deepLinkUrl)}">View full analysis on PUBG Insight</a>
   `;
 
   return page(`${item.mapName} analysis`, body, 200);

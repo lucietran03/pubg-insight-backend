@@ -66,6 +66,22 @@ public class PubgApiClient {
         }
     }
 
+    public PubgPlayerListResponse findPlayerById(String accountId) {
+        rateLimiter.acquire();
+        try {
+            return restClient.get()
+                    .uri("/shards/{shard}/players?filter[playerIds]={id}", defaultShard, accountId)
+                    .retrieve()
+                    .body(PubgPlayerListResponse.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            return new PubgPlayerListResponse(List.of());
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            throw toRateLimitException(e);
+        } catch (RestClientException e) {
+            throw new PubgApiException("PUBG API request failed for account '" + accountId + "'", e);
+        }
+    }
+
     public PubgMatchResponse findMatchById(String matchId) {
         rateLimiter.acquire();
         try {

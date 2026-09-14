@@ -20,6 +20,13 @@ public class PlayerController {
         return playerService.searchPlayerByName(name);
     }
 
+    // Distinct route (not an overload of getPlayerByName) since PUBG account ids and
+    // display names are both single path segments with no shared prefix to disambiguate on.
+    @GetMapping("/by-id/{accountId}")
+    public PlayerDto getPlayerById(@PathVariable String accountId) {
+        return playerService.findPlayerById(accountId);
+    }
+
     @GetMapping("/{playerId}/season-stats")
     public SeasonStatsDto getSeasonStats(@PathVariable String playerId) {
         return playerService.getSeasonStats(playerId);

@@ -47,6 +47,18 @@ public class PlayerService {
         return playerMapper.toPlayerDto(response.data().get(0));
     }
 
+    // Used to resolve a share link's bare account id back into a displayable player -
+    // the share flow only stores accountId, never the display name.
+    public PlayerDto findPlayerById(String accountId) {
+        PubgPlayerListResponse response = pubgApiClient.findPlayerById(accountId);
+
+        if (response.data() == null || response.data().isEmpty()) {
+            throw new PlayerNotFoundException(accountId);
+        }
+
+        return playerMapper.toPlayerDto(response.data().get(0));
+    }
+
     public SeasonStatsDto getSeasonStats(String accountId) {
         SeasonStatsDto cached = readFromCache(accountId);
         if (cached != null) {
