@@ -19,7 +19,8 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:5173",
-                                "http://pubg-insight-frontend.s3-website-us-east-1.amazonaws.com")
+                                "http://pubg-insight-frontend.s3-website-us-east-1.amazonaws.com",
+                                "https://d13c09lhflfxxl.cloudfront.net")
                         .allowedMethods("*")
                         .allowedHeaders("*");
 
