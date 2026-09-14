@@ -147,6 +147,8 @@ Full AWS CLI commands used to provision every resource above are preserved in th
 
 ## Deployment
 
+> This section is only relevant if you want to ship changes to the live AWS environment yourself. Running or grading the project locally (see **Getting Started / Local Setup** above) does not require any of this.
+
 Once the resources above exist, `deploy.sh` (repo root) builds and ships the **backend** to the existing Elastic Beanstalk environment:
 
 ```bash
