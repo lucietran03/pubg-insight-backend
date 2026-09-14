@@ -1,0 +1,150 @@
+<mxGraphModel dx="1400" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1850" pageHeight="1000" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <mxCell id="n1" value="User / Browser" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=13;fontStyle=1;verticalAlign=middle;align=center;fillColor=#F5F5F5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="860" y="40" width="200" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n2" value="Amazon CloudFront&#10;(Frontend CDN)&#10;d13c09lhflfxxl.cloudfront.net" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#B0E3E6;strokeColor=#0B7B79;fontColor=#0B7B79;" vertex="1" parent="1">
+      <mxGeometry x="300" y="180" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n3" value="Amazon CloudFront&#10;(API CDN)&#10;d14f53mm16f0g1.cloudfront.net" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#B0E3E6;strokeColor=#0B7B79;fontColor=#0B7B79;" vertex="1" parent="1">
+      <mxGeometry x="1100" y="180" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n4" value="Amazon S3&#10;pubg-insight-frontend&#10;(static website hosting)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#3D5C2A;" vertex="1" parent="1">
+      <mxGeometry x="300" y="340" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n5" value="Elastic Beanstalk&#10;Spring Boot Backend&#10;Pubg-insight-backend-env" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#7A5900;" vertex="1" parent="1">
+      <mxGeometry x="1100" y="340" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n6" value="API Gateway&#10;(HTTP API)&#10;GET /share/{playerId}/{matchId}" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#7A5900;" vertex="1" parent="1">
+      <mxGeometry x="40" y="500" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n7" value="AWS Lambda&#10;pubg-insight-share-analysis&#10;(Node.js 20.x)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFE6CC;strokeColor=#D79B00;fontColor=#7A5900;" vertex="1" parent="1">
+      <mxGeometry x="300" y="500" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n8" value="EventBridge Scheduler&#10;rate(6 hours)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#7A6B1E;" vertex="1" parent="1">
+      <mxGeometry x="1340" y="500" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n9" value="ECS Fargate Task&#10;season-stats-cache-warmer&#10;cluster: pubg-insight" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#7A6B1E;" vertex="1" parent="1">
+      <mxGeometry x="1600" y="500" width="220" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n10" value="Amazon ECR&#10;pubg-insight-season-stats-&#10;cache-warmer (image repo)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#7A6B1E;" vertex="1" parent="1">
+      <mxGeometry x="1600" y="660" width="220" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n11" value="Amazon S3&#10;pubg-insight-match-cache&#10;matches/ · analytics/ · athena-results/" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#3D5C2A;" vertex="1" parent="1">
+      <mxGeometry x="620" y="680" width="220" height="90" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n12" value="DynamoDB&#10;pubg-insight-analysis-history&#10;PK: playerId · SK: matchId" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#2F4F7A;" vertex="1" parent="1">
+      <mxGeometry x="860" y="680" width="220" height="90" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n13" value="DynamoDB&#10;pubg-insight-season-stats-cache&#10;PK: playerId · TTL: expiresAt" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#2F4F7A;" vertex="1" parent="1">
+      <mxGeometry x="1100" y="680" width="220" height="90" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n14" value="Amazon Athena + Glue&#10;pubg_insight.pubg_insight_analytics&#10;(population comparison query)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#E1D5E7;strokeColor=#9673A6;fontColor=#5C3D66;" vertex="1" parent="1">
+      <mxGeometry x="1340" y="680" width="240" height="90" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n15" value="PUBG Official API&#10;(third-party)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#333333;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="620" y="840" width="200" height="70" as="geometry" />
+    </mxCell>
+
+    <mxCell id="n16" value="Google Gemini API&#10;(third-party)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fontSize=11;fontStyle=1;verticalAlign=middle;align=center;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#333333;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="860" y="840" width="200" height="70" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e1" value="HTTPS (page load)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n1" target="n2">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e2" value="custom origin (HTTP)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n2" target="n4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e3" value="runtime axios calls (HTTPS)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n1" target="n3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e4" value="custom origin (HTTP)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n3" target="n5">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e5" value="REST, Bearer token" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n5" target="n15">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e6" value="REST, API key" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n5" target="n16">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e7" value="cache-aside get/put" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n5" target="n11">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e8" value="PutItem / Query" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n5" target="n12">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e9" value="cache-aside GetItem/PutItem" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n5" target="n13">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e10" value="StartQueryExecution /&#10;GetQueryResults" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n5" target="n14">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e11" value="reads analytics/,&#10;writes athena-results/" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n14" target="n11">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e12" value="clicks share link (HTTPS)" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n1" target="n6">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e13" value="Lambda proxy integration" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n6" target="n7">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e14" value="GetItem" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n7" target="n12">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e15" value="triggers every 6h" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n8" target="n9">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e16" value="pulls container image" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n9" target="n10">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e17" value="Scan distinct playerIds" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n9" target="n12">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e18" value="warms cache: GET /season-stats" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=0;fontSize=10;" edge="1" parent="1" source="n9" target="n5">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="lgd" value="Compute&#10;Containers&#10;Storage&#10;Database&#10;Networking / CDN&#10;Analytics&#10;Third-party (external)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=10;align=left;spacingLeft=8;fillColor=#FFFFFF;strokeColor=#CCCCCC;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="40" y="820" width="160" height="120" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd1" value="" style="rounded=1;fillColor=#FFE6CC;strokeColor=#D79B00;" vertex="1" parent="1">
+      <mxGeometry x="48" y="828" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd2" value="" style="rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656;" vertex="1" parent="1">
+      <mxGeometry x="48" y="844" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd3" value="" style="rounded=1;fillColor=#D5E8D4;strokeColor=#82B366;" vertex="1" parent="1">
+      <mxGeometry x="48" y="860" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd4" value="" style="rounded=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;" vertex="1" parent="1">
+      <mxGeometry x="48" y="876" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd5" value="" style="rounded=1;fillColor=#B0E3E6;strokeColor=#0B7B79;" vertex="1" parent="1">
+      <mxGeometry x="48" y="892" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd6" value="" style="rounded=1;fillColor=#E1D5E7;strokeColor=#9673A6;" vertex="1" parent="1">
+      <mxGeometry x="48" y="908" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd7" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#666666;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="48" y="924" width="14" height="14" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

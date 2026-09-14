@@ -1,159 +1,134 @@
 # PUBG Insight Backend
 
-Backend service for **PUBG Insight – AI-powered Performance Analytics Platform**.
+Backend service for **PUBG Insight — AI-powered Performance Analytics Platform**.
 
-This repository contains the REST API, business logic, integrations with AWS services, PUBG Developer API, and Gemini API.
-
----
-
-# Project Overview
-
-PUBG Insight is a cloud-native analytics platform that transforms PUBG gameplay statistics into meaningful performance insights.
-
-Instead of simply displaying raw statistics, the backend retrieves player data, processes gameplay metrics, generates AI-assisted summaries, and stores historical analysis for future analytics.
+A Spring Boot REST API that turns raw PUBG match/season data into readable performance insights: it fetches player and match data from the PUBG Developer API, generates AI summaries via Google Gemini, caches and persists results across a set of AWS services, and serves everything to the [React frontend](../pubg-insight-frontend).
 
 ---
 
-# Responsibilities
-
-The backend is responsible for:
-
-- Exposing REST APIs
-- Integrating with the PUBG Developer API
-- Processing gameplay statistics
-- Calling the Gemini API for AI insights
-- Managing historical analysis data
-- Communicating with AWS services
-- Providing analytics data for the frontend dashboard
-
----
-
-# Technology Stack
+## Tech Stack
 
 | Category | Technology |
-|-----------|------------|
+|---|---|
 | Language | Java 21 |
-| Framework | Spring Boot 3 |
+| Framework | Spring Boot 4.1.0 (Spring MVC / `RestClient`, synchronous) |
 | Build Tool | Maven |
-| REST API | Spring Web |
 | Validation | Jakarta Validation |
 | AWS SDK | AWS SDK v2 |
-| Database | DynamoDB |
-| Storage | Amazon S3 |
-| Deployment | AWS Elastic Beanstalk |
 | AI | Google Gemini API |
 | External API | PUBG Developer API |
+| Deployment | AWS Elastic Beanstalk (behind CloudFront) |
 
 ---
 
-# High-Level Architecture
+## Architecture
+
+The backend is organized **by feature, not by technical layer**, under `src/main/java/com/pubginsight/`:
 
 ```
-Frontend (React)
-        │
-        ▼
-Spring Boot REST API
-        │
-        ├── PUBG Developer API
-        ├── Gemini API
-        ├── DynamoDB
-        ├── Amazon S3
-        └── Amazon Athena (future analytics)
+com.pubginsight
+├── player/              # player search, season stats
+├── match/               # match analytics, weapon breakdown, Athena population comparison
+├── insight/             # AI-generated insights (composes player + match, calls Gemini)
+├── history/             # saved analysis history (composes match + insight, backed by DynamoDB)
+├── health/              # health check endpoint
+├── client/
+│   ├── pubg/            # PUBG Developer API integration
+│   ├── gemini/          # Google Gemini API integration
+│   ├── s3/              # S3 match-cache client
+│   ├── dynamodb/        # DynamoDB analysis-history / season-stats-cache client
+│   ├── athena/          # Athena analytics-query client
+│   └── telemetry/       # PUBG match telemetry (weapon/kill/hit events)
+└── common/
+    ├── config/          # cross-cutting config (CORS, etc.)
+    └── exception/       # global exception handling
 ```
+
+Feature packages own their own controller, service, mapper, DTOs, and exceptions; `client/*` packages are pure external-integration wrappers with no feature-specific logic. `insight` and `history` are composition features that call other features' services directly rather than duplicating logic.
+
+Each feature package's controller is a good jumping-off point for the API surface: `PlayerController`, `MatchController`, `WeaponBreakdownController`, `InsightController`, `HistoryController`, `HealthController`.
+
+For the full system diagrams (sequence flows, data mapping, design-decision rationale) see **[`docs/deliverables/ARCHITECTURE.md`](docs/deliverables/ARCHITECTURE.md)**.
+
+### AWS services
+
+This backend integrates with AWS services across six categories, each invoked by real application code (not console-only setup):
+
+| Service | Why |
+|---|---|
+| **Elastic Beanstalk** | Hosts the backend itself (`Pubg-insight-backend-env`). |
+| **Lambda + API Gateway** | Standalone Node.js Lambda (`lambda/share-analysis/`) behind an HTTP API serves a public, shareable "report card" for a saved analysis — `GET /share/{playerId}/{matchId}` — reading DynamoDB directly, independent of the main app. |
+| **ECS Fargate + EventBridge Scheduler** | A standalone containerized job (`season-stats-cache-warmer/`) runs on a schedule to proactively refresh cached season stats for recently-searched players, reducing live PUBG API calls. |
+| **S3** | `pubg-insight-frontend` bucket hosts the static frontend; `pubg-insight-match-cache` bucket holds the raw match cache, a flat analytics feed, and Athena query results. |
+| **CloudFront** | Two distributions — one fronting the S3 frontend, one fronting the Elastic Beanstalk backend — for HTTPS and edge caching. |
+| **DynamoDB** | `pubg-insight-analysis-history` (saved analyses) and `pubg-insight-season-stats-cache` (1h TTL cache for PUBG season stats). |
+| **Athena + Glue** | Queries an external table over the S3 analytics feed to compute cross-player damage percentiles, exposed via a backend endpoint (`/population-comparison`). |
+| **PUBG Developer API / Google Gemini API** | Third-party APIs: raw player/match data, and AI-generated performance insights. |
 
 ---
 
-# Planned Package Structure
+## API Overview
 
-```
-src/main/java/com/pubginsight
+All endpoints are under `/api`. See the controllers listed above for full request/response shapes, or the sequence diagrams in `ARCHITECTURE.md` for end-to-end flow.
 
-├── config
-├── controller
-├── dto
-├── exception
-├── model
-├── repository
-├── service
-├── client
-│   ├── pubg
-│   └── gemini
-└── util
-```
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/health` | Health check |
+| `GET` | `/api/players/{name}` | Search a player by in-game name |
+| `GET` | `/api/players/by-id/{accountId}` | Look up a player by PUBG account id |
+| `GET` | `/api/players/{playerId}/season-stats` | Current-season win rate / aggregate stats |
+| `GET` | `/api/players/{playerId}/matches/{matchId}` | Match stats for a specific player |
+| `GET` | `/api/players/{playerId}/matches/{matchId}/population-comparison` | Athena-backed damage percentile vs. all cached matches |
+| `GET` | `/api/players/{playerId}/matches/{matchId}/weapons` | Weapon/kill breakdown from match telemetry |
+| `GET` | `/api/players/{playerId}/matches/{matchId}/insights` | AI-generated insight summary (Gemini) |
+| `POST` | `/api/players/{playerId}/matches/{matchId}/history` | Save a match + insight to analysis history (DynamoDB) |
+| `GET` | `/api/players/{playerId}/history` | List saved analysis history for a player |
 
----
-
-# Development Workflow
-
-```
-Client Request
-        │
-        ▼
-Controller
-        │
-        ▼
-Service
-        │
-        ├── PUBG API
-        ├── Gemini API
-        ├── DynamoDB
-        └── S3
-        │
-        ▼
-Response DTO
-```
+A separate, Spring-independent endpoint is served by the Lambda: `GET /share/{playerId}/{matchId}` (public, read-only, backed directly by DynamoDB).
 
 ---
 
-# Current Development Roadmap
+## Getting Started / Local Setup
 
-- [ ] Initialize Spring Boot project
-- [ ] Configure project structure
-- [ ] Health Check endpoint
-- [ ] PUBG API integration
-- [ ] AI integration
-- [ ] DynamoDB integration
-- [ ] S3 integration
-- [ ] Athena integration
-- [ ] Authentication
-- [ ] Deployment
+**Prerequisites:** Java 21, Maven (or use the bundled `./mvnw`), AWS credentials resolvable via the SDK's default credential provider chain (e.g. `~/.aws/credentials`) if you want to exercise the AWS-backed endpoints locally.
 
----
+1. Edit `src/main/resources/application-local.yml` (gitignored — put real secrets directly in it, Spring Boot does not read `.env` files) with your real API keys:
 
-# Environment Variables
+   ```yaml
+   pubg:
+     api:
+       key: <your PUBG API key>
+   gemini:
+     api:
+       key: <your Gemini API key>
+   ```
 
-```
-PUBG_API_KEY=
+   `spring.profiles.active: local` is already the default in `application.yml`, so this file is picked up automatically — no extra flag needed.
 
-GEMINI_API_KEY=
+2. Run:
 
-AWS_REGION=
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-AWS_ACCESS_KEY_ID=
-
-AWS_SECRET_ACCESS_KEY=
-
-AWS_S3_BUCKET=
-
-AWS_DYNAMODB_TABLE=
-```
+3. The backend runs on `http://localhost:8080`.
 
 ---
 
-# Running the Project
+## Deployment
+
+`deploy.sh` builds and deploys the backend to the existing Elastic Beanstalk environment:
 
 ```bash
-./mvnw spring-boot:run
+./deploy.sh
 ```
 
-Backend runs on
+It runs `mvn clean package` (requires real Maven Central network access), uploads the resulting jar to S3, creates a new Elastic Beanstalk application version, and updates the `Pubg-insight-backend-env` environment to that version.
 
-```
-http://localhost:8080
-```
+The Lambda (`lambda/share-analysis/`) and the ECS Fargate job (`season-stats-cache-warmer/`) are deployed and scheduled separately — see `docs/deliverables/ARCHITECTURE.md` for details.
 
 ---
 
-# Project Status
+## Further Reading
 
-🚧 Under Development
+For full architecture — system context, component diagrams, per-feature sequence diagrams, data mapping, error-handling flow, and design-decision rationale — see **[`docs/deliverables/ARCHITECTURE.md`](docs/deliverables/ARCHITECTURE.md)**.

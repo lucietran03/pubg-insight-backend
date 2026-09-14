@@ -9,36 +9,51 @@ Diagrams use [Mermaid](https://mermaid.js.org/) syntax, which GitHub renders nat
 3. Sequence Diagrams — request-by-request runtime behavior, one per feature
 4. Data Mapping — how PUBG's raw wire format becomes this app's DTOs
 5. Error Handling Flow — exception paths end to end
+6. Design Decisions — the decision log (D1–Dn)
+7. Full AWS Architecture — every deployed AWS service, how it's wired, and why
 
 ---
 
 ## 1. System Context
 
+Every AWS service below is live, deployed to a real personal AWS account (D17), and invoked by the app's own code — none of this is console-only or planned. See §7 for the full deployed topology and §6 for the design decisions behind each addition.
+
 ```mermaid
 flowchart TB
     User(["User / Browser"])
-    FE["React Frontend\n(pubg-insight-frontend)"]
-    BE["Spring Boot Backend\n(pubg-insight-backend)"]
+    CFFE["CloudFront\n(frontend distribution)\nd13c09lhflfxxl.cloudfront.net"]
+    CFBE["CloudFront\n(backend distribution)\nd14f53mm16f0g1.cloudfront.net"]
+    FE["React Frontend\n(pubg-insight-frontend, S3-hosted)"]
+    BE["Spring Boot Backend\n(pubg-insight-backend)\nElastic Beanstalk"]
     PUBG[("PUBG Developer API\n(external)")]
     Gemini[("Google Gemini API\n(external)")]
-    S3[("Amazon S3\n(match cache — code exists,\nnot yet deployed/tested live)")]
-    DDB[("DynamoDB\n(analysis history — code exists,\nnot yet deployed/tested live)")]
-    AWS[("AWS: Elastic Beanstalk / API Gateway / Lambda / Athena\n(not yet integrated — see §7)")]
+    S3[("Amazon S3\nmatch cache + analytics feed")]
+    DDB[("DynamoDB\nanalysis history +\nseason-stats cache")]
+    Athena[("Amazon Athena\npopulation-comparison queries")]
+    APIGW["API Gateway\nGET /share/{playerId}/{matchId}"]
+    Lambda["Lambda\npubg-insight-share-analysis"]
+    EventBridge["EventBridge Scheduler\nrate(6 hours)"]
+    ECS["ECS Fargate\nseason-stats cache warmer\n(cluster pubg-insight)"]
 
-    User -->|HTTPS| FE
-    FE -->|REST/JSON, axios| BE
+    User -->|HTTPS| CFFE
+    CFFE -->|custom HTTP origin| FE
+    User -->|"Share Link" HTTPS| APIGW
+    APIGW --> Lambda
+    Lambda -->|GetItem| DDB
+    FE -->|REST/JSON, axios| CFBE
+    CFBE -->|custom HTTP origin, CachingDisabled| BE
     BE -->|REST, Bearer token| PUBG
     BE -->|REST, API key| Gemini
-    BE -.->|AWS SDK, cache-aside| S3
-    BE -.->|AWS SDK, put/query| DDB
-    BE -.->|planned| AWS
-
-    style S3 stroke-dasharray: 5 5
-    style DDB stroke-dasharray: 5 5
-    style AWS stroke-dasharray: 5 5
+    BE -->|AWS SDK, cache-aside| S3
+    BE -->|AWS SDK, put/query| DDB
+    BE -->|AWS SDK, StartQueryExecution| Athena
+    Athena -->|reads analytics/ prefix| S3
+    EventBridge -->|RunTask, every 6h| ECS
+    ECS -->|Scan playerIds| DDB
+    ECS -->|GET /api/players/{id}/season-stats| CFBE
 ```
 
-**Hard rule enforced today, verified by code inspection**: the frontend has exactly one external call surface (`src/api/axios.ts`, `baseURL = VITE_API_BASE_URL`). It never imports or calls PUBG/Gemini/AWS directly — every such call happens through the backend.
+**Hard rule enforced today, verified by code inspection**: the frontend has exactly one external call surface (`src/api/axios.ts`, `baseURL = VITE_API_BASE_URL`, now pointed at the backend CloudFront distribution) plus one deliberate second surface for the share feature (`VITE_SHARE_API_BASE_URL`, the API Gateway domain, used only by `AiInsights.tsx`'s "Copy Share Link" button to build a URL — the frontend never calls Lambda's DynamoDB read directly, it just links to the public page Lambda renders). Neither PUBG nor Gemini nor any other AWS service is ever called directly from the browser — every such call happens through the backend or the standalone Lambda.
 
 ---
 
@@ -51,8 +66,9 @@ flowchart TB
     subgraph client["client/ — external API integrations"]
         pubg["client.pubg\nPubgApiClient, PubgApiProperties,\nPubgApiException, PubgRateLimitException, dto/*"]
         gemini["client.gemini\nGeminiApiClient, GeminiApiProperties,\nGeminiApiException, dto/*"]
-        s3["client.s3\nS3MatchCacheClient, S3ClientConfig,\nAwsS3Properties, S3CacheException"]
-        ddb["client.dynamodb\nAnalysisHistoryItem, DynamoDbClientConfig,\nAwsDynamoDbProperties, AnalysisHistoryException"]
+        s3["client.s3\nS3MatchCacheClient, S3AnalyticsWriter,\nS3ClientConfig, AwsS3Properties, S3CacheException"]
+        ddb["client.dynamodb\nAnalysisHistoryItem, SeasonStatsCacheItem,\nDynamoDbClientConfig, AwsDynamoDbProperties,\nAnalysisHistoryException, SeasonStatsCacheException"]
+        athena["client.athena\nAthenaAnalyticsClient, AthenaClientConfig,\nAwsAthenaProperties, PopulationComparison, AthenaQueryException"]
     end
 
     subgraph common["common/ — cross-cutting concerns"]
@@ -62,15 +78,17 @@ flowchart TB
 
     subgraph features["feature packages"]
         health["health\nHealthController"]
-        player["player\nPlayerController, PlayerService,\nPlayerMapper, PlayerDto,\nSeasonStatsDto, PlayerNotFoundException"]
+        player["player\nPlayerController, PlayerService,\nPlayerMapper, PlayerDto, SeasonStatsDto,\nSeasonStatsCacheRepository, PlayerNotFoundException"]
         match["match\nMatchController, MatchService,\nMatchMapper, MatchDto,\nMatchNotFoundException"]
         insight["insight\nInsightController, InsightService,\nInsightDto"]
         history["history\nHistoryController, HistoryService,\nAnalysisHistoryRepository, AnalysisHistoryMapper,\nAnalysisHistoryDto"]
     end
 
     player --> pubg
+    player --> ddb
     match --> pubg
     match --> s3
+    match --> athena
     insight --> player
     insight --> match
     insight --> gemini
@@ -82,17 +100,14 @@ flowchart TB
     exc --> pubg
     exc --> gemini
     exc --> ddb
-
-    style s3 stroke-dasharray: 5 5
-    style ddb stroke-dasharray: 5 5
-    style history stroke-dasharray: 5 5
+    exc --> athena
 ```
 
 `insight` and `history` are higher-level features that compose other features (calling their public `Service` classes directly, reusing orchestration already built) rather than duplicating that logic — `insight` composes `player`+`match`; `history` composes `match`+`insight`. This is different from the sibling `player`/`match` relationship — they don't depend on each other, but a feature that needs others is free to depend on them.
 
 Notable design point: `common.exception` depends on every feature/client whose exceptions it catches, but the feature packages never depend on each other in a cycle, and none of them depend back on `common.exception`. This keeps features independent of one another — a change to `match/` cannot break `player/`.
 
-`client.s3` and `client.dynamodb` (dashed above) have real code — see §7 — but have not been deployed or tested against real AWS yet; `match`'s dependency on `s3` and `history`'s dependency on `ddb` are both live in the codebase today, just unverified end-to-end.
+All of `client.s3`, `client.dynamodb`, and `client.athena` are deployed and verified live end-to-end (see §7) — `match`'s dependency on `s3` (match cache + the new analytics feed) and `athena` (population comparison), and `player`'s new dependency on `ddb` (season-stats cache-aside, alongside `history`'s pre-existing one for analysis history) are all exercised by real production traffic, not just present in the codebase.
 
 ### Frontend structure
 
@@ -217,7 +232,7 @@ sequenceDiagram
 
 ### 3.3 Season Stats (Win Rate)
 
-Win rate cannot be derived from a single match — it is a season-level aggregate. This is a separate endpoint, fetched independently when a player is found (see Design Decision D5).
+Win rate cannot be derived from a single match — it is a season-level aggregate. This is a separate endpoint, fetched independently when a player is found (see Design Decision D5). A DynamoDB read-through cache (`pubg-insight-season-stats-cache`, 1-hour TTL, D22) now sits in front of the PUBG calls below — added specifically so the ECS Fargate cache warmer (§3.9) has somewhere to write, and so repeat visits to an already-searched player cost zero PUBG calls for up to an hour.
 
 ```mermaid
 sequenceDiagram
@@ -226,6 +241,8 @@ sequenceDiagram
     participant SVC as seasonStatsService.ts
     participant C as PlayerController
     participant S as PlayerService
+    participant Repo as SeasonStatsCacheRepository
+    participant DDB as DynamoDB\n(pubg-insight-season-stats-cache)
     participant CL as PubgApiClient
     participant PUBG as PUBG API
     participant M as PlayerMapper
@@ -234,27 +251,41 @@ sequenceDiagram
     FE->>SVC: getSeasonStats(playerId)
     SVC->>C: GET /api/players/{playerId}/season-stats
     C->>S: getSeasonStats(accountId)
-    S->>CL: findCurrentSeasonId()
-    CL->>PUBG: GET /shards/{shard}/seasons
-    PUBG-->>CL: PubgSeasonListResponse
-    CL->>CL: find entry where isCurrentSeason == true
-    CL-->>S: seasonId
-    S->>CL: findSeasonStats(accountId, seasonId)
-    CL->>PUBG: GET /shards/{shard}/players/{accountId}/seasons/{seasonId}
-    alt PUBG returns 404
-        PUBG-->>CL: 404
-        CL-->>S: null
-        S-->>C: throw PlayerNotFoundException
-        C-->>FE: 404 {error}
-    else PUBG returns season stats
-        PUBG-->>CL: 200 PubgSeasonStatsResponse\n(gameModeStats: Map<mode, {wins, roundsPlayed}>)
-        CL-->>S: PubgSeasonStatsResponse
-        S->>M: toSeasonStatsDto(attributes)
-        M->>M: sum wins & roundsPlayed across ALL modes\nwinRate = totalWins / totalRounds (0 if no rounds)
-        M-->>S: SeasonStatsDto
+    S->>Repo: findByPlayerId(accountId)
+    Repo->>DDB: GetItem
+    alt cache hit, not expired
+        DDB-->>Repo: item {json, expiresAt}
+        Repo-->>S: Optional.of(item)
+        S->>S: deserialize json -> SeasonStatsDto\n(skip PUBG calls entirely)
         S-->>C: SeasonStatsDto
         C-->>FE: 200 JSON
         FE-->>U: renders "Season Win Rate: XX.X%"
+    else cache miss, expired, or SeasonStatsCacheException
+        Repo-->>S: Optional.empty() / throws (caught, treated as miss)
+        S->>CL: findCurrentSeasonId()
+        CL->>PUBG: GET /shards/{shard}/seasons
+        PUBG-->>CL: PubgSeasonListResponse
+        CL->>CL: find entry where isCurrentSeason == true
+        CL-->>S: seasonId
+        S->>CL: findSeasonStats(accountId, seasonId)
+        CL->>PUBG: GET /shards/{shard}/players/{accountId}/seasons/{seasonId}
+        alt PUBG returns 404
+            PUBG-->>CL: 404
+            CL-->>S: null
+            S-->>C: throw PlayerNotFoundException
+            C-->>FE: 404 {error}
+        else PUBG returns season stats
+            PUBG-->>CL: 200 PubgSeasonStatsResponse\n(gameModeStats: Map<mode, {wins, roundsPlayed}>)
+            CL-->>S: PubgSeasonStatsResponse
+            S->>M: toSeasonStatsDto(attributes)
+            M->>M: sum wins & roundsPlayed across ALL modes\nwinRate = totalWins / totalRounds (0 if no rounds)
+            M-->>S: SeasonStatsDto
+            S->>Repo: save(playerId, json, expiresAt = now + 1h)
+            Repo->>DDB: PutItem\n(soft-failed and logged on error - never fails the request)
+            S-->>C: SeasonStatsDto
+            C-->>FE: 200 JSON
+            FE-->>U: renders "Season Win Rate: XX.X%"
+        end
     end
 ```
 
@@ -300,17 +331,18 @@ sequenceDiagram
     end
 ```
 
-### 3.5 Match caching (S3) — not yet deployed, code only
+### 3.5 Match caching (S3) + analytics feed write
 
-Modifies the Match Analytics flow (§3.2): a cache-aside check runs before calling PUBG, since a completed match's data is immutable and not player-specific — one cached object serves every player who looks up that match.
+Modifies the Match Analytics flow (§3.2): a cache-aside check runs before calling PUBG, since a completed match's data is immutable and not player-specific — one cached object serves every player who looks up that match. Every successful lookup (cache hit or miss) also fires a best-effort write to a second, separate S3 prefix (`analytics/{matchId}-{playerId}.json`) via `S3AnalyticsWriter` — a flat, per-player record purpose-built for Athena (§3.8), kept deliberately separate from the raw JSON:API match cache below because that raw shape is fragile to query (mixed `included[]` item types).
 
 ```mermaid
 sequenceDiagram
     participant S as MatchService
     participant S3C as S3MatchCacheClient
-    participant S3 as Amazon S3
+    participant S3 as Amazon S3\n(pubg-insight-match-cache)
     participant CL as PubgApiClient
     participant PUBG as PUBG API
+    participant AW as S3AnalyticsWriter
 
     S->>S3C: getCachedMatchJson(matchId)
     alt cache hit
@@ -330,9 +362,16 @@ sequenceDiagram
         S3C-->>S: throws S3CacheException
         S->>S: log.warn(...), treat as cache miss\n(a broken cache must never break the feature)
     end
+    Note over S: after resolving the match (either path above),\ntoMatchDto() runs and the response is being returned
+    S->>AW: writeRecord(matchId, playerId, flatAnalyticsJson)
+    AW->>S3: PutObject analytics/{matchId}-{playerId}.json
+    alt write fails (S3CacheException)
+        AW-->>S: throws S3CacheException
+        S->>S: log.warn(...), discard - analytics feed is\npurely additive, never allowed to fail the request
+    end
 ```
 
-### 3.6 Recording analysis history (DynamoDB) — not yet deployed, code only
+### 3.6 Recording analysis history (DynamoDB)
 
 User-triggered (not automatic) — saves a computed match+insight result so it can be retrieved later, without needing to re-fetch from PUBG/Gemini.
 
@@ -368,6 +407,113 @@ sequenceDiagram
         HS-->>C: AnalysisHistoryDto
         C-->>U: 200 JSON
     end
+```
+
+### 3.7 Share Analysis (Lambda + API Gateway)
+
+Entirely independent of the Spring Boot monolith — a standalone Node.js 20.x Lambda (`pubg-insight-share-analysis`) behind an API Gateway HTTP API, reading the same `pubg-insight-analysis-history` DynamoDB table the main backend's `AnalysisHistoryRepository` writes to, via its own direct `GetItem` call and its own least-privilege IAM role (`pubg-insight-share-lambda-role`, `dynamodb:GetItem` only). Triggered from a real "Copy Share Link" button in `AiInsights.tsx` — the link is built client-side (deterministic from `playerId`/`matchId`, no network call needed to construct it) and only resolved when someone actually opens it.
+
+```mermaid
+sequenceDiagram
+    actor U1 as User (analyzer)
+    participant FE as AiInsights.tsx
+    actor U2 as User (link recipient)
+    participant APIGW as API Gateway\n(HTTP API)
+    participant L as Lambda\npubg-insight-share-analysis
+    participant DDB as DynamoDB\n(pubg-insight-analysis-history)
+
+    Note over U1,FE: after "Generate AI Insights" has already\ncalled POST .../history (§3.6), so an item exists
+    U1->>FE: click "Copy Share Link"
+    FE->>FE: build URL: {VITE_SHARE_API_BASE_URL}/share/{playerId}/{matchId}\n(no network call - purely string construction)
+    FE-->>U1: navigator.clipboard.writeText(url)
+
+    U2->>APIGW: GET /share/{playerId}/{matchId}
+    APIGW->>L: invoke(event.pathParameters)
+    L->>DDB: GetItem {playerId, matchId}
+    alt item missing
+        DDB-->>L: no Item
+        L-->>APIGW: 404 HTML "This analysis is no longer available"\n(with CTA link to APP_URL)
+    else DynamoDB read fails
+        DDB-->>L: throws
+        L-->>APIGW: 500 HTML "Something went wrong"
+    else item found
+        DDB-->>L: Item
+        L->>L: unmarshall -> render HTML report card\n(map, mode, placement, kills, damage,\nheadshot %, survival time, top strengths,\ntop recommendation)
+        L-->>APIGW: 200 HTML,\nCTA deep-links to {APP_URL}/?playerId=&matchId=
+    end
+    APIGW-->>U2: HTML report card
+    U2->>U2: clicks CTA -> opens the live SPA\nwith the exact shared analysis pre-loaded (App.tsx reads ?playerId=&matchId=)
+```
+
+### 3.8 Population Comparison (Athena)
+
+Closes the population-baseline gap D18 documents: radar scores are still scaled against a fixed ceiling (no change there), but this is a second, additional metric — how this match's damage compares to the median of every match this app has ever analyzed for the same game mode, computed live from the S3 analytics feed (§3.5) via a real Athena query, not a fixed number.
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant FE as PopulationComparison.tsx
+    participant SVC as populationService.ts
+    participant C as MatchController
+    participant MS as MatchService
+    participant AC as AthenaAnalyticsClient
+    participant Athena as Amazon Athena
+    participant Glue as Glue Data Catalog\n(pubg_insight.pubg_insight_analytics)
+    participant S3 as S3\n(analytics/ prefix)
+
+    Note over FE: mounts alongside the season-average tiles\nin the "Comparisons" grid when a match is selected
+    FE->>SVC: getPopulationComparison(playerId, matchId)
+    SVC->>C: GET /api/players/{playerId}/matches/{matchId}/population-comparison
+    C->>MS: getMatchStatsForPlayer(matchId, playerId)
+    MS-->>C: MatchDto (gameMode, damageDealt)
+    C->>AC: compareDamage(gameMode, damageDealt)
+    AC->>Athena: StartQueryExecution\n(SELECT approx_percentile(damageDealt,0.5), count(*)\nFROM pubg_insight_analytics WHERE gameMode = ?)
+    Athena-->>AC: queryExecutionId
+    loop poll up to 20x / 500ms apart
+        AC->>Athena: GetQueryExecution(queryExecutionId)
+        Athena-->>AC: state (RUNNING/QUEUED/...)
+    end
+    Note over Athena,Glue: Athena resolves the external table's schema/location\nvia Glue even though the table was created with manual DDL
+    Athena->>S3: scans analytics/*.json (JsonSerDe)
+    alt query does not reach SUCCEEDED
+        AC-->>C: throws AthenaQueryException
+        C-->>FE: 502 {error}
+    else SUCCEEDED
+        AC->>Athena: GetQueryResults(queryExecutionId)
+        Athena-->>AC: rows [header, {median_damage, sample_size}]
+        AC->>AC: deltaPct = (matchDamage - medianDamage) / medianDamage * 100
+        AC-->>C: PopulationComparison(medianDamage, sampleSize, deltaPct)
+        C-->>FE: 200 JSON
+        FE-->>U: "▲/▼ NN% Damage — vs all players (sampleSize)"\n(renders nothing if sampleSize == 0)
+    end
+```
+
+### 3.9 Season-Stats Cache Warmer (ECS Fargate + EventBridge Scheduler)
+
+A standalone containerized job, not a second copy of the backend — it only ever calls the backend's own already-existing `/season-stats` endpoint, exactly as a real user's browser would, so it reuses every bit of caching/rate-limit logic already built (§3.3) rather than duplicating it.
+
+```mermaid
+sequenceDiagram
+    participant EB as EventBridge Scheduler\n(rate(6 hours))
+    participant Role as pubg-insight-scheduler-ecs-role
+    participant ECS as ECS Fargate\n(cluster pubg-insight,\ntask def pubg-insight-season-stats-cache-warmer)
+    participant Script as warm-cache.sh
+    participant DDB as DynamoDB\n(pubg-insight-analysis-history)
+    participant BE as Backend (via CloudFront)\nGET /api/players/{id}/season-stats
+    participant Cache as DynamoDB\n(pubg-insight-season-stats-cache)
+
+    EB->>Role: assume role (ecs:RunTask + iam:PassRole,\nscoped to this cluster/task-def only)
+    Role->>ECS: RunTask
+    ECS->>Script: entrypoint runs in the container
+    Script->>DDB: Scan --projection-expression playerId\n(read-only task role: dynamodb:Scan on this table only)
+    DDB-->>Script: every distinct playerId ever analyzed\n(AWS CLI auto-paginates)
+    loop for each player_id
+        Script->>BE: curl GET .../api/players/{player_id}/season-stats
+        BE->>BE: PlayerService.getSeasonStats runs its normal\ncache-aside flow (§3.3) - a miss here means this\ncall itself performs the PUBG fetch + populates Cache
+        BE-->>Script: 200 (or non-2xx, logged as a per-player failure,\ndoes not stop the loop)
+        Note over Cache: warmed as a side effect of the normal\nPlayerService.getSeasonStats code path -\nthe warmer never touches DynamoDB directly for this table
+    end
+    Script-->>ECS: "Warmed season-stats cache for N player(s), F failure(s)"\n(logged to CloudWatch Logs via ecsTaskExecutionRole)
 ```
 
 ---
@@ -566,47 +712,113 @@ Context: the Learner Lab's session-expiring credentials (manual refresh every fe
 Context: the frontend went through two iterations trying to stay under PUBG's 10 req/min limit purely by pacing its own requests (a background queue with a fixed interval, tuned twice after real 429s). This has a fundamental flaw: the 10 req/min budget belongs to the app's single shared PUBG API key, not to any one browser tab - two tabs, or two people using the demo at once, each pacing "safely" on their own can still collectively blow the shared budget, since neither has visibility into the other's calls. Rationale: `PubgRateLimiter` (a single `@Component`, one instance for the whole app) tracks a sliding 60s window of call timestamps and makes `PubgApiClient.acquire()` **block** the calling thread until a slot is free, instead of either side guessing a safe pace or reactively handling a 429 after the fact. This is the one place that can actually see and gate every outgoing PUBG call regardless of which HTTP request triggered it. Blocking a request thread for a few seconds is an acceptable trade-off at this app's scale (a handful of concurrent demo users, not a production service under load) - a slower response reads to the user as normal loading, not as a failure. The existing `PubgRateLimitException`/429 handling (D-something in §5) is kept as a safety net for the case PUBG's own window doesn't line up exactly with this app's, not removed. Trade-off: the frontend's pacing/background-load logic is now redundant for correctness (the backend guarantees the budget either way) - it's been simplified back down to pagination, which is now purely a UX choice (bounding how many matches load onscreen at once) rather than a rate-limit workaround.
 
 **D18 — Radar/skill scoring uses fixed, documented ceilings and a season-aggregate proxy for "Consistency," not percentile/z-score population normalization or true match-to-match variance.**
-Context: a rigorous skill-scoring methodology (percentile ranking, z-score against a population baseline, or a literal variance/standard-deviation "consistency" measure across recent matches) would be more statistically defensible, but PUBG's season-stats endpoint (`PubgSeasonStatsAttributes`/`PubgGameModeStats`) only exposes **season-aggregate sums** (total kills, total damage, total rounds, etc.) for the queried player - it does not expose other players' data (no population to compute a percentile/z-score against) or a per-match breakdown (no distribution to compute variance from) without fetching and aggregating every individual recent match, which costs one PUBG API call per match against the same 10 req/min shared budget that D16 already treats as this project's central constraint. Rationale: `PlayerMapper` scales each radar axis against a fixed, explicitly documented ceiling (e.g. `COMBAT_KILLS_PER_ROUND_CEILING = 2.0`) chosen as a rough "very strong player" reference point rather than a statistically derived one - honestly labeled as such in code comments, not presented as population-calibrated. The "Consistency" axis specifically uses `top10Rate` (how often the player finishes in the top 10 across the season) as a **season-level proxy** for consistency, not a literal per-match variance calculation - a real, meaningful signal (frequent top-10 finishes reflects reliably competitive play) but not the same thing as "low variance in damage/placement across recent matches," which is what "consistency" more precisely means statistically. Consequence: if asked to defend this in the demo/report, the honest answer is "this app has no cross-player population to normalize against, and computing true per-match variance would require an additional per-match-fetch aggregation step not yet built (see the frontend `CLAUDE.md`'s "Deep Insights" future-work entry, which needs the same kind of new backend aggregation endpoint) - the current scores are a deterministic, reproducible, documented approximation, not a fabricated one." This trade-off was made consciously to avoid two worse alternatives: inventing a fake population baseline, or looping per-match PUBG calls on every season-stats lookup (which would reintroduce the exact rate-limit problem D16 was built to solve).
+Context: a rigorous skill-scoring methodology (percentile ranking, z-score against a population baseline, or a literal variance/standard-deviation "consistency" measure across recent matches) would be more statistically defensible, but PUBG's season-stats endpoint (`PubgSeasonStatsAttributes`/`PubgGameModeStats`) only exposes **season-aggregate sums** (total kills, total damage, total rounds, etc.) for the queried player - it does not expose other players' data (no population to compute a percentile/z-score against) or a per-match breakdown (no distribution to compute variance from) without fetching and aggregating every individual recent match, which costs one PUBG API call per match against the same 10 req/min shared budget that D16 already treats as this project's central constraint. Rationale: `PlayerMapper` scales each radar axis against a fixed, explicitly documented ceiling (e.g. `COMBAT_KILLS_PER_ROUND_CEILING = 2.0`) chosen as a rough "very strong player" reference point rather than a statistically derived one - honestly labeled as such in code comments, not presented as population-calibrated. The "Consistency" axis specifically uses `top10Rate` (how often the player finishes in the top 10 across the season) as a **season-level proxy** for consistency, not a literal per-match variance calculation - a real, meaningful signal (frequent top-10 finishes reflects reliably competitive play) but not the same thing as "low variance in damage/placement across recent matches," which is what "consistency" more precisely means statistically. Consequence: if asked to defend this in the demo/report, the honest answer is "this app has no cross-player population to normalize against, and computing true per-match variance would require an additional per-match-fetch aggregation step not yet built (see the frontend `CLAUDE.md`'s "Deep Insights" future-work entry, which needs the same kind of new backend aggregation endpoint) - the current scores are a deterministic, reproducible, documented approximation, not a fabricated one." This trade-off was made consciously to avoid two worse alternatives: inventing a fake population baseline, or looping per-match PUBG calls on every season-stats lookup (which would reintroduce the exact rate-limit problem D16 was built to solve). **Superseded in part by D21** — Athena's population comparison finally provides a real cross-player baseline for damage, though only as an additional metric alongside the radar, not a replacement for it (the radar still uses fixed ceilings; only the new "vs all players" damage tile uses the real population).
+
+**D19 — Two CloudFront distributions (frontend and backend), each a custom HTTP origin rather than an S3-origin distribution.**
+Context: the frontend was plain S3 static-website HTTP hosting with no CDN or HTTPS — a real, pre-existing gap independent of the rubric, and also the Networking & Content Delivery category gap the rubric scores separately. The natural-seeming approach — a single CloudFront distribution with the S3 bucket as an `S3Origin` — doesn't work here because S3 **website endpoints** (`*.s3-website-*.amazonaws.com`, needed for SPA routing via the bucket's index/error document configuration) don't support Origin Access Control; only S3 REST/API endpoints do. Rationale: front the S3 website endpoint as a custom HTTP origin instead (`OriginProtocolPolicy=http-only`, `ViewerProtocolPolicy=redirect-to-https`, CachingOptimized) — this still gets real HTTPS termination and edge caching at CloudFront, it's just not the S3-origin integration CloudFront is usually paired with. A second, separate distribution was then added in front of Elastic Beanstalk for a concrete reason discovered during live testing, not preemptively: once the SPA was served over HTTPS via the first distribution, browsers blocked its calls to the backend's plain-HTTP Elastic Beanstalk URL as mixed content. Fronting the backend with its own CloudFront distribution (also custom HTTP origin, since EB's default domain is also HTTP-only) fixes that by giving the backend an HTTPS URL too; `VITE_API_BASE_URL` now points at this second distribution instead of the raw EB URL. Trade-off: the backend distribution must use `CachingDisabled` + the `AllViewer` origin request policy instead of `CachingOptimized`, since every backend response is per-player/per-match dynamic data that must never be cached at the edge (a stale cached player search or match lookup would be a real correctness bug, not just a UX one) — this also means the backend distribution adds a small, real amount of extra request latency (an edge hop that does no caching) compared to hitting Elastic Beanstalk directly, accepted purely to solve the mixed-content problem.
+
+**D20 — Share Analysis feature is a standalone Lambda + API Gateway HTTP API, deliberately independent of the Spring Boot monolith, not a new endpoint on the existing backend.**
+Context: this closes two things at once — the Compute (bonus) category gap from adding a second, genuinely distinct compute service type, and a real, previously-identified product gap: the original project brief asked to investigate "asynchronous/background processing if appropriate" for reducing PUBG API load, which was never built. Rationale: a shareable, read-only summary of an already-saved analysis (`pubg-insight-analysis-history`, written by `HistoryService`, D12/D13) doesn't need any of the Spring Boot app's PUBG/Gemini orchestration — it only needs one `GetItem` and some HTML rendering, which is exactly what Lambda is for, and keeping it a separate deployable means a bug or outage in the monolith can't take down already-shared links. `GeminiApiClient`/`PubgApiClient` are never invoked from this path at all — the Lambda only reads data the main app already computed and saved. Trade-off: two codebases now read the same DynamoDB table with two independent access patterns (`AnalysisHistoryRepository`'s Enhanced Client mapping vs. the Lambda's raw `GetItemCommand` + manual `unmarshall`) — a schema change to `AnalysisHistoryItem` must be manually kept in sync with the Lambda's expectations (`item.mapName`, `item.strengths`, etc.), since there's no shared type between a Java repository and a Node.js function. Accepted because the item shape is simple and infrequently changed, and because the alternative (a shared library or a call back into the monolith) would reintroduce the same coupling this decision exists to avoid.
+
+**D21 — Athena queries a separate, purpose-built S3 analytics feed rather than the existing raw match cache, via a manually-defined Glue-backed external table.**
+Context: this closes the Analytics category gap, and directly answers D18's honestly-documented limitation — "this app has no cross-player population to normalize against." The existing S3 match cache (`matches/{matchId}.json`, D12) already amounts to an accidental data lake of every match ever looked up, but its shape is PUBG's raw JSON:API format (`data`/`included[]` with mixed item types) — directly queryable by Athena in principle, but painful (every query would need to filter `included[]` by `type == "participant"` inline). Rationale: `S3AnalyticsWriter` writes a second, flat, purpose-built record per match+player lookup to a separate `analytics/` prefix specifically so Athena's SQL stays simple (`SELECT approx_percentile(damageDealt, 0.5), count(*) ... WHERE gameMode = ?`), and `AthenaAnalyticsClient` exposes it as a real, on-demand query triggered by `GET /api/players/{playerId}/matches/{matchId}/population-comparison` — not a report run manually in the console. The external table (`pubg_insight.pubg_insight_analytics`, `org.openx.data.jsonserde.JsonSerDe`) is Glue-backed even though it was created with manual DDL rather than a crawler, which is why the EB instance role needs `glue:GetTable`/`GetDatabase` in addition to the Athena permissions — Athena always resolves table metadata through Glue, regardless of how the table was defined. Trade-off: the analytics feed only starts accumulating population data from the moment `S3AnalyticsWriter` shipped, so early in the app's life `sampleSize` is small and the frontend tile (`PopulationComparison.tsx`) intentionally renders nothing at `sampleSize === 0` rather than showing a misleadingly confident percentage from one or two data points; Athena's query latency (typically a few seconds, per the polling loop's `MAX_POLL_ATTEMPTS`/`POLL_INTERVAL_MILLIS`) is also visibly slower than every other endpoint in this app, which is why that tile renders a loading skeleton instead of blocking the rest of the match view.
+
+**D22 — ECS Fargate scheduled task warms the season-stats cache by calling the backend's own public endpoint, not by duplicating `PlayerService`'s PUBG-fetching logic in a second codebase.**
+Context: this closes the Containers category gap, and — like D20 — traces back to the original brief's unaddressed "scheduled refresh" / rate-limit-protection ask. A new DynamoDB table, `pubg-insight-season-stats-cache` (partition key `playerId`, TTL attribute `expiresAt`), gives `PlayerService.getSeasonStats` a 1-hour read-through cache (mirroring the S3 cache-aside pattern from D12, but backed by DynamoDB since season stats are small structured JSON, not opaque blobs) so repeat visits to an already-searched player cost zero PUBG calls for up to an hour. Rationale: rather than write a second piece of code that calls PUBG's season-stats endpoints directly from the container (duplicating `PubgApiClient`, `PlayerMapper`, and the cache-write logic in a completely separate Node/Python/whatever runtime), `warm-cache.sh` does the simplest thing that actually works: `aws dynamodb scan` the existing `pubg-insight-analysis-history` table for every distinct `playerId` anyone has ever analyzed, then `curl` each one's `/api/players/{id}/season-stats` — the exact same endpoint a real browser calls, exercising the exact same code path (including D12-style soft-fail behavior) rather than a parallel one that could drift out of sync. The container itself is deliberately minimal: its `Dockerfile` copies the official `public.ecr.aws/aws-cli/aws-cli` image's CLI bundle onto a plain `amazonlinux:2` base (which already ships `curl`/`bash`) specifically to avoid any package-manager network calls at build time — a real constraint given this project's development environment has unreliable outbound network access. IAM follows the same deliberate, non-wildcard-where-avoidable pattern used everywhere else in this project (e.g. the EB instance role's scoped `AthenaAnalyticsAccess` policy, D21): `pubg-insight-season-stats-warmer-task-role` gets read-only `dynamodb:Scan` on the analysis-history table only (it never writes to either DynamoDB table directly — the cache write happens inside the backend's own request handling), `ecsTaskExecutionRole` is the standard `AmazonECSTaskExecutionRolePolicy` (ECR pull + CloudWatch Logs), and `pubg-insight-scheduler-ecs-role` grants EventBridge Scheduler only `ecs:RunTask`+`iam:PassRole` scoped to this one cluster/task-definition. Trade-off: the warmer is only useful once the backend is deployed with the cache-aside code live — running it against an older backend deployment would just generate six hours' worth of ordinary cache-miss PUBG traffic for no benefit, since there'd be nowhere for it to write. It also assumes recently-searched players are worth pre-warming; a player nobody has looked up yet gets no benefit until their first real search, which is the expected and accepted scope (this is rate-limit protection for repeat lookups, not a way to avoid the first PUBG call for a brand-new player).
 
 ---
 
-## 7. Not Yet Built (Planned Architecture)
+## 7. Full AWS Architecture
 
-The following are part of the approved architecture (`PROJECT_CONTEXT.md`). Status per service, verified against actual code:
+Everything below is deployed to a real personal AWS account (`us-east-1`, D17) and verified working end-to-end — not planned, not console-only. This section replaces an earlier "Not Yet Built" section that described all of this as either code-only or entirely unbuilt; that's no longer true of anything listed here. The six AWS service categories this project's rubric scores are annotated below (see `CLAUDE.md` at the repo root for the full scoring rationale).
 
-- **DynamoDB (analysis history)** and **S3 (match cache)** — **application code exists** (`client.dynamodb`, `client.s3`, and the `history` feature package are wired into `MatchService`/a new `HistoryController`). None of it has been deployed or run against a real AWS account yet — no table or bucket exists, and the code was written without network access to even compile it in the environment it was written in. Treat it as "ready to test," not "verified working."
-- **Elastic Beanstalk, API Gateway, Lambda, Athena** — no code yet at all.
+- **Compute** — Elastic Beanstalk (`pubg-insight-backend` / `Pubg-insight-backend-env`) runs the Spring Boot monolith. Deployed via `deploy.sh` (`mvn clean package` → S3 upload → `create-application-version` → `update-environment`), not a manual Console upload.
+- **Compute, bonus (Lambda + API Gateway)** — `pubg-insight-share-analysis` (Node.js 20.x) behind an API Gateway HTTP API, `GET /share/{playerId}/{matchId}`. See §3.7.
+- **Containers (ECS Fargate)** — `season-stats-cache-warmer`, a scheduled Fargate task in cluster `pubg-insight`, triggered every 6 hours by EventBridge Scheduler. See §3.9.
+- **Storage (S3)** — `pubg-insight-frontend` (SPA static hosting) and `pubg-insight-match-cache` (three prefixes: `matches/`, `analytics/`, `athena-results/`).
+- **Networking & Content Delivery (CloudFront)** — two distributions, one per S3/EB origin. See D19.
+- **Database (DynamoDB)** — `pubg-insight-analysis-history` (pre-existing) and `pubg-insight-season-stats-cache` (new, D22).
+- **Analytics (Athena)** — external table `pubg_insight.pubg_insight_analytics` over the S3 `analytics/` prefix, backed by the Glue Data Catalog. See §3.8, D21.
+- **Third-party APIs** — PUBG Official API and Google Gemini API (unchanged, capped at 2 types by the rubric).
 
 ```mermaid
-flowchart LR
-    FE["React Frontend"] -->|HTTPS| EB["Elastic Beanstalk\n(Spring Boot backend)"]
-    EB --> APIGW["API Gateway"]
-    APIGW --> Lambda["Lambda\n(PUBG data retrieval/processing)"]
-    Lambda --> PUBG[("PUBG API")]
-    Lambda --> Gemini[("Gemini API")]
-    EB --> DDB[("DynamoDB\nanalysis history\n(code exists)")]
-    EB --> S3[("S3\nmatch/report cache\n(code exists)")]
-    S3 --> Athena[("Athena\nanalytics queries")]
-    Athena --> Dashboard["Analytics Dashboard\n(frontend, not built)"]
+flowchart TB
+    User(["User / Browser"])
 
-    style FE fill:#333,color:#fff
-    style EB fill:#f2a900,color:#000
-    style DDB stroke-dasharray: 2 2
-    style S3 stroke-dasharray: 2 2
+    subgraph cdn["Networking & Content Delivery"]
+        CFFE["CloudFront\nd13c09lhflfxxl.cloudfront.net\nCachingOptimized"]
+        CFBE["CloudFront\nd14f53mm16f0g1.cloudfront.net\nCachingDisabled + AllViewer"]
+    end
+
+    subgraph storage["Storage (S3)"]
+        S3FE[("pubg-insight-frontend\n(SPA static hosting)")]
+        S3MC[("pubg-insight-match-cache\nmatches/ · analytics/ · athena-results/")]
+    end
+
+    subgraph compute["Compute"]
+        EB["Elastic Beanstalk\nPubg-insight-backend-env\n(Spring Boot 4.1.0 / Java 21)"]
+    end
+
+    subgraph computeBonus["Compute — bonus"]
+        APIGW["API Gateway (HTTP API)\nGET /share/{playerId}/{matchId}"]
+        Lambda["Lambda\npubg-insight-share-analysis\n(Node.js 20.x)"]
+    end
+
+    subgraph containers["Containers"]
+        EventBridge["EventBridge Scheduler\nrate(6 hours)"]
+        ECS["ECS Fargate\ncluster: pubg-insight\ntask: season-stats-cache-warmer"]
+    end
+
+    subgraph database["Database (DynamoDB)"]
+        DDBHist[("pubg-insight-analysis-history")]
+        DDBCache[("pubg-insight-season-stats-cache\nTTL: expiresAt")]
+    end
+
+    subgraph analytics["Analytics"]
+        Glue["Glue Data Catalog\npubg_insight.pubg_insight_analytics"]
+        Athena["Amazon Athena"]
+    end
+
+    subgraph thirdparty["Third-party APIs"]
+        PUBG[("PUBG Developer API")]
+        Gemini[("Google Gemini API")]
+    end
+
+    User -->|HTTPS| CFFE
+    CFFE --> S3FE
+    User -->|share link, HTTPS| APIGW
+    APIGW --> Lambda
+    Lambda -->|GetItem, own IAM role| DDBHist
+
+    S3FE -.->|axios, VITE_API_BASE_URL| CFBE
+    CFBE --> EB
+    EB --> PUBG
+    EB --> Gemini
+    EB -->|cache-aside GetObject/PutObject| S3MC
+    EB -->|cache-aside GetItem/PutItem| DDBCache
+    EB -->|PutItem, D12/D13| DDBHist
+    EB -->|StartQueryExecution, IAM: AthenaAnalyticsAccess| Athena
+    Athena -->|GetTable/GetDatabase| Glue
+    Athena -->|scans analytics/*.json| S3MC
+
+    EventBridge -->|RunTask, pubg-insight-scheduler-ecs-role| ECS
+    ECS -->|Scan playerId, read-only| DDBHist
+    ECS -->|GET /season-stats, own container, own task role| CFBE
 ```
 
-All of the above must be triggered by application code — never a manual Console/CLI step — per the rubric's automation requirement (`CLAUDE.md` → Automation is graded, manual setup is not). The DynamoDB/S3 code already follows this: `HistoryController`/`MatchService` call the AWS SDK directly, with no manual Console step in the runtime path — only the one-time table/bucket creation (allowed) remains a human action.
+All of the above is triggered by application code — never a manual Console/CLI step — per the rubric's automation requirement (`CLAUDE.md` → "Automation is graded, manual setup is not"). The one-time exceptions, all allowed under the rubric, are infrastructure creation itself: table/bucket/distribution/cluster/function creation, the Glue table DDL, and the EventBridge Scheduler rule definition. Every runtime invocation — S3 GetObject/PutObject, DynamoDB GetItem/PutItem/Scan, Athena StartQueryExecution, Lambda invocation via API Gateway, ECS RunTask via EventBridge — is either the app's own code calling the AWS SDK directly, or one AWS-managed service invoking another on a schedule, with no human in the loop.
 
-### What's needed to actually turn DynamoDB/S3 on
+IAM, per service (each scoped deliberately, not a shared wildcard role — see D21/D22 for the reasoning behind each):
 
-Full click-by-click steps for all of this: `docs/decisions/AWS_SETUP.md` (project-specific, personal AWS account per D17) and `docs/decisions/LEARNER_LAB.md` (official AWS Academy readme, now historical only).
+| Principal | Role | Grants |
+|---|---|---|
+| EB EC2 instances | `aws-elasticbeanstalk-ec2-role` | `AmazonS3FullAccess`, `AmazonDynamoDBFullAccess`, inline `AthenaAnalyticsAccess` (`athena:StartQueryExecution/GetQueryExecution/GetQueryResults`, `glue:GetTable/GetDatabase` scoped to the `pubg_insight` database/table) |
+| Share Lambda | `pubg-insight-share-lambda-role` | `dynamodb:GetItem` only, on `pubg-insight-analysis-history` |
+| ECS warmer task | `pubg-insight-season-stats-warmer-task-role` | `dynamodb:Scan` only, on `pubg-insight-analysis-history` |
+| ECS task execution | `ecsTaskExecutionRole` | standard `AmazonECSTaskExecutionRolePolicy` (ECR pull, CloudWatch Logs) |
+| EventBridge Scheduler | `pubg-insight-scheduler-ecs-role` | `ecs:RunTask` + `iam:PassRole`, scoped to the `pubg-insight` cluster / warmer task definition only |
 
-1. ~~Confirm the deployment region~~ — done, kept as `us-east-1`, matching this app's existing default.
-2. Create the DynamoDB table (name matches `DYNAMODB_ANALYSIS_HISTORY_TABLE`, default `pubg-insight-analysis-history`) with partition key `playerId` (String) and sort key `matchId` (String) — one-time Console setup, allowed under the rubric.
-3. Create the S3 bucket (name matches `S3_CACHE_BUCKET`, default `pubg-insight-match-cache`) — same, one-time setup.
-4. Ensure the runtime environment (local run, or eventually Elastic Beanstalk) can resolve AWS credentials — the code relies on the SDK's default credential provider chain (an Elastic Beanstalk-created service role when deployed; locally, the `pubg-insight-dev` IAM user's permanent access key in `~/.aws/credentials`, see the setup guide).
-5. Run `mvn compile`/`mvn test` for the first time with real network access — neither agent that wrote this code could do so in this project's development environment; the AWS SDK v2 class/method names used are believed correct but unverified against the real dependency. (Update: `mvn compile` has since succeeded on the user's real machine — see §8 below.)
-6. Elastic Beanstalk, when ready to deploy: create the application, then under **Configure more options → Security**, let it create a new service role (a personal account can create its own, unlike the Lab). Exact steps in `docs/decisions/AWS_SETUP.md`.
+Full click-by-click setup steps for everything above: `docs/decisions/AWS_SETUP.md` (project-specific, personal AWS account per D17); `docs/decisions/LEARNER_LAB.md` is historical only (superseded by D17).
 
 ---
 
@@ -621,7 +833,12 @@ Carried over from the local-baseline QA audit; not blocking, but worth being awa
 - **This project's Spring Boot 4.1.0 auto-configures a Jackson 3 mapper bean (`tools.jackson.databind.json.JsonMapper`), not a classic Jackson 2 `com.fasterxml.jackson.databind.ObjectMapper` bean.** Discovered via the first real `mvn test` run: `MatchService` originally constructor-injected `ObjectMapper`, expecting Spring to auto-configure one — it doesn't, in this version, so context startup failed with `NoSuchBeanDefinitionException`, cascading into 8 failing tests (every test that builds a real `MatchService`, directly or transitively). Fixed by having `MatchService` construct its own `ObjectMapper` instance directly rather than relying on Spring DI for that specific type (`pom.xml` already declares the classic `jackson-databind`/`jackson-core`/`jackson-annotations` dependencies explicitly, so the class itself is on the classpath — there's just no Spring-managed bean of it). **If any future code needs JSON (de)serialization, do the same** — don't assume `@Autowired ObjectMapper` will resolve in this project.
 - First real `mvn compile`/`mvn test` run (see above) confirmed **compile succeeded across the entire codebase**, including all the DynamoDB/S3 code written without any ability to compile it beforehand — the AWS SDK v2 class/method names used were all correct. Only the one Jackson issue above caused test failures; nothing else did.
 - `README.md` in both repos is stale (backend's still describes the old layer-based package plan and lists Spring Boot 3; frontend's is still the default Vite template) — this document supersedes them for architecture purposes, but the READMEs should eventually be updated to at least point here.
-- `S3ClientConfig` and `DynamoDbClientConfig` each independently read `@Value("${aws.region}")` — harmless duplication (written by two separate, independently-run agents that didn't see each other's code) rather than a shared `AwsProperties` record. Worth consolidating if a third AWS service config is added, not urgent at two.
-- Once DynamoDB/S3 are actually deployed, every existing `@SpringBootTest`-based integration test will, for the first time, construct real `S3Client`/`DynamoDbEnhancedClient` beans and (for tests that exercise `MatchService`) attempt a real (uncredentialed, in CI/local-without-AWS-config) S3 call that's expected to fail fast into the soft-fail path (D12) — functionally fine, but confirm it doesn't meaningfully slow down the test suite via credential-provider-chain timeouts.
+- `S3ClientConfig`, `DynamoDbClientConfig`, and `AthenaClientConfig` each independently read `@Value("${aws.region}")` — harmless duplication (written by separate, independently-run agents that didn't see each other's code) rather than a shared `AwsProperties` record. Now three configs do this, not two; still not urgent to consolidate at this scale, but the case for it is stronger now than when this was first noted.
+- **DynamoDB, S3, and Athena are now genuinely deployed and exercised by real production traffic** — the earlier caveat here ("once deployed, every `@SpringBootTest` will for the first time construct a real `S3Client`/`DynamoDbEnhancedClient` bean...") is resolved: `mvn test` has run repeatedly against the real dependency versions with no surprises beyond the Jackson issue above. What's still true: the local/CI test suite runs without real AWS credentials configured, so any test that exercises `MatchService`/`PlayerService`/`AthenaAnalyticsClient` still hits the soft-fail path (D12) or (for Athena, which has no soft-fail — see below) would throw, rather than making a real call — confirm no test actually invokes `AthenaAnalyticsClient` for real, since unlike S3/DynamoDB there's no catch-and-log fallback for a broken Athena client.
+- **`AthenaAnalyticsClient.compareDamage` has no soft-fail path** — unlike the S3 match cache (D12) and the new DynamoDB season-stats cache, an Athena failure (bad credentials, query timeout, `AthenaQueryException`) propagates straight to `GlobalExceptionHandler` as a 502, and `MatchController.getPopulationComparison` is a dedicated endpoint (not inlined into the main match-stats response), so a broken Athena integration fails only the population-comparison tile, not match analytics as a whole — but that tile itself has no graceful degradation beyond the frontend's existing "silently render nothing on any fetch error" convention (`PopulationComparison.tsx`).
+- **The backend CloudFront distribution (`d14f53mm16f0g1.cloudfront.net`) adds a small amount of real extra latency to every API call** — it's `CachingDisabled` by design (D19), so every request still does a full round trip to Elastic Beanstalk; CloudFront here buys HTTPS (to fix the mixed-content bug) and nothing else, at the cost of one extra network hop versus calling EB directly.
+- **The ECS Fargate cache warmer only helps if the backend it's warming already has the season-stats cache-aside code deployed** (D22) — running the warmer against an older Elastic Beanstalk deployment would scan DynamoDB and call `/season-stats` for every known player exactly as designed, but since `PlayerService.getSeasonStats` on that older version has nowhere to write, it would just generate six hours' worth of ordinary PUBG traffic against the shared rate-limit budget for zero caching benefit. Deployment order matters here in a way it doesn't for the other three additions.
+- **The share Lambda and the main backend read/write `pubg-insight-analysis-history` through two independent, hand-maintained mappings** (D20) — `AnalysisHistoryRepository`'s Enhanced Client `@DynamoDbBean` vs. the Lambda's raw `GetItemCommand` + `unmarshall` + direct field access (`item.mapName`, `item.strengths`, etc.). A future change to `AnalysisHistoryItem`'s shape must be manually mirrored in `lambda/share-analysis/index.mjs`, or shared links will silently render blank/incorrect fields with no compile-time warning on either side.
+- **Population-comparison sample sizes are small early in the app's life** — the `analytics/` S3 prefix only starts accumulating records from the point `S3AnalyticsWriter` shipped (D21), so a game mode with few analyzed matches so far will show a low `sampleSize`; the frontend already handles this by rendering nothing at `sampleSize === 0` (`PopulationComparison.tsx`), but a `sampleSize` of, say, 2 is technically non-zero and will still render a percentage that isn't statistically meaningful — worth being upfront about in the demo if asked.
 - **Confirmed live (under the since-superseded Learner Lab, D8→D17)**: a real run against the Lab's S3 bucket produced `S3Exception: The provided token is malformed or otherwise invalid` on every cache read/write — an expired/stale Lab session token, not a code bug. The D12 soft-fail path handled it exactly as designed: every match lookup logged a `WARN` and fell back to the PUBG API with no user-visible failure. Not applicable anymore under the personal-account credentials (D17), which don't expire per-session — if a similar `AccessDenied`/token error reappears now, it means the IAM user's policy or access key is actually wrong, not a stale session.
 - A real Gemini read timeout during response-body extraction was found to throw a plain `RestClientException` that escaped both clients' original `catch (HttpStatusCodeException | ResourceAccessException e)` clause uncaught — see §5 for the full explanation and fix (both clients now catch `RestClientException` directly).

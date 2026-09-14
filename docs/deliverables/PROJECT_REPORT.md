@@ -12,7 +12,7 @@ Several existing tools already surface PUBG gameplay statistics pulled from the 
 - **PUBG's own in-game/website career statistics page** — the first-party equivalent, showing lifetime and per-season stats per game mode. Comprehensive but, again, purely presentational: numbers without analysis.
 - General esports/game analytics dashboards (the same category as op.gg's trackers for other titles, or generic stat-tracking sites) — the broader pattern across competitive games is the same: aggregate the numbers, visualize them, and leave interpretation to the player.
 
-**What this project does differently**: rather than stopping at retrieval and visualization, PUBG Insight adds an interpretation layer on top of the same class of data these tools expose — computing derived metrics itself (rather than only displaying what the API already aggregates) and using an LLM (Gemini) to convert those metrics into an explicit, natural-language performance summary, strengths, weaknesses, and recommendations. It also treats the underlying infrastructure as the object of study as much as the app itself: the assignment's requirement to demonstrate real, automated cloud service integration (Elastic Beanstalk, API Gateway, Lambda, DynamoDB, S3, Athena) shapes the architecture as much as the player-facing feature set does, which is not a concern any of the tools above need to address.
+**What this project does differently**: rather than stopping at retrieval and visualization, PUBG Insight adds an interpretation layer on top of the same class of data these tools expose — computing derived metrics itself (rather than only displaying what the API already aggregates) and using an LLM (Gemini) to convert those metrics into an explicit, natural-language performance summary, strengths, weaknesses, and recommendations. It also treats the underlying infrastructure as the object of study as much as the app itself: the assignment's requirement to demonstrate real, automated cloud service integration (Elastic Beanstalk, API Gateway, Lambda, ECS Fargate, DynamoDB, S3, CloudFront, Athena) shapes the architecture as much as the player-facing feature set does, which is not a concern any of the tools above need to address.
 
 ---
 
@@ -30,11 +30,13 @@ Each major component and the purpose it serves (see `docs/deliverables/ARCHITECT
 | **`match` feature** | Match Analytics — given a specific match and player, extracts that player's participant stats (kills, damage, headshot rate, survival time, placement) from PUBG's match response. |
 | **`insight` feature** | AI Insights — composes the `player` and `match` features' already-computed metrics into a prompt, sends it to Gemini via `client/gemini`, and returns the parsed result. Depends on both sibling features rather than duplicating their data-fetching logic. |
 | **`common`** | Cross-cutting concerns used by every feature: CORS configuration and centralized exception-to-HTTP-response mapping. |
-| **AWS Elastic Beanstalk** *(planned)* | Hosts the deployed Spring Boot backend, providing a stable URL independent of the underlying EC2 instance. |
-| **AWS API Gateway + Lambda** *(planned)* | Exposes the backend's REST operations publicly and runs PUBG data retrieval/processing as invoked cloud functions rather than a fixed always-on process. |
-| **AWS DynamoDB** *(planned)* | Persists historical analysis results (Feature 4), so past analyses survive beyond a single session. |
-| **AWS S3** *(planned)* | Caches PUBG match responses and generated reports, reducing repeat calls to the rate-limited PUBG API. |
-| **AWS Athena** *(planned)* | Queries the historical data cached in S3 to power the Analytics Dashboard's trend charts (Feature 5). |
+| **AWS Elastic Beanstalk** | Hosts the deployed Spring Boot monolith (`Pubg-insight-backend-env`), providing a stable URL independent of the underlying EC2 instance. |
+| **AWS API Gateway + Lambda** | A standalone Node.js 20.x Lambda (`pubg-insight-share-analysis`) behind an API Gateway HTTP API route (`GET /share/{playerId}/{matchId}`) — reads the analysis-history DynamoDB table directly with its own least-privilege IAM role and renders a public, read-only HTML "report card" for a saved analysis, entirely independent of the Spring Boot monolith. Triggered by a real "Copy Share Link" button on the AI Insights panel. |
+| **AWS ECS (Fargate)** | A standalone containerized job (own Dockerfile/ECR repo, `season-stats-cache-warmer/`) that scans the analysis-history DynamoDB table for known players and proactively re-warms a DynamoDB read-through season-stats cache by calling the main backend's own endpoint — run as a scheduled Fargate task, triggered automatically every 6 hours by an EventBridge Scheduler rule, to cut repeat live PUBG API calls. |
+| **AWS DynamoDB** | Two tables: one persisting every saved AI-insight analysis (read by both the monolith and the share-link Lambda), one acting as a 1-hour read-through cache for season stats (read/written by the monolith, warmed by the ECS job). |
+| **AWS S3** | Two buckets: one hosting the static frontend site, one holding the raw PUBG match-response cache plus a separate flat analytics feed (the input to Athena) and an Athena query-results prefix. |
+| **AWS CloudFront** | Two distributions: one in front of the S3-hosted frontend (HTTPS + edge caching in place of plain S3 website hosting), one in front of the Elastic Beanstalk backend (fixes a mixed-content issue where the HTTPS frontend could not call a plain-HTTP backend origin). |
+| **AWS Athena** | An external table (Glue Data Catalog, manual DDL) over the S3 analytics feed, queried live by `AthenaAnalyticsClient` from a `GET /api/players/{playerId}/matches/{matchId}/population-comparison` endpoint — computes the median damage percentile across every match this app has ever analyzed for a given game mode, the cross-player baseline the radar-scoring logic never had (see Design Decision D18 in `ARCHITECTURE.md`). |
 
 ---
 
@@ -64,7 +66,12 @@ The backend never exposes either external API's raw shape to the frontend. Every
 - `MatchDto` — matchId, mapName, gameMode, kills, headshotKills, headshotRate, damageDealt, timeSurvivedSeconds, winPlace.
 - `InsightDto` — summary, strengths, weaknesses, recommendations.
 
-**Planned** (not yet implemented — see `docs/deliverables/ARCHITECTURE.md` §7): a DynamoDB item shape for stored analysis history (player id, match id, computed metrics, timestamp) and an S3 object convention for cached PUBG match responses, to be defined when Features 4/5 are built.
+### AWS-facing data shapes
+
+- **DynamoDB — analysis history** (`AnalysisHistoryItem`, partition key `playerId`, sort key `matchId`): the same match/insight fields as `MatchDto`/`InsightDto` plus a `createdAt` timestamp. Read directly by both `HistoryController` in the Spring Boot backend and the standalone `pubg-insight-share-analysis` Lambda.
+- **DynamoDB — season-stats cache** (`SeasonStatsCacheItem`): a 1-hour TTL read-through cache keyed by player id, populated on demand by `PlayerService` and proactively re-warmed every 6 hours by the ECS Fargate job in `season-stats-cache-warmer/`.
+- **S3 — match cache**: one JSON object per match id (`matches/{matchId}.json`), the raw PUBG match response, keyed only by match id since a completed match's data is immutable and not player-specific.
+- **S3 — analytics feed**: a separate, flat, app-controlled object convention (one record per analyzed match: game mode, damage dealt, etc.) that Athena's external table reads over — deliberately kept apart from the raw PUBG-shaped match cache so the Athena schema never depends on PUBG's own wire format.
 
 ---
 
@@ -79,7 +86,10 @@ The backend never exposes either external API's raw shape to the frontend. Every
 - AWS Elastic Beanstalk documentation — https://docs.aws.amazon.com/elasticbeanstalk/
 - AWS Lambda documentation — https://docs.aws.amazon.com/lambda/
 - Amazon API Gateway documentation — https://docs.aws.amazon.com/apigateway/
+- Amazon ECS (Fargate) documentation — https://docs.aws.amazon.com/ecs/
+- Amazon EventBridge Scheduler documentation — https://docs.aws.amazon.com/scheduler/
 - Amazon DynamoDB documentation — https://docs.aws.amazon.com/dynamodb/
 - Amazon S3 documentation — https://docs.aws.amazon.com/s3/
+- Amazon CloudFront documentation — https://docs.aws.amazon.com/cloudfront/
 - Amazon Athena documentation — https://docs.aws.amazon.com/athena/
 - op.gg PUBG stats (related work example) — https://pubg.op.gg
