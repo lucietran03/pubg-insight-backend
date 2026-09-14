@@ -26,11 +26,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-// Deliberately not routed through PubgApiClient/PubgRateLimiter: telemetry is served
-// unauthenticated from a separate CDN host and isn't subject to that rate limit.
-//
-// Streams the JSON array token-by-token instead of loading it whole; files can run
-// into the tens of MB.
+// Not routed through PubgApiClient/PubgRateLimiter - telemetry is unauthenticated and unrate-limited.
+// Streams the JSON array token-by-token rather than loading it whole; files can run into the tens of MB.
 @Component
 public class TelemetryClient {
 

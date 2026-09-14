@@ -89,9 +89,8 @@ public class MatchService {
         }
     }
 
-    // A completed match is immutable, so a cache hit avoids a PUBG API call entirely -
-    // important given PUBG's 10 req/min free-tier limit. Cache failures are soft-failed
-    // (return null, same as a miss) so a broken cache never breaks the feature.
+    // Completed matches are immutable, so a cache hit skips a PUBG call (PUBG's 10 req/min limit).
+    // Cache failures soft-fail to null, same as a miss, so a broken cache never breaks the feature.
     private PubgMatchResponse fetchFromCache(String matchId) {
         try {
             Optional<String> cachedJson = s3MatchCacheClient.getCachedMatchJson(matchId);

@@ -46,9 +46,8 @@ public class GeminiApiClient {
         }
     }
 
-    // Tries each configured model in order, falling back on quota/rate-limit failures since
-    // those are per-model, not per-application. Propagates the last real failure (not a
-    // synthesized one) if every model is down, so its concrete type is preserved.
+    // Tries each configured model in order, falling back on quota/rate-limit failures (those are
+    // per-model). Propagates the last real failure if every model is down, preserving its type.
     public String generateText(String prompt) {
         RuntimeException lastFailure = null;
 

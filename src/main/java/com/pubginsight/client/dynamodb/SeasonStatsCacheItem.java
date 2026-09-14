@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
-// json holds a serialized SeasonStatsDto rather than mapped fields, since season stats
-// change shape often and this cache should never need a schema migration to keep up.
-// expiresAt doubles as the table's DynamoDB TTL attribute for automatic expiry.
 @DynamoDbBean
 @Data
 @NoArgsConstructor
@@ -16,7 +13,10 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 public class SeasonStatsCacheItem {
 
     private String playerId;
+    // Serialized SeasonStatsDto, not mapped fields - season stats change shape too often
+    // to keep migrating a fixed schema.
     private String json;
+    // Doubles as the table's DynamoDB TTL attribute for automatic expiry.
     private Long expiresAt;
 
     @DynamoDbPartitionKey
