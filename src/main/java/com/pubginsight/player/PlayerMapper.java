@@ -12,9 +12,8 @@ import java.util.Map;
 @Component
 public class PlayerMapper {
 
-    // Radar axes are scaled 0-100 against a fixed ceiling rather than other players' stats,
-    // since there's no population of users to normalize against. Ceilings are rough "very
-    // strong player" reference points, not statistically derived.
+    // Scaled against a fixed ceiling, not other players' stats - there's no user
+    // population to normalize against. Ceilings are rough reference points, not derived.
     private static final double COMBAT_KILLS_PER_ROUND_CEILING = 2.0;
     private static final double SURVIVAL_SECONDS_CEILING = 1200.0;
     private static final double PRECISION_HEADSHOT_RATE_CEILING = 0.5;

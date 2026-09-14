@@ -6,9 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
-// No explicit credentials provider: the SDK's default chain resolves credentials from the
-// environment. Building the client makes no network call, so this bean is safe to construct
-// even without AWS credentials present (e.g. in tests) - failures surface only on a real call.
+// No explicit credentials provider - the SDK's default chain resolves them. Building the
+// client makes no network call, so this bean is safe even without credentials present.
 @Configuration
 public class S3ClientConfig {
 

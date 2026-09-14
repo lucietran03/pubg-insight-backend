@@ -11,10 +11,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
-// Maps PUBG telemetry "damageCauserName" identifiers (e.g. "WeapAK47_C") to human-readable
-// names (e.g. "AKM"), bundled from PUBG's official dictionary at
-// src/main/resources/telemetry/damage-causer-names.json.
-//
 // resolve() falls back to the raw id when it isn't in the dictionary yet, rather than
 // fabricating a name.
 @Component

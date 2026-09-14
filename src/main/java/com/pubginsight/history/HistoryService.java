@@ -10,9 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 
-// Re-derives match/insight data via MatchService/InsightService rather than storing it,
-// which means recordAnalysis does one redundant PUBG match lookup (generateInsights fetches
-// it again internally) - an accepted trade-off since this isn't a hot path.
+// Re-derives match/insight data rather than storing it, so recordAnalysis makes one
+// redundant PUBG match lookup - an accepted trade-off since this isn't a hot path.
 @Service
 public class HistoryService {
 

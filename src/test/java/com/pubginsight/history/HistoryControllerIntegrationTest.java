@@ -22,10 +22,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// Wires Controller -> HistoryService -> AnalysisHistoryMapper for real through Spring;
-// MatchService/InsightService and AnalysisHistoryRepository are mocked, so no real
-// PUBG/Gemini/AWS call happens. Context startup also builds a real DynamoDbEnhancedClient
-// bean, which is safe without AWS credentials since only an actual table operation would need them.
+// Context startup builds a real DynamoDbEnhancedClient bean but needs no AWS credentials,
+// since only an actual table operation would use them; MatchService/InsightService are mocked.
 @SpringBootTest
 @AutoConfigureMockMvc
 class HistoryControllerIntegrationTest {

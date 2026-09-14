@@ -8,9 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PubgRateLimiterTest {
 
-    // Only verifies the "under budget" path stays non-blocking - deliberately doesn't
-    // assert on the blocking-past-the-limit path, since that would require the test to
-    // actually wait out a real ~60s window to observe the release.
+    // Only verifies the "under budget" path stays non-blocking; asserting the blocking
+    // path would require waiting out a real ~60s window.
     @Test
     void allowsCallsUpToTheLimitWithoutBlocking() {
         PubgRateLimiter rateLimiter = new PubgRateLimiter();

@@ -7,9 +7,8 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-// No explicit credentials provider: the SDK's default chain resolves credentials from the
-// environment. Building the client makes no network call, so this bean is safe to construct
-// even without AWS credentials present (e.g. in tests) - failures surface only on a real call.
+// No explicit credentials provider - the SDK's default chain resolves them. Building the
+// client makes no network call, so this bean is safe even without credentials present.
 @Configuration
 public class DynamoDbClientConfig {
 

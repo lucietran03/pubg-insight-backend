@@ -26,15 +26,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-// Fetches a match's telemetry file and extracts one player's kill events and the
-// damage-dealt events where that player was the attacker.
+// Deliberately not routed through PubgApiClient/PubgRateLimiter: telemetry is served
+// unauthenticated from a separate CDN host and isn't subject to that rate limit.
 //
-// Deliberately NOT routed through client.pubg.PubgApiClient/PubgRateLimiter: telemetry
-// files are served unauthenticated from a separate CDN host, not api.pubg.com, and are not
-// subject to that rate limit.
-//
-// Streams the top-level JSON array token-by-token rather than loading it whole, since
-// telemetry files can run into the tens of MB.
+// Streams the JSON array token-by-token instead of loading it whole; files can run
+// into the tens of MB.
 @Component
 public class TelemetryClient {
 

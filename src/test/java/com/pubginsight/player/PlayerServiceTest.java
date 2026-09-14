@@ -61,8 +61,7 @@ class PlayerServiceTest {
     @Test
     void attachesPreviousSeasonComparisonWhenPreviousSeasonStatsAvailable() {
         // Distinct map keys matter: PubgSeasonStatsAttributes is a record, so two Map.of()
-        // instances are equal, and Mockito's equality-based stub matching would otherwise
-        // collide the current/previous stubs.
+        // instances are equal and Mockito's stub matching would otherwise collide.
         PubgSeasonStatsAttributes currentAttributes = new PubgSeasonStatsAttributes(
                 Map.of("current-marker", new PubgGameModeStats(0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0)));
         PubgSeasonStatsAttributes previousAttributes = new PubgSeasonStatsAttributes(

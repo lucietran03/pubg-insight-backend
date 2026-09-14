@@ -19,9 +19,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-// Telemetry failures (missing asset URL, unreachable CDN, bad payload) are caught and
-// turned into an empty breakdown rather than an error - this panel must never break the
-// match page. PUBG API errors still propagate normally.
+// Telemetry failures are caught and turned into an empty breakdown, not an error -
+// this panel must never break the match page. PUBG API errors still propagate.
 @Service
 public class WeaponBreakdownService {
 

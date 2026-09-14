@@ -7,9 +7,8 @@ import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-// PUBG's 10 req/min limit is shared across the whole app (one API key), so this enforces
-// it centrally. acquire() blocks rather than rejecting, since a slower response reads as
-// normal loading while a 429 reads as broken.
+// PUBG's 10 req/min limit is shared app-wide (one API key). acquire() blocks rather than
+// rejecting, since a slow response reads as normal loading while a 429 reads as broken.
 @Component
 public class PubgRateLimiter {
 
