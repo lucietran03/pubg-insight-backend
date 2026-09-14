@@ -7,6 +7,8 @@ public record SeasonComparison(
         double avgDamageDeltaPct,
         double killDeathRatioDeltaPct,
         double headshotRateDeltaPct,
-        double top10RateDeltaPct
+        double top10RateDeltaPct,
+        double avgSurvivalDeltaPct,
+        double longestKillDeltaPct
 ) {
 }

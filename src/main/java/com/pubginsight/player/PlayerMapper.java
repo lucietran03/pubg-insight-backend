@@ -43,6 +43,7 @@ public class PlayerMapper {
         int totalTop10s = 0;
         int totalAssists = 0;
         int totalRevives = 0;
+        int totalDBNOs = 0;
         double totalDamage = 0.0;
         double totalTimeSurvived = 0.0;
         double longestKillMeters = 0.0;
@@ -55,6 +56,7 @@ public class PlayerMapper {
             totalTop10s += orZero(m.top10s());
             totalAssists += orZero(m.assists());
             totalRevives += orZero(m.revives());
+            totalDBNOs += orZero(m.dBNOs());
             totalDamage += orZero(m.damageDealt());
             totalTimeSurvived += orZero(m.timeSurvived());
             longestKillMeters = Math.max(longestKillMeters, orZero(m.longestKill()));
@@ -70,6 +72,9 @@ public class PlayerMapper {
         double avgSurvivalSeconds = totalRounds == 0 ? 0.0 : totalTimeSurvived / totalRounds;
         double avgSupportPerRound = totalRounds == 0 ? 0.0 : (double) (totalAssists + totalRevives) / totalRounds;
         double combatKillsPerRound = totalRounds == 0 ? 0.0 : (double) totalKills / totalRounds;
+        // Share of knockdowns actually converted into a kill - can exceed 1.0 since a kill
+        // without a preceding knock (e.g. a headshot) still counts as a kill.
+        double knockToKillRate = totalDBNOs == 0 ? 0.0 : (double) totalKills / totalDBNOs;
 
         RadarScores radar = new RadarScores(
                 scale(combatKillsPerRound, COMBAT_KILLS_PER_ROUND_CEILING),
@@ -90,6 +95,7 @@ public class PlayerMapper {
                 top10Rate,
                 avgSurvivalSeconds,
                 longestKillMeters,
+                knockToKillRate,
                 radar,
                 classifyArchetype(radar),
                 null
@@ -102,7 +108,9 @@ public class PlayerMapper {
                 percentDelta(current.avgDamage(), previous.avgDamage()),
                 percentDelta(current.killDeathRatio(), previous.killDeathRatio()),
                 percentDelta(current.headshotRate(), previous.headshotRate()),
-                percentDelta(current.top10Rate(), previous.top10Rate())
+                percentDelta(current.top10Rate(), previous.top10Rate()),
+                percentDelta(current.avgSurvivalSeconds(), previous.avgSurvivalSeconds()),
+                percentDelta(current.longestKillMeters(), previous.longestKillMeters())
         );
     }
 

@@ -42,7 +42,7 @@ class InsightServiceTest {
     private static SeasonStatsDto seasonStats(int wins, int roundsPlayed, double winRate) {
         return new SeasonStatsDto(
                 wins, roundsPlayed, winRate,
-                300.0, 1.5, 0.3, 0.4, 600.0, 150.0,
+                300.0, 1.5, 0.3, 0.4, 600.0, 150.0, 1.2,
                 new RadarScores(50, 50, 50, 50, 50, 50),
                 "Balanced Operator",
                 null

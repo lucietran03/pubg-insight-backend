@@ -69,7 +69,7 @@ class PlayerServiceTest {
                 Map.of("previous-marker", new PubgGameModeStats(0, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0.0, 0.0, 0, 0)));
         SeasonStatsDto currentDto = seasonStats(0.2, 0.4);
         SeasonStatsDto previousDto = seasonStats(0.1, 0.5);
-        SeasonComparison comparison = new SeasonComparison(100.0, 0.0, 0.0, -20.0, 0.0);
+        SeasonComparison comparison = new SeasonComparison(100.0, 0.0, 0.0, -20.0, 0.0, 0.0, 0.0);
 
         when(pubgApiClient.findCurrentSeasonId()).thenReturn("season-current");
         when(pubgApiClient.findSeasonStats("account.1", "season-current"))
@@ -128,7 +128,7 @@ class PlayerServiceTest {
 
     private static SeasonStatsDto seasonStats(double winRate, double headshotRate) {
         return new SeasonStatsDto(
-                0, 0, winRate, 0.0, 0.0, headshotRate, 0.0, 0.0, 0.0,
+                0, 0, winRate, 0.0, 0.0, headshotRate, 0.0, 0.0, 0.0, 0.0,
                 new RadarScores(0, 0, 0, 0, 0, 0), "Balanced Operator", null);
     }
 }

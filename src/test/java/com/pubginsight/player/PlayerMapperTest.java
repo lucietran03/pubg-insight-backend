@@ -155,7 +155,7 @@ class PlayerMapperTest {
     private static SeasonStatsDto seasonStats(
             double winRate, double avgDamage, double killDeathRatio, double headshotRate, double top10Rate) {
         return new SeasonStatsDto(
-                0, 0, winRate, avgDamage, killDeathRatio, headshotRate, top10Rate, 0.0, 0.0,
+                0, 0, winRate, avgDamage, killDeathRatio, headshotRate, top10Rate, 0.0, 0.0, 0.0,
                 new RadarScores(0, 0, 0, 0, 0, 0), "Balanced Operator", null);
     }
 }

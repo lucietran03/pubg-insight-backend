@@ -10,6 +10,9 @@ public record SeasonStatsDto(
         double top10Rate,
         double avgSurvivalSeconds,
         double longestKillMeters,
+        // Kills / knockdowns for the season - can exceed 1.0 since a kill without a
+        // preceding knock (e.g. a headshot) still counts as a kill.
+        double knockToKillRate,
         RadarScores radar,
         String archetype,
         // Null when there is no previous season to compare against (e.g. a brand-new
@@ -21,6 +24,6 @@ public record SeasonStatsDto(
     // into any other season.
     public SeasonStatsDto withPreviousSeasonComparison(SeasonComparison comparison) {
         return new SeasonStatsDto(wins, roundsPlayed, winRate, avgDamage, killDeathRatio, headshotRate,
-                top10Rate, avgSurvivalSeconds, longestKillMeters, radar, archetype, comparison);
+                top10Rate, avgSurvivalSeconds, longestKillMeters, knockToKillRate, radar, archetype, comparison);
     }
 }
