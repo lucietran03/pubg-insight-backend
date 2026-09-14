@@ -1,23 +1,23 @@
 {
   "schemaVersion": "1.0",
   "metrics": {
-    "nodes": 22,
-    "edges": 27,
+    "nodes": 21,
+    "edges": 25,
     "boundaries": 5,
-    "phases": 5,
+    "phases": 4,
     "nestedBoundaries": 0,
     "containmentRatio": 0.0,
     "maxNodesPerPhase": 6,
-    "crossBoundaryEdges": 20,
-    "crossBoundaryRatio": 0.741,
-    "feedbackEdges": 2,
-    "aspectRatio": 1.571,
+    "crossBoundaryEdges": 19,
+    "crossBoundaryRatio": 0.76,
+    "feedbackEdges": 0,
+    "aspectRatio": 1.4,
     "topologyTerms": [],
     "branchNodes": 10,
     "cycleDetected": false,
     "longestPath": 7,
     "maxDegree": 6,
-    "hubScore": 0.286
+    "hubScore": 0.3
   },
   "candidates": [
     {
@@ -29,10 +29,18 @@
       ]
     },
     {
-      "strategy": "hybrid-grid",
-      "score": 4.0,
+      "strategy": "phase-columns",
+      "score": 5.0,
       "reasons": [
-        "+4.0: phase feedback edges require two-dimensional routing"
+        "+2.0: ordered phase narrative",
+        "+3.0: ordered flow without phase feedback"
+      ]
+    },
+    {
+      "strategy": "hub-and-spoke",
+      "score": 5.0,
+      "reasons": [
+        "+5.0: one node has high exchange centrality"
       ]
     },
     {
@@ -44,15 +52,7 @@
       ]
     },
     {
-      "strategy": "phase-columns",
-      "score": 0.0,
-      "reasons": [
-        "+2.0: ordered phase narrative",
-        "-2.0: feedback weakens a strict left-to-right lifecycle"
-      ]
-    },
-    {
-      "strategy": "hub-and-spoke",
+      "strategy": "hybrid-grid",
       "score": 0.0,
       "reasons": []
     },
@@ -75,21 +75,18 @@
   "geometryPlan": {
     "orientation": "landscape",
     "phaseWeights": {
-      "frontend-group": 0.94,
+      "frontend-group": 1.06,
       "backend-features": 1.42,
       "backend-clients": 1.3,
-      "external-live-group": 1.3,
-      "aws-planned-group": 1.18
+      "external-live-group": 1.3
     },
     "phaseTreatment": "filled-or-scope-based",
-    "foundationBand": false,
-    "reservedRails": [
-      "top"
-    ],
+    "foundationBand": true,
+    "reservedRails": [],
     "stepPolicy": "badge primary handoffs; suffix parallel substeps; leave context edges unnumbered"
   },
   "manualReviewRisks": [
-    "Feedback edges may require a hybrid-grid override or a reserved return rail.",
+    "A high-centrality service exists but the selected layout does not place it as a hub.",
     "Explicit strategy overrides automatic recommendation dense-phase-columns."
   ]
 }

@@ -68,40 +68,16 @@
       "updatedAt": "2026-09-13T06:34:55Z"
     },
     {
-      "key": "aws-api-gateway",
-      "requested": "Amazon API Gateway",
+      "key": "aws-iam",
+      "requested": "AWS IAM",
       "state": "Embedded",
-      "provider": "user",
+      "provider": "aws-official",
       "sourceUrl": "",
-      "localPath": "assets/icons/custom/awsapigateway.svg",
-      "sha256": "22bc78b5ef6c7f228c419c7579d9278cf577296492b89940de850385b35e7b8f",
-      "license": "User supplied; usage rights must be confirmed by the user.",
-      "message": "",
-      "updatedAt": "2026-09-13T06:34:55Z"
-    },
-    {
-      "key": "aws-lambda",
-      "requested": "AWS Lambda",
-      "state": "Embedded",
-      "provider": "user",
-      "sourceUrl": "",
-      "localPath": "assets/icons/custom/awslambda.svg",
-      "sha256": "33832e1ca5cb5a14762b0fb9bc8e0913c0596ec5c54b745b3b0b20e3a6a61a4f",
-      "license": "User supplied; usage rights must be confirmed by the user.",
-      "message": "",
-      "updatedAt": "2026-09-13T06:34:55Z"
-    },
-    {
-      "key": "aws-athena",
-      "requested": "Amazon Athena",
-      "state": "Embedded",
-      "provider": "user",
-      "sourceUrl": "",
-      "localPath": "assets/icons/custom/awsathena.svg",
-      "sha256": "03844d38ca3ed4fdcd102d9e654c35aa091c1f11b4c04fa4eb76dab864d6deba",
-      "license": "User supplied; usage rights must be confirmed by the user.",
-      "message": "",
-      "updatedAt": "2026-09-13T06:34:55Z"
+      "localPath": "assets/icons/custom/awsiam.svg",
+      "sha256": "3135793557c065d0481a3985ccc0574b36278d56a2e2c5d59107d0d28f51b827",
+      "license": "AWS Architecture Icons; usage per AWS icon guidelines.",
+      "message": "Extracted directly from the official AWS Architecture Service Icons ZIP (Arch_Security-Identity/64/Arch_AWS-Identity-and-Access-Management_64.svg), same source archive as the other AWS icons in this manifest.",
+      "updatedAt": "2026-09-14T12:00:00Z"
     },
     {
       "key": "springboot",
