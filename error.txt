@@ -1,6 +1,6 @@
-2026-09-14T17:40:24.450+07:00 ERROR 34421 --- [pubg-insight-backend] [nio-8080-exec-6] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.ClassCastException: class com.pubginsight.client.dynamodb.AnalysisHistoryItem cannot be cast to class com.pubginsight.client.dynamodb.AnalysisHistoryItem (com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader org.springframework.boot.devtools.restart.classloader.RestartClassLoader @1a3e05ce; com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader 'app')] with root cause
+2026-09-14T20:44:22.345+07:00 ERROR 46719 --- [pubg-insight-backend] [nio-8080-exec-3] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.ClassCastException: class com.pubginsight.client.dynamodb.AnalysisHistoryItem cannot be cast to class com.pubginsight.client.dynamodb.AnalysisHistoryItem (com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader org.springframework.boot.devtools.restart.classloader.RestartClassLoader @33e63590; com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader 'app')] with root cause
 
-java.lang.ClassCastException: class com.pubginsight.client.dynamodb.AnalysisHistoryItem cannot be cast to class com.pubginsight.client.dynamodb.AnalysisHistoryItem (com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader org.springframework.boot.devtools.restart.classloader.RestartClassLoader @1a3e05ce; com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader 'app')
+java.lang.ClassCastException: class com.pubginsight.client.dynamodb.AnalysisHistoryItem cannot be cast to class com.pubginsight.client.dynamodb.AnalysisHistoryItem (com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader org.springframework.boot.devtools.restart.classloader.RestartClassLoader @33e63590; com.pubginsight.client.dynamodb.AnalysisHistoryItem is in unnamed module of loader 'app')
 	at software.amazon.awssdk.enhanced.dynamodb.internal.mapper.ResolvedImmutableAttribute.lambda$create$0(ResolvedImmutableAttribute.java:54) ~[dynamodb-enhanced-2.28.29.jar:na]
 	at software.amazon.awssdk.enhanced.dynamodb.mapper.StaticImmutableTableSchema.lambda$itemToMap$5(StaticImmutableTableSchema.java:518) ~[dynamodb-enhanced-2.28.29.jar:na]
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604) ~[na:na]
@@ -61,3 +61,80 @@ java.lang.ClassCastException: class com.pubginsight.client.dynamodb.AnalysisHist
 	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57) ~[tomcat-embed-core-11.0.22.jar:11.0.22]
 	at java.base/java.lang.Thread.run(Thread.java:1474) ~[na:na]
+react-dom_client.js?v=7fa763d1:14334 Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+Navigated to http://localhost:5173/
+react-dom_client.js?v=7fa763d1:14334 Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+XHR finished loading: GET "<URL>".
+content-all.js:514 Fetch finished loading: GET "chrome-extension://difoiogjjojoaoomphldepapgpbgkhkb/fonts/fonts.css".
+I$ @ content-all.js:514
+iFe @ content-all.js:553
+(anonymous) @ content-all.js:3287
+(anonymous) @ content-all.js:3287
+content-all.js:514 Fetch finished loading: GET "chrome-extension://difoiogjjojoaoomphldepapgpbgkhkb/content-all.css".
+I$ @ content-all.js:514
+iFe @ content-all.js:553
+(anonymous) @ content-all.js:3287
+(anonymous) @ content-all.js:3287
+content-all.js:518 Fetch finished loading: GET "chrome-extension://difoiogjjojoaoomphldepapgpbgkhkb/i18n/vi.json".
+VMe @ content-all.js:518
+(anonymous) @ content-all.js:520
+(anonymous) @ content-all.js:520
+lSe @ content-all.js:8
+Oee @ content-all.js:8
+WWt @ content-all.js:8
+QB @ content-all.js:6
+wPr @ content-all.js:8
+YH @ content-all.js:8
+zKt @ content-all.js:8
+lot @ content-all.js:1
+rot @ content-all.js:1
+historyService.ts:10  POST http://localhost:8080/api/players/account.82bad0072f31455d8d9f8d834da2f2f3/matches/68738f58-f3aa-4ba1-b42e-29f768c4d313/history 500 (Internal Server Error)
+dispatchXhrRequest @ axios.js?v=7fa763d1:2442
+xhr @ axios.js?v=7fa763d1:2347
+dispatchRequest @ axios.js?v=7fa763d1:3057
+_request @ axios.js?v=7fa763d1:3297
+request @ axios.js?v=7fa763d1:3184
+httpMethod @ axios.js?v=7fa763d1:3333
+wrap @ axios.js?v=7fa763d1:12
+(anonymous) @ historyService.ts:10
+(anonymous) @ AiInsights.tsx:381
+historyService.ts:10 XHR failed loading: POST "http://localhost:8080/api/players/account.82bad0072f31455d8d9f8d834da2f2f3/matches/68738f58-f3aa-4ba1-b42e-29f768c4d313/history".
+dispatchXhrRequest @ axios.js?v=7fa763d1:2442
+xhr @ axios.js?v=7fa763d1:2347
+dispatchRequest @ axios.js?v=7fa763d1:3057
+_request @ axios.js?v=7fa763d1:3297
+request @ axios.js?v=7fa763d1:3184
+httpMethod @ axios.js?v=7fa763d1:3333
+wrap @ axios.js?v=7fa763d1:12
+(anonymous) @ historyService.ts:10
+(anonymous) @ AiInsights.tsx:381
