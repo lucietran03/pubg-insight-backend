@@ -14,6 +14,7 @@ import com.pubginsight.client.pubg.dto.PubgSeasonStatsData;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsResponse;
 import com.pubginsight.client.s3.S3AnalyticsWriter;
 import com.pubginsight.client.s3.S3MatchCacheClient;
+import com.pubginsight.player.SeasonStatsCacheRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +56,15 @@ class InsightControllerIntegrationTest {
     @MockitoBean
     private S3AnalyticsWriter s3AnalyticsWriter;
 
+    // Same reason as s3MatchCacheClient above - without this, PlayerService's real
+    // cache-aside read can hit AWS instead of the stubbed PubgApiClient deciding behavior.
+    @MockitoBean
+    private SeasonStatsCacheRepository seasonStatsCacheRepository;
+
     @BeforeEach
     void forceCacheMiss() {
         when(s3MatchCacheClient.getCachedMatchJson(anyString())).thenReturn(Optional.empty());
+        when(seasonStatsCacheRepository.findByPlayerId(anyString())).thenReturn(Optional.empty());
     }
 
     @Test

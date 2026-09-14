@@ -8,6 +8,7 @@ import com.pubginsight.client.pubg.dto.PubgPlayerListResponse;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsAttributes;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsData;
 import com.pubginsight.client.pubg.dto.PubgSeasonStatsResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,10 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,8 +36,18 @@ class PlayerServiceTest {
     @Mock
     private PlayerMapper playerMapper;
 
+    @Mock
+    private SeasonStatsCacheRepository seasonStatsCacheRepository;
+
     @InjectMocks
     private PlayerService playerService;
+
+    // lenient(): the searchPlayerByName tests never touch this stub, and strict stubbing
+    // would otherwise fail them with UnnecessaryStubbingException.
+    @BeforeEach
+    void forceCacheMiss() {
+        lenient().when(seasonStatsCacheRepository.findByPlayerId(anyString())).thenReturn(Optional.empty());
+    }
 
     @Test
     void throwsPlayerNotFoundWhenNoDataReturned() {

@@ -27,6 +27,7 @@ aws:
   region: ${AWS_REGION:us-east-1}
   dynamodb:
     analysis-history-table: ${DYNAMODB_ANALYSIS_HISTORY_TABLE:pubg-insight-analysis-history}
+    season-stats-cache-table: ${DYNAMODB_SEASON_STATS_CACHE_TABLE:pubg-insight-season-stats-cache}
   s3:
     cache-bucket: ${S3_CACHE_BUCKET:pubg-insight-match-cache}
   athena:
