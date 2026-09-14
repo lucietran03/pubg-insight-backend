@@ -31,11 +31,13 @@ function page(title, bodyHtml, statusCode) {
   .card { background: #1C1C1C; border-radius: 8px; padding: 24px; }
   h1 { font-size: 1.4rem; margin: 0 0 4px; }
   .muted { color: #9c9c9c; font-size: 0.85rem; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; text-align: center; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; text-align: center; }
   .stat-value { font-size: 1.4rem; font-weight: 800; }
   .stat-label { font-size: 0.75rem; color: #9c9c9c; text-transform: uppercase; letter-spacing: 0.5px; }
   .summary { line-height: 1.6; margin: 16px 0; }
-  .strength { color: #F2A900; font-weight: 700; margin-top: 12px; }
+  .section-label { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.8px; color: #F2A900; margin-top: 20px; }
+  .strength { color: #d9fbe0; margin: 6px 0 0; }
+  .recommendation { color: #f5f5f5; margin: 6px 0 0; }
   a.cta { display: inline-block; margin-top: 24px; color: #121212; background: #F2A900; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 700; }
 </style>
 </head>
@@ -80,7 +82,9 @@ export const handler = async (event) => {
     );
   }
 
-  const topStrength = item.strengths?.[0];
+  const topStrengths = (item.strengths ?? []).slice(0, 3);
+  const topRecommendation = item.recommendations?.[0];
+  const survivedMinutes = item.timeSurvivedSeconds != null ? Math.round(item.timeSurvivedSeconds / 60) : null;
 
   const body = `
     <h1>${escapeHtml(item.mapName)} · ${escapeHtml(item.gameMode)}</h1>
@@ -89,9 +93,13 @@ export const handler = async (event) => {
       <div><div class="stat-value">${escapeHtml(item.kills)}</div><div class="stat-label">Kills</div></div>
       <div><div class="stat-value">${escapeHtml(Math.round(item.damageDealt))}</div><div class="stat-label">Damage</div></div>
       <div><div class="stat-value">${escapeHtml(Math.round((item.headshotRate ?? 0) * 100))}%</div><div class="stat-label">Headshot</div></div>
+      <div><div class="stat-value">${survivedMinutes !== null ? escapeHtml(survivedMinutes) + "m" : "—"}</div><div class="stat-label">Survived</div></div>
     </div>
     ${item.insightSummary ? `<p class="summary">${escapeHtml(item.insightSummary)}</p>` : ""}
-    ${topStrength ? `<p class="strength">✓ ${escapeHtml(topStrength)}</p>` : ""}
+    ${topStrengths.length > 0
+      ? `<div class="section-label">WHAT WENT WELL</div>${topStrengths.map((s) => `<p class="strength">✓ ${escapeHtml(s)}</p>`).join("")}`
+      : ""}
+    ${topRecommendation ? `<div class="section-label">KEY COACHING ADVICE</div><p class="recommendation">${escapeHtml(topRecommendation)}</p>` : ""}
     <a class="cta" href="${escapeHtml(APP_URL)}">View full analysis on PUBG Insight</a>
   `;
 
