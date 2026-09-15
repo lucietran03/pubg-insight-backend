@@ -59,7 +59,7 @@ flowchart TB
 
 ## 2. Component View (Backend Package Structure)
 
-The backend is organized **by feature, not by technical layer** (see `CLAUDE.md` → Backend Package Structure). Arrows show compile-time dependencies (which package imports which).
+The backend is organized **by feature, not by technical layer**. Arrows show compile-time dependencies (which package imports which).
 
 ```mermaid
 flowchart TB
@@ -291,7 +291,7 @@ sequenceDiagram
 
 ### 3.4 AI Insights (Gemini)
 
-Composes Match Analytics and Season Stats — Gemini receives only the already-aggregated numbers those two produce, never raw match telemetry (per `CLAUDE.md` → AI Integration Principles).
+Composes Match Analytics and Season Stats — Gemini receives only the already-aggregated numbers those two produce, never raw match telemetry.
 
 ```mermaid
 sequenceDiagram
@@ -706,7 +706,7 @@ Context: Gemini's free tier rate-limits requests just like PUBG's does, but unti
 Context: a real bug was found where a Gemini 403 (misconfigured API key) reached the user as "PUBG service is temporarily unavailable" — `GlobalExceptionHandler` already returned a correct, distinct message per exception type, but `errorMessage.ts` ignored the response body and hardcoded a status-based string instead. Rationale: fixing the frontend to read `error.response.data.error` makes every current and future backend exception type automatically distinguishable to the user, with the message defined in exactly one place (the exception handler) instead of two places that can drift out of sync.
 
 **D17 — Switched from the Learner Lab to a personal AWS account (Free Tier + $100 promotional credit).**
-Context: the Learner Lab's session-expiring credentials (manual refresh every few hours from the "AWS Details" panel) and no-custom-IAM-role restriction (D8) became too much practical friction this close to the submission deadline. Rationale: a personal account trades away the Lab's zero-billing-risk safety net for permanent credentials (one-time IAM user + access key, never expiring) and full freedom to create IAM roles/policies per service, removing the recurring per-session setup step entirely. Consequence: real billing risk is now live (mitigated by the $100 credit + Free Tier + a Billing alarm) and the downloaded access-key CSV is a genuine permanent secret that must never be committed, unlike the Lab's self-expiring session token which was low-risk if briefly exposed. See `docs/decisions/AWS_SETUP.md`.
+Context: the Learner Lab's session-expiring credentials (manual refresh every few hours from the "AWS Details" panel) and no-custom-IAM-role restriction (D8) became too much practical friction this close to the submission deadline. Rationale: a personal account trades away the Lab's zero-billing-risk safety net for permanent credentials (one-time IAM user + access key, never expiring) and full freedom to create IAM roles/policies per service, removing the recurring per-session setup step entirely. Consequence: real billing risk is now live (mitigated by the $100 credit + Free Tier + a Billing alarm) and the downloaded access-key CSV is a genuine permanent secret that must never be committed, unlike the Lab's self-expiring session token which was low-risk if briefly exposed.
 
 **D16 — PUBG rate limiting is enforced backend-side (`PubgRateLimiter`, blocking), not frontend-side (pacing/backoff).**
 Context: the frontend went through two iterations trying to stay under PUBG's 10 req/min limit purely by pacing its own requests (a background queue with a fixed interval, tuned twice after real 429s). This has a fundamental flaw: the 10 req/min budget belongs to the app's single shared PUBG API key, not to any one browser tab - two tabs, or two people using the demo at once, each pacing "safely" on their own can still collectively blow the shared budget, since neither has visibility into the other's calls. Rationale: `PubgRateLimiter` (a single `@Component`, one instance for the whole app) tracks a sliding 60s window of call timestamps and makes `PubgApiClient.acquire()` **block** the calling thread until a slot is free, instead of either side guessing a safe pace or reactively handling a 429 after the fact. This is the one place that can actually see and gate every outgoing PUBG call regardless of which HTTP request triggered it. Blocking a request thread for a few seconds is an acceptable trade-off at this app's scale (a handful of concurrent demo users, not a production service under load) - a slower response reads to the user as normal loading, not as a failure. The existing `PubgRateLimitException`/429 handling (D-something in §5) is kept as a safety net for the case PUBG's own window doesn't line up exactly with this app's, not removed. Trade-off: the frontend's pacing/background-load logic is now redundant for correctness (the backend guarantees the budget either way) - it's been simplified back down to pagination, which is now purely a UX choice (bounding how many matches load onscreen at once) rather than a rate-limit workaround.
@@ -730,7 +730,7 @@ Context: this closes the Containers category gap, and — like D20 — traces ba
 
 ## 7. Full AWS Architecture
 
-Everything below is deployed to a real personal AWS account (`us-east-1`, D17) and verified working end-to-end — not planned, not console-only. This section replaces an earlier "Not Yet Built" section that described all of this as either code-only or entirely unbuilt; that's no longer true of anything listed here. The six AWS service categories this project's rubric scores are annotated below (see `CLAUDE.md` at the repo root for the full scoring rationale).
+Everything below is deployed to a real personal AWS account (`us-east-1`, D17) and verified working end-to-end — not planned, not console-only. This section replaces an earlier "Not Yet Built" section that described all of this as either code-only or entirely unbuilt; that's no longer true of anything listed here. The six AWS service categories this project's rubric scores are annotated below.
 
 - **Compute** — Elastic Beanstalk (`pubg-insight-backend` / `Pubg-insight-backend-env`) runs the Spring Boot monolith. Deployed via `deploy.sh` (`mvn clean package` → S3 upload → `create-application-version` → `update-environment`), not a manual Console upload.
 - **Compute, bonus (Lambda + API Gateway)** — `pubg-insight-share-analysis` (Node.js 20.x) behind an API Gateway HTTP API, `GET /share/{playerId}/{matchId}`. See §3.7.
@@ -806,7 +806,7 @@ flowchart TB
     ECS -->|GET /season-stats, own container, own task role| CFBE
 ```
 
-All of the above is triggered by application code — never a manual Console/CLI step — per the rubric's automation requirement (`CLAUDE.md` → "Automation is graded, manual setup is not"). The one-time exceptions, all allowed under the rubric, are infrastructure creation itself: table/bucket/distribution/cluster/function creation, the Glue table DDL, and the EventBridge Scheduler rule definition. Every runtime invocation — S3 GetObject/PutObject, DynamoDB GetItem/PutItem/Scan, Athena StartQueryExecution, Lambda invocation via API Gateway, ECS RunTask via EventBridge — is either the app's own code calling the AWS SDK directly, or one AWS-managed service invoking another on a schedule, with no human in the loop.
+All of the above is triggered by application code — never a manual Console/CLI step — per the rubric's automation requirement (automation is graded, manual setup is not). The one-time exceptions, all allowed under the rubric, are infrastructure creation itself: table/bucket/distribution/cluster/function creation, the Glue table DDL, and the EventBridge Scheduler rule definition. Every runtime invocation — S3 GetObject/PutObject, DynamoDB GetItem/PutItem/Scan, Athena StartQueryExecution, Lambda invocation via API Gateway, ECS RunTask via EventBridge — is either the app's own code calling the AWS SDK directly, or one AWS-managed service invoking another on a schedule, with no human in the loop.
 
 IAM, per service (each scoped deliberately, not a shared wildcard role — see D21/D22 for the reasoning behind each):
 
@@ -818,7 +818,7 @@ IAM, per service (each scoped deliberately, not a shared wildcard role — see D
 | ECS task execution | `ecsTaskExecutionRole` | standard `AmazonECSTaskExecutionRolePolicy` (ECR pull, CloudWatch Logs) |
 | EventBridge Scheduler | `pubg-insight-scheduler-ecs-role` | `ecs:RunTask` + `iam:PassRole`, scoped to the `pubg-insight` cluster / warmer task definition only |
 
-Full click-by-click setup steps for everything above: `docs/decisions/AWS_SETUP.md` (project-specific, personal AWS account per D17); `docs/decisions/LEARNER_LAB.md` is historical only (superseded by D17).
+Full one-time AWS resource checklist for everything above: `README.md` → "AWS Resources Required" (personal AWS account per D17).
 
 ---
 
