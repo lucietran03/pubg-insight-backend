@@ -209,5 +209,56 @@
     <mxCell id="legend-title" value="Numbers indicate each AWS service's role in the request/automation flow (see docs/deliverables/ARCHITECTURE.md)." style="text;html=1;fontSize=11;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1">
       <mxGeometry x="60" y="730" width="1200" height="20" as="geometry" />
     </mxCell>
+    <mxCell id="legend-box" value="LEGEND" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CCCCCC;verticalAlign=top;align=left;spacingLeft=10;spacingTop=6;fontSize=11;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+      <mxGeometry x="60" y="770" width="260" height="240" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd1-swatch" value="" style="rounded=1;fillColor=#ED7100;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="76" y="800" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd1-label" value="Compute" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="797" width="220" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd2-swatch" value="" style="rounded=1;fillColor=#ED7100;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="76" y="826" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd2-label" value="Containers" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="823" width="220" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd3-swatch" value="" style="rounded=1;fillColor=#7AA116;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="76" y="852" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd3-label" value="Storage" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="849" width="220" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd4-swatch" value="" style="rounded=1;fillColor=#3B48CC;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="76" y="878" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd4-label" value="Database" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="875" width="220" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd5-swatch" value="" style="rounded=1;fillColor=#8C4FFF;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="76" y="904" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd5-label" value="Networking &amp; Content Delivery" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="901" width="220" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd6-swatch" value="" style="rounded=1;fillColor=#8C4FFF;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="76" y="930" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd6-label" value="Analytics" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="927" width="220" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd7-swatch" value="" style="rounded=1;fillColor=#E7157B;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="76" y="956" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd7-label" value="App Integration (EventBridge)" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="953" width="220" height="20" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd8-swatch" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#666666;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="76" y="982" width="14" height="14" as="geometry" />
+    </mxCell>
+    <mxCell id="lgd8-label" value="Third-party (external)" style="text;html=1;fontSize=11;fontColor=#333333;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="96" y="979" width="220" height="20" as="geometry" />
+    </mxCell>
   </root>
 </mxGraphModel>
