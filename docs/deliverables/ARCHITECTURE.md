@@ -50,7 +50,7 @@ flowchart TB
     Athena -->|reads analytics/ prefix| S3
     EventBridge -->|RunTask, every 6h| ECS
     ECS -->|Scan playerIds| DDB
-    ECS -->|GET /api/players/{id}/season-stats| CFBE
+    ECS -->|"GET /api/players/{id}/season-stats"| CFBE
 ```
 
 **Hard rule enforced today, verified by code inspection**: the frontend has exactly one external call surface (`src/api/axios.ts`, `baseURL = VITE_API_BASE_URL`, now pointed at the backend CloudFront distribution) plus one deliberate second surface for the share feature (`VITE_SHARE_API_BASE_URL`, the API Gateway domain, used only by `AiInsights.tsx`'s "Copy Share Link" button to build a URL — the frontend never calls Lambda's DynamoDB read directly, it just links to the public page Lambda renders). Neither PUBG nor Gemini nor any other AWS service is ever called directly from the browser — every such call happens through the backend or the standalone Lambda.
